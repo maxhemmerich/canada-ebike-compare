@@ -16,13 +16,13 @@ def esc(s):
 PICKS = [
     ("Apartment, stairs, or carrying it onto transit",
      "velotric-tempo",
-     "The Tempo is 39 lb, the only bike here you can carry one-handed, and it rides fine with the motor off. Take the small 374 Wh battery as the price of that."),
+     "At 39 lb the Tempo is 16 lb lighter than anything else here, and light enough to ride with the motor off. The 374 Wh battery is the trade-off."),
     ("The longest commute on one charge",
-     "velotric-discover-3",
-     "Discover 3 claims the longest range in this set (80 mi / ~129 km of pedal assist) on a 730 Wh battery, with lights, fenders and a rack included."),
-    ("Riding at the legal maximum, on a 400-series highway shoulder or open road",
      "surface604-rook",
-     "The Rook is the only Class 3 bike here: 45 km/h, and a 960 Wh battery so the speed does not empty the pack by lunchtime."),
+     "The Rook carries the biggest battery here (960 Wh) and claims the longest range of the five: up to 150 km in eco. It is also the only bike here that ships at Class 3."),
+    ("The best all-round daily commuter",
+     "velotric-discover-3",
+     "750 W of motor, a 730 Wh battery and ~129 km of claimed pedal assist, with lights, fenders and a rack included. The most complete package of the five."),
     ("The cheapest way in, without buying a toy",
      "radkick-7speed",
      "At CA$1,899 the RadKick 7-Speed is the lowest price here and still has hydraulic brakes and a rear rack. Its 360 Wh battery is the honest limit: short trips only."),
@@ -173,7 +173,7 @@ PAGE = r"""<!doctype html>
 
   <section id="compare">
     <h2>The comparison</h2>
-    <p class="sub">Every price is in Canadian dollars from the maker's Canadian storefront. "Claimed range" is the maker's own estimate, not a test result. Scroll the table sideways on a phone.</p>
+    <p class="sub">Every price is in Canadian dollars as published by the maker, and every spec links to the page it was read from. "Claimed range" is the maker's own estimate, not a test result. Scroll the table sideways on a phone.</p>
     <div class="tablewrap">
       <table>
         <caption>Bikes listed cheapest to dearest. Specs read __CHECKED__; prices move, so confirm on the maker's page before you buy.</caption>

@@ -84,7 +84,7 @@
       "sensor": "Torque + cadence (SensorSwap)",
       "warranty": "2 years (covers electrical)",
       "payload": "440 lb max bike load / 66 lb rack",
-      "best_for": "The all-round daily commuter: the longest claimed range and the most powerful motor here, with lights, fenders and a rack included. Class 3 unlocking is done in the app, where local rules allow.",
+      "best_for": "The all-round daily commuter: a 750 W motor, a 730 Wh battery and the second-longest claimed range here (~129 km of pedal assist), with lights, fenders and a rear rack included. It ships as Class 2; Class 3 (28 mph) is unlocked in the app where local rules allow.",
       "source_url": "https://www.velotric.ca/products/discover-3",
       "source_note": "Specification & Geometry table on the product page. Price shown as CA$2,699.00 CAD (confirmed in the page's JSON-LD, priceCurrency CAD)."
     },
@@ -105,7 +105,7 @@
       "sensor": "Torque sensor",
       "warranty": "5 years frame / 2 years components",
       "payload": "Not stated on the product page",
-      "best_for": "Fast, long commutes: the biggest battery here (960 Wh) and the only Class 3 bike in the set, so it holds 45 km/h legally. Vancouver-designed with in-stock parts and a 5-year frame warranty.",
+      "best_for": "The long-haul, high-speed pick: the biggest battery here (960 Wh) and the only bike in this set that ships at Class 3, with a 45 km/h claimed top speed. Vancouver-designed, with a 5-year frame warranty. It was Out of Stock when checked, and its motor wattage and weight are not published on the product page.",
       "source_url": "https://www.surface604bikes.com/electric-bikes/rook",
       "source_note": "Product page (motor, battery, class, brakes, warranty) and the site's model-comparison table. Price shown as CA$2,699.00 (page JSON-LD: priceCurrency CAD). This model showed Out of Stock on the date checked."
     }
