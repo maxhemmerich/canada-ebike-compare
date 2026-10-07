@@ -1,4 +1,4 @@
-/* GAMMA-ADMIRAL 3 site config.
+/* GAMMA site config.
  * Affiliate destinations live here as ONE NAMED CONSTANT PER PRODUCT.
  * Every value is null on purpose: no affiliate account exists yet, so no button
  * on the site may point at a live paying link. When Max approves and signs up,

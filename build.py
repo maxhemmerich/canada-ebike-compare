@@ -206,7 +206,7 @@ __ROWS__
 <footer><div class="wrap">
   <p><strong>Disclosure (repeated):</strong> this site carries no live affiliate links. Links marked "maker specs" go to the manufacturer's own page, unmonetised. If paid partner links are added later, they will be labelled as such here and on the button itself.</p>
   <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
-  <p>Built __CHECKED__ by the GAMMA-ADMIRAL 3 project. Data: <a href="data/products.json">products.json</a>.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="data/products.json">products.json</a>.</p>
 </div></footer>
 
 <script src="config.js"></script>
@@ -264,7 +264,7 @@ NOTE = ParagraphStyle("NOTE", fontName="Helvetica-Oblique", fontSize=9, leading=
 PDF = os.path.join(ROOT, "guide", "canada-commuter-ebike-guide.pdf")
 doc = SimpleDocTemplate(PDF, pagesize=landscape(letter), leftMargin=40, rightMargin=40,
                         topMargin=38, bottomMargin=36, title="Canadian Commuter E-Bike Guide",
-                        author="GAMMA-ADMIRAL 3")
+                        author="GAMMA")
 
 def footer(canvas, d):
     canvas.saveState()
