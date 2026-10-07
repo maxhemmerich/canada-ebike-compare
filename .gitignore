@@ -1,0 +1,13 @@
+# Internal — never published to the public site
+BRIEF.md
+PAYMENT.md
+CLAIM.md
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
