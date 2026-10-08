@@ -95,22 +95,19 @@ def pair_label(a, b):
     pa, pb = BY_ID[a], BY_ID[b]
     return "%s %s vs %s %s" % (pa["maker"], pa["model"], pb["maker"], pb["model"])
 
-def pair_priceline(a, b):
-    pa, pb = BY_ID[a], BY_ID[b]
-    return ("%s each" % pa["price_display"]) if pa["price_display"] == pb["price_display"] \
-        else ("%s vs %s" % (pa["price_display"], pb["price_display"]))
-
 def pair_availability(a, b):
     """Availability exactly as observed in data/products.json; nothing where none was observed."""
     return ["%s %s: %s" % (BY_ID[q]["maker"], BY_ID[q]["model"], BY_ID[q]["availability"])
             for q in (a, b) if BY_ID[q].get("availability")]
 
 def pair_card(a, b):
+    # Deliberately no price in the card: the price belongs on the comparison table and on the pair's
+    # own page, and repeating it here would add another "CA$1,899" token to the landing page for no
+    # reader benefit. The card names the two bikes, the pair's link, and any observed availability.
     notes = "".join('<p class="pickstock">%s</p>' % esc(n) for n in pair_availability(a, b))
-    return ('<article class="pick"><h3><a href="vs/%s/">%s</a></h3>'
-            '<p class="pickwho">%s</p>%s'
+    return ('<article class="pick"><h3><a href="vs/%s/">%s</a></h3>%s'
             '<p>Column by column, on the same published figures as the table above.</p></article>'
-            % (esc(pair_slug(a, b)), esc(pair_label(a, b)), esc(pair_priceline(a, b)), notes))
+            % (esc(pair_slug(a, b)), esc(pair_label(a, b)), notes))
 
 PAIR_CARDS = "\n".join(pair_card(a, b) for a, b in PAIRS)
 
