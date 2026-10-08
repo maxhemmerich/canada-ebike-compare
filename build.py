@@ -9,6 +9,14 @@ PRODUCTS = DATA["products"]
 BY_ID = {p["id"]: p for p in PRODUCTS}
 CHECKED = DATA["checked_on"]
 
+# ---------------------------------------------------------------- order
+# ONE deterministic order for every list of the five bikes, on the page and in the PDF.
+# The table caption promises cheapest-to-dearest, so sort by price ascending. Three models
+# tie at CA$2,699, so ties break by model name A-Z and then by id: the same data always
+# builds the identical page (no reliance on the order rows happen to sit in products.json).
+ORDER = sorted(PRODUCTS, key=lambda p: (p["price_cad"], p["model"].lower(), p["id"]))
+TIE_NOTE = "equal-price bikes A-Z"
+
 def esc(s):
     return html.escape(str(s), quote=True)
 
@@ -56,7 +64,7 @@ def row_html(p):
         + "</tr>"
     )
 
-ROWS = "\n".join(row_html(p) for p in PRODUCTS)
+ROWS = "\n".join(row_html(p) for p in ORDER)
 
 def pick_html(title, pid, body):
     p = BY_ID[pid]
@@ -71,14 +79,14 @@ def source_html(p):
             f'<a href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">{esc(p["source_url"])}</a>'
             f'<br><span class="fn">{esc(p["source_note"])}</span></li>')
 
-SOURCES_HTML = "\n".join(source_html(p) for p in PRODUCTS)
+SOURCES_HTML = "\n".join(source_html(p) for p in ORDER)
 
 def detail_html(p):
     return (f'<article class="detail"><h3>{esc(p["maker"])} {esc(p["model"])} <span class="dprice">{esc(p["price_display"])}</span></h3>'
             f'<p>{esc(p["best_for"])}</p>'
             f'<p class="src">Source: <a href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">{esc(p["maker"])} product page</a>, checked {esc(CHECKED)}.</p></article>')
 
-DETAILS_HTML = "\n".join(detail_html(p) for p in PRODUCTS)
+DETAILS_HTML = "\n".join(detail_html(p) for p in ORDER)
 
 PAGE = r"""<!doctype html>
 <html lang="en">
@@ -176,7 +184,7 @@ PAGE = r"""<!doctype html>
     <p class="sub">Every price is in Canadian dollars as published by the maker, and every spec links to the page it was read from. "Claimed range" is the maker's own estimate, not a test result. Scroll the table sideways on a phone.</p>
     <div class="tablewrap">
       <table>
-        <caption>Bikes listed cheapest to dearest. Specs read __CHECKED__; prices move, so confirm on the maker's page before you buy.</caption>
+        <caption>Bikes listed cheapest to dearest; __TIE_NOTE__. Specs read __CHECKED__; prices move, so confirm on the maker's page before you buy.</caption>
         <thead><tr>
           <th scope="col">Model</th><th scope="col">Price (CAD)</th><th scope="col">Motor</th>
           <th scope="col">Torque</th><th scope="col">Battery</th><th scope="col">Claimed range</th>
@@ -231,6 +239,7 @@ __ROWS__
 
 out = (PAGE
        .replace("__CHECKED__", esc(CHECKED))
+       .replace("__TIE_NOTE__", esc(TIE_NOTE))
        .replace("__DISCLOSURE__", esc(json.load(open(os.path.join(ROOT,"data","products.json"), encoding="utf-8"))["currency_note"]) + " " + "<strong>Disclosure:</strong> no live affiliate links yet; every product link goes to the maker's own site.")
        .replace("__PICKS__", PICKS_HTML)
        .replace("__ROWS__", ROWS)
@@ -292,11 +301,11 @@ for title, pid, body in PICKS:
 
 story.append(PageBreak())
 story.append(Paragraph("The comparison", H2))
-story.append(Paragraph("Cheapest to dearest. Claimed range is the maker's estimate, not a test. Weight is the maker's figure. Where a maker does not publish a figure, the cell says so.", SMALL))
+story.append(Paragraph("Cheapest to dearest; %s. Claimed range is the maker's estimate, not a test. Weight is the maker's figure. Where a maker does not publish a figure, the cell says so." % TIE_NOTE, SMALL))
 story.append(Spacer(1, 8))
 hdr = ["Model", "Price\n(CAD)", "Motor", "Torque", "Battery", "Claimed\nrange", "Weight", "Brakes", "Class", "Warranty"]
 rows = [[Paragraph(x.replace("\n", "<br/>"), CELLB) for x in hdr]]
-for p in PRODUCTS:
+for p in ORDER:
     rows.append([
         Paragraph("<b>%s</b><br/><font size=7 color='#5d6270'>%s</font>" % (p["model"], p["maker"]), CELL),
         Paragraph("<b>%s</b>" % p["price_display"], CELL),
@@ -320,7 +329,7 @@ story.append(Paragraph("Cheapest is not the same as best value: the RadKick cost
 
 story.append(PageBreak())
 story.append(Paragraph("Which one for which household", H2))
-for p in PRODUCTS:
+for p in ORDER:
     story.append(KeepTogether([
         Paragraph("%s %s &nbsp;&middot;&nbsp; %s" % (p["maker"], p["model"], p["price_display"]), H3),
         Paragraph(p["best_for"], BODY),
@@ -332,7 +341,7 @@ story.append(PageBreak())
 story.append(Paragraph("Where every number comes from", H2))
 story.append(Paragraph("Each bike below links to the exact page the figures were read from, on %s." % CHECKED, BODY))
 story.append(Spacer(1, 6))
-for p in PRODUCTS:
+for p in ORDER:
     story.append(KeepTogether([
         Paragraph("<b>%s %s</b> - %s" % (p["maker"], p["model"], p["source_url"]), SMALL),
         Paragraph(p["source_note"], SMALL),
