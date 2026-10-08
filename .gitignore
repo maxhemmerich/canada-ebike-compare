@@ -2,6 +2,7 @@
 BRIEF.md
 PAYMENT.md
 CLAIM.md
+affiliate-programs.md   # internal program research (feeds PAYMENT.md); not site content
 
 # Python
 __pycache__/
