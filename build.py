@@ -40,10 +40,17 @@ PICKS = [
 ]
 
 # ---------------------------------------------------------------- HTML
+def stock_badge(p):
+    """Availability as observed on the maker's page. Rendered only where it was seen:
+    a maker whose stock we did not observe gets no badge, never an invented "in stock"."""
+    a = p.get("availability")
+    return f'<span class="stock">{esc(a)}</span>' if a else ""
+
 def model_cell(p):
     return ('<th scope="row" class="model">'
             f'<span class="mname">{esc(p["model"])}</span>'
             f'<span class="mmaker">{esc(p["maker"])}</span>'
+            + stock_badge(p) +
             f'<a class="spec-link" href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">maker specs \u2197</a>'
             '</th>')
 
@@ -70,6 +77,7 @@ def pick_html(title, pid, body):
     p = BY_ID[pid]
     return (f'<article class="pick"><h3>{esc(title)}</h3>'
             f'<p class="pickwho">{esc(p["maker"])} {esc(p["model"])} &middot; {esc(p["price_display"])}</p>'
+            + (f'<p class="pickstock">{esc(p["availability"])}</p>' if p.get("availability") else "") +
             f'<p>{esc(body)}</p></article>')
 
 PICKS_HTML = "\n".join(pick_html(*pk) for pk in PICKS)
@@ -83,6 +91,7 @@ SOURCES_HTML = "\n".join(source_html(p) for p in ORDER)
 
 def detail_html(p):
     return (f'<article class="detail"><h3>{esc(p["maker"])} {esc(p["model"])} <span class="dprice">{esc(p["price_display"])}</span></h3>'
+            + (f'<p class="pickstock">{esc(p["availability"])}</p>' if p.get("availability") else "") +
             f'<p>{esc(p["best_for"])}</p>'
             f'<p class="src">Source: <a href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">{esc(p["maker"])} product page</a>, checked {esc(CHECKED)}.</p></article>')
 
@@ -144,6 +153,9 @@ PAGE = r"""<!doctype html>
   .spec-link{font-size:12.5px;text-decoration:none;border-bottom:1px solid var(--accent)}
   td.price{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
   .aff{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
+  .stock{display:inline-block;margin:1px 0 2px;font-size:11px;font-weight:700;color:#fff;
+    background:var(--amber);padding:1px 6px;border-radius:4px;letter-spacing:.02em}
+  .pickstock{margin:0 0 6px;font-size:12.5px;font-weight:700;color:var(--amber)}
   .details{display:grid;gap:20px}
   .detail{border-left:3px solid var(--accent);padding:2px 0 2px 16px}
   .detail h3{margin:0 0 6px;font-size:18px}
@@ -229,8 +241,11 @@ __ROWS__
   };
   document.querySelectorAll(".aff").forEach(function(el){
     var id = el.getAttribute("data-aff");
+    // A row says "affiliate link" only when a real tracking link is configured for it.
+    // While the constant is null the row says nothing: the disclosure above the fold
+    // already covers the absence, and no claim is made about any application's status.
     var live = cfg[affMap[id]];
-    el.textContent = live ? "affiliate link" : "partner link pending approval";
+    el.textContent = live ? "affiliate link" : "";
   });
 })();
 </script>
@@ -294,11 +309,14 @@ story.append(Spacer(1, 6))
 story.append(Paragraph("Which one, in one line each", H2))
 for title, pid, body in PICKS:
     p = BY_ID[pid]
-    story.append(KeepTogether([
+    block: list = [
         Paragraph(title, H3),
         Paragraph("<font color='#0a5340'><b>%s %s &middot; %s</b></font>" % (p["maker"], p["model"], p["price_display"]), SMALL),
-        Paragraph(body, BODY),
-    ]))
+    ]
+    if p.get("availability"):
+        block.append(Paragraph("<font color='#a6550c'><b>%s</b></font>" % p["availability"], SMALL))
+    block.append(Paragraph(body, BODY))
+    story.append(KeepTogether(block))
 
 story.append(PageBreak())
 story.append(Paragraph("The comparison", H2))
@@ -307,8 +325,11 @@ story.append(Spacer(1, 8))
 hdr = ["Model", "Price\n(CAD)", "Motor", "Torque", "Battery", "Claimed\nrange", "Weight", "Brakes", "Class", "Warranty"]
 rows = [[Paragraph(x.replace("\n", "<br/>"), CELLB) for x in hdr]]
 for p in ORDER:
+    modelcell = "<b>%s</b><br/><font size=7 color='#5d6270'>%s</font>" % (p["model"], p["maker"])
+    if p.get("availability"):
+        modelcell += "<br/><font size=7 color='#a6550c'><b>%s</b></font>" % p["availability"]
     rows.append([
-        Paragraph("<b>%s</b><br/><font size=7 color='#5d6270'>%s</font>" % (p["model"], p["maker"]), CELL),
+        Paragraph(modelcell, CELL),
         Paragraph("<b>%s</b>" % p["price_display"], CELL),
         Paragraph(p["motor"], CELL), Paragraph(p["torque"], CELL), Paragraph(p["battery"], CELL),
         Paragraph(p["range"], CELL), Paragraph(p["weight"], CELL), Paragraph(p["brakes"], CELL),

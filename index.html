@@ -54,6 +54,9 @@
   .spec-link{font-size:12.5px;text-decoration:none;border-bottom:1px solid var(--accent)}
   td.price{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
   .aff{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
+  .stock{display:inline-block;margin:1px 0 2px;font-size:11px;font-weight:700;color:#fff;
+    background:var(--amber);padding:1px 6px;border-radius:4px;letter-spacing:.02em}
+  .pickstock{margin:0 0 6px;font-size:12.5px;font-weight:700;color:var(--amber)}
   .details{display:grid;gap:20px}
   .detail{border-left:3px solid var(--accent);padding:2px 0 2px 16px}
   .detail h3{margin:0 0 6px;font-size:18px}
@@ -88,7 +91,7 @@
     <h2>Which one, in one line each</h2>
     <p class="sub">Match the bike to your ride, not to the biggest number on the box.</p>
     <div class="picks"><article class="pick"><h3>Apartment, stairs, or carrying it onto transit</h3><p class="pickwho">Velotric Tempo &middot; CA$2,099</p><p>At 39 lb the Tempo is 16 lb lighter than anything else here, and light enough to ride with the motor off. The 374 Wh battery is the trade-off.</p></article>
-<article class="pick"><h3>The longest commute on one charge</h3><p class="pickwho">Surface 604 Rook &middot; CA$2,699</p><p>The Rook carries the biggest battery here (960 Wh) and claims the longest range of the five: up to 150 km in eco. It is also the only bike here that ships at Class 3.</p></article>
+<article class="pick"><h3>The longest commute on one charge</h3><p class="pickwho">Surface 604 Rook &middot; CA$2,699</p><p class="pickstock">Out of stock when checked</p><p>The Rook carries the biggest battery here (960 Wh) and claims the longest range of the five: up to 150 km in eco. It is also the only bike here that ships at Class 3.</p></article>
 <article class="pick"><h3>The best all-round daily commuter</h3><p class="pickwho">Velotric Discover 3 &middot; CA$2,699</p><p>750 W of motor, a 730 Wh battery and ~129 km of claimed pedal assist, with lights, fenders and a rack included. The most complete package of the five.</p></article>
 <article class="pick"><h3>The cheapest way in, without buying a toy</h3><p class="pickwho">Rad Power Bikes RadKick 7-Speed &middot; CA$1,899</p><p>At CA$1,899 the RadKick 7-Speed is the lowest price here and still has hydraulic brakes and a rear rack. Its 360 Wh battery is the honest limit: short trips only.</p></article>
 <article class="pick"><h3>A bike that feels like a bike, on a long mixed commute</h3><p class="pickwho">Rad Power Bikes Radster Road &middot; CA$2,699</p><p>The Radster Road pairs a torque sensor with a 100 Nm motor, so the assist follows your pedalling instead of pushing you. It is the heaviest of the five.</p></article></div>
@@ -110,7 +113,7 @@
 <tr><th scope="row" class="model"><span class="mname">Tempo</span><span class="mmaker">Velotric</span><a class="spec-link" href="https://www.velotric.ca/products/velotric-tempo-ebike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,099<span class="aff" data-aff="velotric-tempo"></span></td><td>Rear hub, 350 W (650 W peak)</td><td>45 Nm</td><td>374 Wh (removable)</td><td>up to 97 km (maker estimate)</td><td>39 lb / 17.7 kg</td><td>Shimano hydraulic disc, 180 mm rotors</td><td>Not stated on the product page</td><td>2 years</td></tr>
 <tr><th scope="row" class="model"><span class="mname">Discover 3</span><span class="mmaker">Velotric</span><a class="spec-link" href="https://www.velotric.ca/products/discover-3" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="velotric-discover-3"></span></td><td>Rear hub, 750 W (1,100 W peak)</td><td>75 Nm</td><td>730 Wh (15.2 Ah), Samsung/LG 21700</td><td>80 mi / ~129 km PAS (65 mi throttle)</td><td>61 lb / 27.7 kg</td><td>Tektro hydraulic disc, 180 mm rotors</td><td>Class 1/2/3 (20 mph default, adjustable to 28)</td><td>2 years (covers electrical)</td></tr>
 <tr><th scope="row" class="model"><span class="mname">Radster Road</span><span class="mmaker">Rad Power Bikes</span><a class="spec-link" href="https://radpowerbikes.ca/products/radster-road-electric-commuter-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="radster-road"></span></td><td>Rear hub, 500 W rated</td><td>100 Nm</td><td>720 Wh (15 Ah)</td><td>40-104 km (maker estimate)</td><td>74.5 lb / 33.8 kg</td><td>Hydraulic disc</td><td>Class 1/2 (ships Class 2)</td><td>1 year (Rad warranty page)</td></tr>
-<tr><th scope="row" class="model"><span class="mname">Rook</span><span class="mmaker">Surface 604</span><a class="spec-link" href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="surface604-rook"></span></td><td>500 W Bafang geared hub (750 W peak)</td><td>Not stated on the product page</td><td>960 Wh (20 Ah)</td><td>up to 150 km (maker, eco mode)</td><td>Not stated on the product page</td><td>Tektro Auriga hydraulic disc</td><td>Class 3 (45 km/h)</td><td>5 years frame / 2 years components</td></tr>
+<tr><th scope="row" class="model"><span class="mname">Rook</span><span class="mmaker">Surface 604</span><span class="stock">Out of stock when checked</span><a class="spec-link" href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="surface604-rook"></span></td><td>500 W Bafang geared hub (750 W peak)</td><td>Not stated on the product page</td><td>960 Wh (20 Ah)</td><td>up to 150 km (maker, eco mode)</td><td>Not stated on the product page</td><td>Tektro Auriga hydraulic disc</td><td>Class 3 (45 km/h)</td><td>5 years frame / 2 years components</td></tr>
         </tbody>
       </table>
     </div>
@@ -123,7 +126,7 @@
 <article class="detail"><h3>Velotric Tempo <span class="dprice">CA$2,099</span></h3><p>Carrying-up-stairs and mixed bike/motor use: at 39 lb it is by far the lightest here, and light enough to ride with the motor off. The 374 Wh battery is the smallest, so plan short hops or charge often.</p><p class="src">Source: <a href="https://www.velotric.ca/products/velotric-tempo-ebike" target="_blank" rel="noopener nofollow">Velotric product page</a>, checked 2026-10-07.</p></article>
 <article class="detail"><h3>Velotric Discover 3 <span class="dprice">CA$2,699</span></h3><p>The all-round daily commuter: a 750 W motor, a 730 Wh battery and the second-longest claimed range here (~129 km of pedal assist), with lights, fenders and a rear rack included. It ships as Class 2; Class 3 (28 mph) is unlocked in the app where local rules allow.</p><p class="src">Source: <a href="https://www.velotric.ca/products/discover-3" target="_blank" rel="noopener nofollow">Velotric product page</a>, checked 2026-10-07.</p></article>
 <article class="detail"><h3>Rad Power Bikes Radster Road <span class="dprice">CA$2,699</span></h3><p>A long, bike-feeling commute: the torque sensor and 100 Nm motor make pedalling feel assisted rather than motorised. It is the heaviest bike here, so it suits a garage or ground-floor lock-up.</p><p class="src">Source: <a href="https://radpowerbikes.ca/products/radster-road-electric-commuter-bike" target="_blank" rel="noopener nofollow">Rad Power Bikes product page</a>, checked 2026-10-07.</p></article>
-<article class="detail"><h3>Surface 604 Rook <span class="dprice">CA$2,699</span></h3><p>The long-haul, high-speed pick: the biggest battery here (960 Wh) and the only bike in this set that ships at Class 3, with a 45 km/h claimed top speed. Vancouver-designed, with a 5-year frame warranty. It was Out of Stock when checked, and its motor wattage and weight are not published on the product page.</p><p class="src">Source: <a href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">Surface 604 product page</a>, checked 2026-10-07.</p></article></div>
+<article class="detail"><h3>Surface 604 Rook <span class="dprice">CA$2,699</span></h3><p class="pickstock">Out of stock when checked</p><p>The long-haul, high-speed pick: the biggest battery here (960 Wh) and the only bike in this set that ships at Class 3, with a 45 km/h claimed top speed. Vancouver-designed, with a 5-year frame warranty. It was Out of Stock when checked, and its motor wattage and weight are not published on the product page.</p><p class="src">Source: <a href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">Surface 604 product page</a>, checked 2026-10-07.</p></article></div>
   </section>
 
   <section id="sources">
@@ -155,8 +158,11 @@
   };
   document.querySelectorAll(".aff").forEach(function(el){
     var id = el.getAttribute("data-aff");
+    // A row says "affiliate link" only when a real tracking link is configured for it.
+    // While the constant is null the row says nothing: the disclosure above the fold
+    // already covers the absence, and no claim is made about any application's status.
     var live = cfg[affMap[id]];
-    el.textContent = live ? "affiliate link" : "partner link pending approval";
+    el.textContent = live ? "affiliate link" : "";
   });
 })();
 </script>

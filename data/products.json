@@ -105,6 +105,7 @@
       "sensor": "Torque sensor",
       "warranty": "5 years frame / 2 years components",
       "payload": "Not stated on the product page",
+      "availability": "Out of stock when checked",
       "best_for": "The long-haul, high-speed pick: the biggest battery here (960 Wh) and the only bike in this set that ships at Class 3, with a 45 km/h claimed top speed. Vancouver-designed, with a 5-year frame warranty. It was Out of Stock when checked, and its motor wattage and weight are not published on the product page.",
       "source_url": "https://www.surface604bikes.com/electric-bikes/rook",
       "source_note": "Product page (motor, battery, class, brakes, warranty) and the site's model-comparison table. Price shown as CA$2,699.00 (page JSON-LD: priceCurrency CAD). This model showed Out of Stock on the date checked."

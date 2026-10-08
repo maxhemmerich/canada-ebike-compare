@@ -21,9 +21,15 @@ figure, the table says "not stated" rather than guessing.
 ## Honesty / disclosure
 
 There are **no live affiliate links on this site**. The affiliate destinations are declared in
-`config.js` as one named constant per product, and every one is `null`. Buttons show a
-"partner link pending approval" chip. Every product link goes to the maker's own website,
-unmonetised. If paid partner links are ever added, they will be labelled as such.
+`config.js` as one named constant per product, and every one is `null`. Every product link goes
+to the maker's own website, unmonetised; a row is labelled "affiliate link" only when its
+constant holds a real tracking link. If paid partner links are ever added, they will be
+labelled as such.
+
+Availability is carried as an `availability` field on the product (currently set only for the
+Rook, which showed out of stock on the date checked) and is rendered in the bike's comparison
+row wherever it is present — a product whose stock we did not observe gets no badge, never an
+invented "in stock".
 
 ## Rebuilding
 
