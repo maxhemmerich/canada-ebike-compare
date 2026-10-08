@@ -17,6 +17,46 @@ CHECKED = DATA["checked_on"]
 ORDER = sorted(PRODUCTS, key=lambda p: (p["price_cad"], p["model"].lower(), p["id"]))
 TIE_NOTE = "equal-price bikes A-Z"
 
+# ---------------------------------------------------------------- published-range table
+# Used by the "how far will it go" picker. This is the only hand-made table in the build, so it is
+# guarded twice, and it is checked HERE - before a single file is written - so a drifted figure stops
+# the build instead of leaving a half-written site behind:
+#   1. it must cover exactly the models in products.json, and
+#   2. every number in it must appear literally in that model's published `range` string.
+# There is no derating factor and no "hills cost you 20%" rule anywhere: where a maker publishes a
+# single figure, the picker says exactly that rather than inventing a lower one.
+RANGE_PARSE = {
+    "radster-road": dict(
+        high=104, low=40, low_label="bottom of the maker's range",
+        high_from='the top of the maker\'s published range "40-104 km (maker estimate)"',
+        low_from='the bottom of the maker\'s published range "40-104 km (maker estimate)"'),
+    "radkick-7speed": dict(
+        high=56, low=24, low_label="bottom of the maker's range",
+        high_from='the top of the maker\'s published range "24-56 km (maker estimate)"',
+        low_from='the bottom of the maker\'s published range "24-56 km (maker estimate)"'),
+    "velotric-tempo": dict(
+        high=97, low=None, low_label=None,
+        high_from='the maker\'s single published figure "up to 97 km (maker estimate)"',
+        low_from=None),
+    "velotric-discover-3": dict(
+        high=129, low=105, low_label="throttle only, from the maker's 65 mi figure",
+        high_from='the maker\'s published pedal-assist figure "80 mi / ~129 km PAS (65 mi throttle)"',
+        low_from='the maker\'s published throttle-only figure "65 mi", converted to km (1 mi = 1.609344 km)'),
+    "surface604-rook": dict(
+        high=150, low=None, low_label=None,
+        high_from='the maker\'s single published figure "up to 150 km (maker, eco mode)"',
+        low_from=None),
+}
+_RANGE_TOKENS = {"radster-road": ("104", "40"), "radkick-7speed": ("56", "24"),
+                 "velotric-tempo": ("97",), "velotric-discover-3": ("129", "65"),
+                 "surface604-rook": ("150",)}
+assert set(RANGE_PARSE) == {q["id"] for q in PRODUCTS} == set(_RANGE_TOKENS), \
+    "the range table is out of step with data/products.json"
+for _pid, _toks in _RANGE_TOKENS.items():
+    _src = BY_ID[_pid]["range"]
+    for _t in _toks:
+        assert _t in _src, "figure %s is not in the published range string for %s: %r" % (_t, _pid, _src)
+
 def esc(s):
     return html.escape(str(s), quote=True)
 
@@ -184,6 +224,7 @@ PAGE = r"""<!doctype html>
     <div class="cta">
       <a class="btn" href="guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
       <a class="btn ghost" href="#compare">Compare the five</a>
+      <a class="btn ghost" href="how-far/">How far will it go?</a>
     </div>
     <p class="disclosure" role="note">__DISCLOSURE__</p>
   </section>
@@ -431,8 +472,267 @@ for p in ORDER:
     open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(bike_html(p))
     print("wrote bikes/%s/index.html" % p["id"])
 
+# ================================================================ "how far will it go" range picker
+# The one page here that answers a question instead of listing a spec sheet: a buyer types a round-trip
+# distance and sees which of the five bikes claims to cover it, from the sourced figures already in
+# data/products.json. Generated here so a rebuild cannot drop it, and linked from sitemap.xml.
+# RANGE_PARSE (defined and guarded at the top of this file, before anything is written) supplies the
+# two figures per model.
+
+# The browser gets exactly what the table above says: published strings, and the two figures derived
+# from them. No affiliate constant is read or written here; there is nothing on this page to point at.
+PICKER_DATA = json.dumps([
+    {"id": q["id"], "maker": q["maker"], "model": q["model"], "price": q["price_display"],
+     "battery": q["battery"], "range": q["range"], "url": "bikes/%s/" % q["id"],
+     "high": RANGE_PARSE[q["id"]]["high"], "low": RANGE_PARSE[q["id"]]["low"],
+     "highFrom": RANGE_PARSE[q["id"]]["high_from"], "lowLabel": RANGE_PARSE[q["id"]]["low_label"]}
+    for q in ORDER], ensure_ascii=False).replace("<", "\\u003c")
+
+def _low_cell(pid):
+    r = RANGE_PARSE[pid]
+    if r["low"] is None:
+        return '<span class="onefig">one figure only</span>'
+    return '%d km<br><span class="fn">%s</span>' % (r["low"], esc(r["low_label"]))
+
+FIG_ROWS = "\n".join(
+    '<tr><th scope="row" class="model"><a class="mname" href="../bikes/%s/">%s</a>'
+    '<span class="mmaker">%s</span></th>'
+    '<td class="price">%s</td><td>%s</td><td>%s</td><td class="num">%d km</td><td>%s</td>'
+    '<td><a class="spec-link" href="%s" target="_blank" rel="noopener nofollow">maker specs \u2197</a></td></tr>'
+    % (esc(q["id"]), esc(q["model"]), esc(q["maker"]), esc(q["price_display"]), esc(q["battery"]),
+       esc(q["range"]), RANGE_PARSE[q["id"]]["high"], _low_cell(q["id"]), esc(q["source_url"]))
+    for q in ORDER)
+
+BIKE_LINKS = "\n      ".join(
+    '<li><a href="../bikes/%s/">%s %s &mdash; %s, claimed range %s</a></li>'
+    % (esc(q["id"]), esc(q["maker"]), esc(q["model"]), esc(q["price_display"]), esc(q["range"]))
+    for q in ORDER)
+
+PICKER_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
+<title>How far will an e-bike go? Range vs. your commute (Canada)</title>
+<meta name="description" content="How big a battery do you need for a 14 km commute? Enter your round-trip distance and see which of five Canadian commuter e-bikes claims to cover it, using each maker's own published range figure.">
+<link rel="canonical" href="__CANONICAL__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .pickerbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 18px 14px;max-width:640px}
+  .pickerbox label{display:block;font-weight:600;font-size:14.5px;margin:0 0 6px}
+  .inputrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  input#dist{font:700 22px/1.1 Georgia,serif;font-variant-numeric:tabular-nums;width:120px;
+    padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  .quick{display:flex;flex-wrap:wrap;gap:6px}
+  .quick button{border:1px solid var(--line);background:#fff;color:var(--accent-ink);
+    border-radius:999px;padding:6px 13px;font-size:13.5px;font-weight:600;cursor:pointer}
+  .quick button:hover{border-color:var(--accent)}
+  label.hills{display:flex;gap:9px;align-items:flex-start;font-weight:400;margin:14px 0 0}
+  label.hills input{width:17px;height:17px;margin:2px 0 0}
+  .methodline{font-size:13px;color:var(--muted);margin:12px 0 0;max-width:70ch}
+  .summary{font-weight:700;font-size:16px;margin:20px 0 0}
+  #results h3{font-family:-apple-system,"Segoe UI",sans-serif;font-size:13px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+  ul.rt{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  ul.rt li{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;
+    background:var(--card);padding:12px 14px}
+  ul.rt li.cover{border-left-color:var(--accent)}
+  ul.rt li.partial{border-left-color:var(--amber)}
+  ul.rt li.short{opacity:.9}
+  .rowhead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:baseline}
+  .rowhead b{font-size:16px}
+  .rowhead a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  .rowhead a:hover{border-bottom-color:var(--accent)}
+  .rprice{font-variant-numeric:tabular-nums;font-weight:700;font-size:14.5px}
+  .rt,.rfacts{margin:6px 0 0;font-size:14.5px;color:#333842;max-width:78ch}
+  .rfacts{font-size:13px;color:var(--muted)}
+  td.num{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .onefig{color:var(--muted);font-size:12.5px}
+  ol.method{margin:0;padding-left:22px;max-width:80ch}
+  ol.method li{margin:0 0 10px;color:#333842}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Prices and specs checked <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="hero" style="border-top:none">
+    <p class="crumb"><a href="../">All five commuter e-bikes, compared</a> &rsaquo; Range picker</p>
+    <h1>How far will it actually go?</h1>
+    <p class="deck">"How big a battery do I need for a 14 km commute?" Put your round-trip distance in below. This page compares it with the range figure each maker publishes on its own product page &mdash; not a test we ran, and not a number we bent to fit.</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today; every link goes to a maker's own page or to another page on this site.</p>
+  </section>
+
+  <section id="picker">
+    <h2>Your round trip</h2>
+    <p class="sub">Round-trip distance in kilometres. The decision is made only against figures quoted in full in the table below.</p>
+    <div class="pickerbox">
+      <label for="dist">Round-trip distance (km)</label>
+      <div class="inputrow">
+        <input id="dist" type="number" min="1" max="500" step="1" value="14" inputmode="numeric" aria-describedby="methodline">
+        <span class="quick">
+          <button type="button" data-km="5">5 km</button>
+          <button type="button" data-km="10">10 km</button>
+          <button type="button" data-km="14">14 km</button>
+          <button type="button" data-km="25">25 km</button>
+          <button type="button" data-km="40">40 km</button>
+        </span>
+      </div>
+      <label class="hills"><input id="hills" type="checkbox"> My route is hilly, or I ride with a load</label>
+      <p class="methodline" id="methodline">With the hills box clear, your distance is compared with each maker's highest published figure. With it ticked, the comparison moves to the lowest figure that maker publishes; a maker who publishes only one figure is labelled as such, not adjusted by a rule of ours.</p>
+    </div>
+    <p class="summary" id="summary" role="status" aria-live="polite"></p>
+    <div id="results"></div>
+    <noscript><p class="note">This picker needs JavaScript to sort the bikes. The table below lists every published figure it works from, so nothing on this page depends on scripts to be readable.</p></noscript>
+  </section>
+
+  <section id="figures">
+    <h2>Every figure this page uses, as published</h2>
+    <p class="sub">No test-ride number and no remembered number is used anywhere on this page. The "top figure" and "lowest published figure" columns are the maker's own published range, read exactly as written; where a maker publishes a single figure, the lowest column says so.</p>
+    <div class="tablewrap">
+      <table>
+        <caption>Claimed range as published by each maker, read __CHECKED__. Claimed range is the maker's own estimate and depends on rider weight, hills, temperature and assist level &mdash; none of that is modelled on this page.</caption>
+        <thead><tr>
+          <th scope="col">Model</th><th scope="col">Price (CAD)</th><th scope="col">Battery</th>
+          <th scope="col">Maker's published claimed range</th><th scope="col">Top figure</th>
+          <th scope="col">Lowest published figure</th><th scope="col">Source</th>
+        </tr></thead>
+        <tbody>
+__FIGROWS__
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>How this page decides</h2>
+    <ol class="method">
+      <li><strong>It only ever quotes the maker.</strong> Each top figure and each lowest published figure above is a number the maker itself published, quoted in full in the table, with a link to the page it was read from.</li>
+      <li><strong>Hills are not modelled.</strong> No maker here publishes a hills figure, so this page will not invent a percentage for you. The hills box changes which published figure you are measured against &mdash; the maker's own low end, where one exists.</li>
+      <li><strong>A caveat on the Rook.</strong> Surface 604 describes its published figure as eco mode, so that top figure is the maker's best case, not a worst case.</li>
+      <li><strong>One conversion, named.</strong> The Discover 3's lowest figure is published in miles (65 mi) and is shown here converted to kilometres.</li>
+      <li><strong>Battery size is the whole story only sometimes.</strong> The Wh figure above is the maker's published capacity; two bikes can post the same miles from different Wh once weight and assist level are counted in.</li>
+    </ol>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All five commuter e-bikes, compared side by side</a></li>
+      __BIKELINKS__
+      <li><a href="../guide/canada-commuter-ebike-guide.pdf" download>The free decision-guide PDF</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today. Links go to the makers' own pages and to other pages on this site. If a paid partner link is ever added, it will be labelled as one, here and on the button itself.</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="#picker">this picker</a>.</p>
+</div></footer>
+
+<script type="application/json" id="rangeData">__PICKERDATA__</script>
+<script>
+(function(){
+  var DATA = JSON.parse(document.getElementById("rangeData").textContent);
+  var dist = document.getElementById("dist");
+  var hills = document.getElementById("hills");
+  var out = document.getElementById("results");
+  var sum = document.getElementById("summary");
+  if (!DATA || !DATA.length) return;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".quick button"), function(b){
+    b.addEventListener("click", function(){ dist.value = b.getAttribute("data-km"); render(); });
+  });
+  dist.addEventListener("input", render);
+  hills.addEventListener("change", render);
+
+  function card(m, cls, text){
+    return '<li class="row ' + cls + '">'
+      + '<div class="rowhead"><b><a href="' + m.url + '">' + m.maker + ' ' + m.model + '</a></b>'
+      + '<span class="rprice">' + m.price + '</span></div>'
+      + '<p class="rt">' + text + '</p>'
+      + '<p class="rfacts">Battery: ' + m.battery + ' &middot; maker\u2019s claimed range: ' + m.range
+      + ' &middot; <a href="' + m.url + '">full specs</a></p></li>';
+  }
+
+  function group(title, items){
+    if (!items.length) return "";
+    return '<h3>' + title + '</h3><ul class="rt">' + items.join("") + '</ul>';
+  }
+
+  function render(){
+    var d = parseFloat(dist.value);
+    if (!(d > 0) || d > 500) {
+      sum.textContent = "Enter a round-trip distance in kilometres (1 to 500).";
+      out.innerHTML = "";
+      return;
+    }
+    var dShow = (Math.round(d * 10) / 10);
+    var hilly = hills.checked;
+    var cover = [], partial = [], short = [];
+    DATA.forEach(function(m){
+      if (!hilly) {
+        if (d <= m.high) cover.push(card(m, "cover",
+          "Covers a " + dShow + " km round trip. " + m.maker + " publishes up to " + m.high + " km."));
+        else short.push(card(m, "short",
+          "Does not reach your round trip: " + m.maker + " publishes up to " + m.high + " km, "
+          + (Math.round((d - m.high) * 10) / 10) + " km short."));
+      } else if (m.low !== null && m.low !== undefined) {
+        if (d <= m.low) cover.push(card(m, "cover",
+          "Covers it even against the lowest figure " + m.maker + " publishes: " + m.low + " km (" + m.lowLabel + ")."));
+        else if (d <= m.high) partial.push(card(m, "partial",
+          "Covers it only on the best case: " + m.maker + " publishes up to " + m.high + " km. Their lowest published figure is "
+          + m.low + " km (" + m.lowLabel + "), and that does not reach " + dShow + " km."));
+        else short.push(card(m, "short",
+          "Does not reach your round trip: " + m.maker + " publishes up to " + m.high + " km."));
+      } else {
+        if (d <= m.high) partial.push(card(m, "partial",
+          "One published figure only: " + m.maker + " publishes " + m.high + " km and no lower figure, so a hilly route cannot be checked against the maker\u2019s own numbers. Treat " + m.high + " km as the best case."));
+        else short.push(card(m, "short",
+          "Does not reach your round trip: " + m.maker + " publishes one figure, " + m.high + " km."));
+      }
+    });
+    out.innerHTML = group("Covers your round trip", cover)
+                  + group("Covers it only on the maker\u2019s best-case figure", partial)
+                  + group("Does not reach", short);
+    if (!hilly) {
+      sum.textContent = (short.length === 0)
+        ? "All five bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes."
+        : cover.length + " of the 5 bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes; "
+          + short.length + (short.length === 1 ? " does not." : " do not.");
+    } else {
+      sum.textContent = "Hills on: " + cover.length + " of the 5 claim to cover a " + dShow
+        + " km round trip even against the lowest figure their maker publishes; " + partial.length
+        + " only on the maker\u2019s best case; " + short.length + " do not reach it.";
+    }
+  }
+  render();
+})();
+</script>
+</body>
+</html>
+"""
+
+_picker_out = (PICKER_PAGE
+               .replace("__CSS__", CSS)
+               .replace("__CANONICAL__", "%s/how-far/" % SITE)
+               .replace("__CHECKED__", esc(CHECKED))
+               .replace("__FIGROWS__", FIG_ROWS)
+               .replace("__BIKELINKS__", BIKE_LINKS)
+               .replace("__PICKERDATA__", PICKER_DATA))
+os.makedirs(os.path.join(ROOT, "how-far"), exist_ok=True)
+open(os.path.join(ROOT, "how-far", "index.html"), "w", encoding="utf-8").write(_picker_out)
+print("wrote how-far/index.html")
+
 # ---------------------------------------------------------------- sitemap + robots
-URLS = ["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
+URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER] + ["%s/how-far/" % SITE])
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
            + "\n".join("  <url><loc>%s</loc><lastmod>%s</lastmod></url>" % (u, esc(CHECKED)) for u in URLS)

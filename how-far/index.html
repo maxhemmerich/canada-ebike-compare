@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
+<title>How far will an e-bike go? Range vs. your commute (Canada)</title>
+<meta name="description" content="How big a battery do you need for a 14 km commute? Enter your round-trip distance and see which of five Canadian commuter e-bikes claims to cover it, using each maker's own published range figure.">
+<link rel="canonical" href="https://maxhemmerich.github.io/canada-ebike-compare/how-far/">
+<style>
+  :root{
+    --paper:#faf8f4; --ink:#16181d; --muted:#5d6270; --line:#e3ddd1;
+    --accent:#0e6b53; --accent-ink:#0a5340; --amber:#a6550c; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent-ink)}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  header.top{border-bottom:1px solid var(--line);background:var(--paper)}
+  .top .wrap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:14px;padding-bottom:14px}
+  .brand{font:700 15px/1 -apple-system,"Segoe UI",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  .stamp{font-size:13px;color:var(--muted)}
+  h1,h2,h3{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:700;letter-spacing:-.01em}
+  .hero{padding:44px 0 8px}
+  .hero h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:0 0 14px;max-width:20ch}
+  .deck{font-size:19px;color:#333842;max-width:62ch;margin:0 0 22px}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 26px}
+  .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+    font-weight:600;padding:13px 20px;border-radius:8px}
+  .btn:hover{background:var(--accent-ink)}
+  .btn.ghost{background:transparent;color:var(--accent-ink);border:1px solid var(--accent)}
+  .disclosure{background:#fff;border:1px solid var(--line);border-left:4px solid var(--amber);
+    padding:14px 16px;border-radius:6px;font-size:15px;color:#3a3f49;max-width:70ch}
+  .disclosure strong{color:var(--ink)}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  section h2{font-size:clamp(22px,3vw,30px);margin:0 0 6px}
+  .sub{color:var(--muted);margin:0 0 24px;max-width:66ch}
+  .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px 28px}
+  .pick h3{font-size:17px;margin:0 0 4px;font-family:-apple-system,"Segoe UI",sans-serif;font-weight:700}
+  .pick .pickwho{margin:0 0 8px;font-size:14px;color:var(--accent-ink);font-weight:600}
+  .pick p{margin:0;color:#333842;font-size:15px}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+  table{border-collapse:collapse;width:100%;min-width:880px;font-size:13.4px}
+  caption{text-align:left;padding:14px 16px;color:var(--muted);font-size:13px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{position:sticky;top:0;background:#f3efe7;font-size:12px;letter-spacing:.05em;
+    text-transform:uppercase;color:#4a4f59;white-space:nowrap;z-index:1}
+  tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+  th.model{white-space:normal;min-width:150px}
+  .mname{display:block;font-weight:700;font-size:15px}
+  .mmaker{display:block;color:var(--muted);font-size:13px;margin:2px 0 6px}
+  .spec-link{font-size:12.5px;text-decoration:none;border-bottom:1px solid var(--accent)}
+  a.mname{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  a.mname:hover{border-bottom-color:var(--accent)}
+  td.price{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  .aff{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
+  .stock{display:inline-block;margin:1px 0 2px;font-size:11px;font-weight:700;color:#fff;
+    background:var(--amber);padding:1px 6px;border-radius:4px;letter-spacing:.02em}
+  .pickstock{margin:0 0 6px;font-size:12.5px;font-weight:700;color:var(--amber)}
+  .details{display:grid;gap:20px}
+  .detail{border-left:3px solid var(--accent);padding:2px 0 2px 16px}
+  .detail h3{margin:0 0 6px;font-size:18px}
+  .detail .dprice{color:var(--muted);font-family:-apple-system,sans-serif;font-size:15px;font-weight:600}
+  .detail p{margin:0 0 8px;color:#333842;max-width:72ch}
+  .src,.fn{font-size:13px;color:var(--muted)}
+  ul.sources{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+  ul.sources li{border-bottom:1px dashed var(--line);padding-bottom:12px;max-width:78ch}
+  .note{font-size:14px;color:var(--muted);max-width:72ch}
+  footer{border-top:1px solid var(--line);padding:28px 0 50px;color:var(--muted);font-size:13.5px}
+  footer p{margin:0 0 8px;max-width:78ch}
+
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .pickerbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 18px 14px;max-width:640px}
+  .pickerbox label{display:block;font-weight:600;font-size:14.5px;margin:0 0 6px}
+  .inputrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  input#dist{font:700 22px/1.1 Georgia,serif;font-variant-numeric:tabular-nums;width:120px;
+    padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  .quick{display:flex;flex-wrap:wrap;gap:6px}
+  .quick button{border:1px solid var(--line);background:#fff;color:var(--accent-ink);
+    border-radius:999px;padding:6px 13px;font-size:13.5px;font-weight:600;cursor:pointer}
+  .quick button:hover{border-color:var(--accent)}
+  label.hills{display:flex;gap:9px;align-items:flex-start;font-weight:400;margin:14px 0 0}
+  label.hills input{width:17px;height:17px;margin:2px 0 0}
+  .methodline{font-size:13px;color:var(--muted);margin:12px 0 0;max-width:70ch}
+  .summary{font-weight:700;font-size:16px;margin:20px 0 0}
+  #results h3{font-family:-apple-system,"Segoe UI",sans-serif;font-size:13px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+  ul.rt{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  ul.rt li{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;
+    background:var(--card);padding:12px 14px}
+  ul.rt li.cover{border-left-color:var(--accent)}
+  ul.rt li.partial{border-left-color:var(--amber)}
+  ul.rt li.short{opacity:.9}
+  .rowhead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:baseline}
+  .rowhead b{font-size:16px}
+  .rowhead a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  .rowhead a:hover{border-bottom-color:var(--accent)}
+  .rprice{font-variant-numeric:tabular-nums;font-weight:700;font-size:14.5px}
+  .rt,.rfacts{margin:6px 0 0;font-size:14.5px;color:#333842;max-width:78ch}
+  .rfacts{font-size:13px;color:var(--muted)}
+  td.num{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .onefig{color:var(--muted);font-size:12.5px}
+  ol.method{margin:0;padding-left:22px;max-width:80ch}
+  ol.method li{margin:0 0 10px;color:#333842}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Prices and specs checked <strong>2026-10-08</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="hero" style="border-top:none">
+    <p class="crumb"><a href="../">All five commuter e-bikes, compared</a> &rsaquo; Range picker</p>
+    <h1>How far will it actually go?</h1>
+    <p class="deck">"How big a battery do I need for a 14 km commute?" Put your round-trip distance in below. This page compares it with the range figure each maker publishes on its own product page &mdash; not a test we ran, and not a number we bent to fit.</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today; every link goes to a maker's own page or to another page on this site.</p>
+  </section>
+
+  <section id="picker">
+    <h2>Your round trip</h2>
+    <p class="sub">Round-trip distance in kilometres. The decision is made only against figures quoted in full in the table below.</p>
+    <div class="pickerbox">
+      <label for="dist">Round-trip distance (km)</label>
+      <div class="inputrow">
+        <input id="dist" type="number" min="1" max="500" step="1" value="14" inputmode="numeric" aria-describedby="methodline">
+        <span class="quick">
+          <button type="button" data-km="5">5 km</button>
+          <button type="button" data-km="10">10 km</button>
+          <button type="button" data-km="14">14 km</button>
+          <button type="button" data-km="25">25 km</button>
+          <button type="button" data-km="40">40 km</button>
+        </span>
+      </div>
+      <label class="hills"><input id="hills" type="checkbox"> My route is hilly, or I ride with a load</label>
+      <p class="methodline" id="methodline">With the hills box clear, your distance is compared with each maker's highest published figure. With it ticked, the comparison moves to the lowest figure that maker publishes; a maker who publishes only one figure is labelled as such, not adjusted by a rule of ours.</p>
+    </div>
+    <p class="summary" id="summary" role="status" aria-live="polite"></p>
+    <div id="results"></div>
+    <noscript><p class="note">This picker needs JavaScript to sort the bikes. The table below lists every published figure it works from, so nothing on this page depends on scripts to be readable.</p></noscript>
+  </section>
+
+  <section id="figures">
+    <h2>Every figure this page uses, as published</h2>
+    <p class="sub">No test-ride number and no remembered number is used anywhere on this page. The "top figure" and "lowest published figure" columns are the maker's own published range, read exactly as written; where a maker publishes a single figure, the lowest column says so.</p>
+    <div class="tablewrap">
+      <table>
+        <caption>Claimed range as published by each maker, read 2026-10-08. Claimed range is the maker's own estimate and depends on rider weight, hills, temperature and assist level &mdash; none of that is modelled on this page.</caption>
+        <thead><tr>
+          <th scope="col">Model</th><th scope="col">Price (CAD)</th><th scope="col">Battery</th>
+          <th scope="col">Maker's published claimed range</th><th scope="col">Top figure</th>
+          <th scope="col">Lowest published figure</th><th scope="col">Source</th>
+        </tr></thead>
+        <tbody>
+<tr><th scope="row" class="model"><a class="mname" href="../bikes/radkick-7speed/">RadKick 7-Speed</a><span class="mmaker">Rad Power Bikes</span></th><td class="price">CA$1,899</td><td>360 Wh (10 Ah)</td><td>24-56 km (maker estimate)</td><td class="num">56 km</td><td>24 km<br><span class="fn">bottom of the maker&#x27;s range</span></td><td><a class="spec-link" href="https://radpowerbikes.ca/products/radkick-7-speed-electric-lightweight-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="../bikes/velotric-tempo/">Tempo</a><span class="mmaker">Velotric</span></th><td class="price">CA$2,099</td><td>374 Wh (removable)</td><td>up to 97 km (maker estimate)</td><td class="num">97 km</td><td><span class="onefig">one figure only</span></td><td><a class="spec-link" href="https://www.velotric.ca/products/velotric-tempo-ebike" target="_blank" rel="noopener nofollow">maker specs ↗</a></td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="../bikes/velotric-discover-3/">Discover 3</a><span class="mmaker">Velotric</span></th><td class="price">CA$2,699</td><td>730 Wh (15.2 Ah), Samsung/LG 21700</td><td>80 mi / ~129 km PAS (65 mi throttle)</td><td class="num">129 km</td><td>105 km<br><span class="fn">throttle only, from the maker&#x27;s 65 mi figure</span></td><td><a class="spec-link" href="https://www.velotric.ca/products/discover-3" target="_blank" rel="noopener nofollow">maker specs ↗</a></td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="../bikes/radster-road/">Radster Road</a><span class="mmaker">Rad Power Bikes</span></th><td class="price">CA$2,699</td><td>720 Wh (15 Ah)</td><td>40-104 km (maker estimate)</td><td class="num">104 km</td><td>40 km<br><span class="fn">bottom of the maker&#x27;s range</span></td><td><a class="spec-link" href="https://radpowerbikes.ca/products/radster-road-electric-commuter-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="../bikes/surface604-rook/">Rook</a><span class="mmaker">Surface 604</span></th><td class="price">CA$2,699</td><td>960 Wh (20 Ah)</td><td>up to 150 km (maker, eco mode)</td><td class="num">150 km</td><td><span class="onefig">one figure only</span></td><td><a class="spec-link" href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">maker specs ↗</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>How this page decides</h2>
+    <ol class="method">
+      <li><strong>It only ever quotes the maker.</strong> Each top figure and each lowest published figure above is a number the maker itself published, quoted in full in the table, with a link to the page it was read from.</li>
+      <li><strong>Hills are not modelled.</strong> No maker here publishes a hills figure, so this page will not invent a percentage for you. The hills box changes which published figure you are measured against &mdash; the maker's own low end, where one exists.</li>
+      <li><strong>A caveat on the Rook.</strong> Surface 604 describes its published figure as eco mode, so that top figure is the maker's best case, not a worst case.</li>
+      <li><strong>One conversion, named.</strong> The Discover 3's lowest figure is published in miles (65 mi) and is shown here converted to kilometres.</li>
+      <li><strong>Battery size is the whole story only sometimes.</strong> The Wh figure above is the maker's published capacity; two bikes can post the same miles from different Wh once weight and assist level are counted in.</li>
+    </ol>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All five commuter e-bikes, compared side by side</a></li>
+      <li><a href="../bikes/radkick-7speed/">Rad Power Bikes RadKick 7-Speed &mdash; CA$1,899, claimed range 24-56 km (maker estimate)</a></li>
+      <li><a href="../bikes/velotric-tempo/">Velotric Tempo &mdash; CA$2,099, claimed range up to 97 km (maker estimate)</a></li>
+      <li><a href="../bikes/velotric-discover-3/">Velotric Discover 3 &mdash; CA$2,699, claimed range 80 mi / ~129 km PAS (65 mi throttle)</a></li>
+      <li><a href="../bikes/radster-road/">Rad Power Bikes Radster Road &mdash; CA$2,699, claimed range 40-104 km (maker estimate)</a></li>
+      <li><a href="../bikes/surface604-rook/">Surface 604 Rook &mdash; CA$2,699, claimed range up to 150 km (maker, eco mode)</a></li>
+      <li><a href="../guide/canada-commuter-ebike-guide.pdf" download>The free decision-guide PDF</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today. Links go to the makers' own pages and to other pages on this site. If a paid partner link is ever added, it will be labelled as one, here and on the button itself.</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
+  <p>Built 2026-10-08 by the GAMMA project. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="#picker">this picker</a>.</p>
+</div></footer>
+
+<script type="application/json" id="rangeData">[{"id": "radkick-7speed", "maker": "Rad Power Bikes", "model": "RadKick 7-Speed", "price": "CA$1,899", "battery": "360 Wh (10 Ah)", "range": "24-56 km (maker estimate)", "url": "bikes/radkick-7speed/", "high": 56, "low": 24, "highFrom": "the top of the maker's published range \"24-56 km (maker estimate)\"", "lowLabel": "bottom of the maker's range"}, {"id": "velotric-tempo", "maker": "Velotric", "model": "Tempo", "price": "CA$2,099", "battery": "374 Wh (removable)", "range": "up to 97 km (maker estimate)", "url": "bikes/velotric-tempo/", "high": 97, "low": null, "highFrom": "the maker's single published figure \"up to 97 km (maker estimate)\"", "lowLabel": null}, {"id": "velotric-discover-3", "maker": "Velotric", "model": "Discover 3", "price": "CA$2,699", "battery": "730 Wh (15.2 Ah), Samsung/LG 21700", "range": "80 mi / ~129 km PAS (65 mi throttle)", "url": "bikes/velotric-discover-3/", "high": 129, "low": 105, "highFrom": "the maker's published pedal-assist figure \"80 mi / ~129 km PAS (65 mi throttle)\"", "lowLabel": "throttle only, from the maker's 65 mi figure"}, {"id": "radster-road", "maker": "Rad Power Bikes", "model": "Radster Road", "price": "CA$2,699", "battery": "720 Wh (15 Ah)", "range": "40-104 km (maker estimate)", "url": "bikes/radster-road/", "high": 104, "low": 40, "highFrom": "the top of the maker's published range \"40-104 km (maker estimate)\"", "lowLabel": "bottom of the maker's range"}, {"id": "surface604-rook", "maker": "Surface 604", "model": "Rook", "price": "CA$2,699", "battery": "960 Wh (20 Ah)", "range": "up to 150 km (maker, eco mode)", "url": "bikes/surface604-rook/", "high": 150, "low": null, "highFrom": "the maker's single published figure \"up to 150 km (maker, eco mode)\"", "lowLabel": null}]</script>
+<script>
+(function(){
+  var DATA = JSON.parse(document.getElementById("rangeData").textContent);
+  var dist = document.getElementById("dist");
+  var hills = document.getElementById("hills");
+  var out = document.getElementById("results");
+  var sum = document.getElementById("summary");
+  if (!DATA || !DATA.length) return;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".quick button"), function(b){
+    b.addEventListener("click", function(){ dist.value = b.getAttribute("data-km"); render(); });
+  });
+  dist.addEventListener("input", render);
+  hills.addEventListener("change", render);
+
+  function card(m, cls, text){
+    return '<li class="row ' + cls + '">'
+      + '<div class="rowhead"><b><a href="' + m.url + '">' + m.maker + ' ' + m.model + '</a></b>'
+      + '<span class="rprice">' + m.price + '</span></div>'
+      + '<p class="rt">' + text + '</p>'
+      + '<p class="rfacts">Battery: ' + m.battery + ' &middot; maker\u2019s claimed range: ' + m.range
+      + ' &middot; <a href="' + m.url + '">full specs</a></p></li>';
+  }
+
+  function group(title, items){
+    if (!items.length) return "";
+    return '<h3>' + title + '</h3><ul class="rt">' + items.join("") + '</ul>';
+  }
+
+  function render(){
+    var d = parseFloat(dist.value);
+    if (!(d > 0) || d > 500) {
+      sum.textContent = "Enter a round-trip distance in kilometres (1 to 500).";
+      out.innerHTML = "";
+      return;
+    }
+    var dShow = (Math.round(d * 10) / 10);
+    var hilly = hills.checked;
+    var cover = [], partial = [], short = [];
+    DATA.forEach(function(m){
+      if (!hilly) {
+        if (d <= m.high) cover.push(card(m, "cover",
+          "Covers a " + dShow + " km round trip. " + m.maker + " publishes up to " + m.high + " km."));
+        else short.push(card(m, "short",
+          "Does not reach your round trip: " + m.maker + " publishes up to " + m.high + " km, "
+          + (Math.round((d - m.high) * 10) / 10) + " km short."));
+      } else if (m.low !== null && m.low !== undefined) {
+        if (d <= m.low) cover.push(card(m, "cover",
+          "Covers it even against the lowest figure " + m.maker + " publishes: " + m.low + " km (" + m.lowLabel + ")."));
+        else if (d <= m.high) partial.push(card(m, "partial",
+          "Covers it only on the best case: " + m.maker + " publishes up to " + m.high + " km. Their lowest published figure is "
+          + m.low + " km (" + m.lowLabel + "), and that does not reach " + dShow + " km."));
+        else short.push(card(m, "short",
+          "Does not reach your round trip: " + m.maker + " publishes up to " + m.high + " km."));
+      } else {
+        if (d <= m.high) partial.push(card(m, "partial",
+          "One published figure only: " + m.maker + " publishes " + m.high + " km and no lower figure, so a hilly route cannot be checked against the maker\u2019s own numbers. Treat " + m.high + " km as the best case."));
+        else short.push(card(m, "short",
+          "Does not reach your round trip: " + m.maker + " publishes one figure, " + m.high + " km."));
+      }
+    });
+    out.innerHTML = group("Covers your round trip", cover)
+                  + group("Covers it only on the maker\u2019s best-case figure", partial)
+                  + group("Does not reach", short);
+    if (!hilly) {
+      sum.textContent = (short.length === 0)
+        ? "All five bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes."
+        : cover.length + " of the 5 bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes; "
+          + short.length + (short.length === 1 ? " does not." : " do not.");
+    } else {
+      sum.textContent = "Hills on: " + cover.length + " of the 5 claim to cover a " + dShow
+        + " km round trip even against the lowest figure their maker publishes; " + partial.length
+        + " only on the maker\u2019s best case; " + short.length + " do not reach it.";
+    }
+  }
+  render();
+})();
+</script>
+</body>
+</html>
