@@ -48,7 +48,7 @@ def stock_badge(p):
 
 def model_cell(p):
     return ('<th scope="row" class="model">'
-            f'<span class="mname">{esc(p["model"])}</span>'
+            f'<a class="mname" href="bikes/{esc(p["id"])}/">{esc(p["model"])}</a>'
             f'<span class="mmaker">{esc(p["maker"])}</span>'
             + stock_badge(p) +
             f'<a class="spec-link" href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">maker specs \u2197</a>'
@@ -151,6 +151,8 @@ PAGE = r"""<!doctype html>
   .mname{display:block;font-weight:700;font-size:15px}
   .mmaker{display:block;color:var(--muted);font-size:13px;margin:2px 0 6px}
   .spec-link{font-size:12.5px;text-decoration:none;border-bottom:1px solid var(--accent)}
+  a.mname{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  a.mname:hover{border-bottom-color:var(--accent)}
   td.price{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
   .aff{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
   .stock{display:inline-block;margin:1px 0 2px;font-size:11px;font-weight:700;color:#fff;
@@ -263,6 +265,184 @@ out = (PAGE
        .replace("__SOURCES__", SOURCES_HTML))
 open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8").write(out)
 print("wrote index.html")
+
+# ================================================================ per-bike pages, sitemap, robots.txt
+# One indexable URL per model, generated from the same dataset as the comparison page so a rebuild
+# cannot drop them. Nothing here is written by hand: every field comes from data/products.json, and a
+# figure the maker did not publish is absent rather than guessed.
+SITE = "https://maxhemmerich.github.io/canada-ebike-compare"
+# The comparison page's stylesheet is this site's one theme; the bike pages reuse it verbatim, so a
+# bike page cannot drift into a second look.
+CSS = PAGE.split("<style>", 1)[1].split("</style>", 1)[0]
+
+BIKE_FIELDS = [
+    ("type", "Type"), ("motor", "Motor"), ("torque", "Torque"), ("battery", "Battery"),
+    ("range", "Claimed range"), ("weight", "Weight"), ("brakes", "Brakes"),
+    ("eclass", "Class"), ("sensor", "Sensor"), ("warranty", "Warranty"), ("payload", "Max load"),
+]
+
+# The affiliate rule, unchanged from the comparison page: a bike page offers a partner link only when
+# its own constant in config.js holds a real tracking URL. While the constant is null the element is
+# removed, so the page carries no link and says nothing about the status of any application.
+BIKE_AFF_JS = """<script src="../../config.js"></script>
+<script>
+(function(){
+  var cfg = window.GAMMA_CONFIG || { products:{} };
+  var affMap = {
+    "radster-road":"AFFILIATE_RADSTER_ROAD","radkick-7speed":"AFFILIATE_RADKICK_7SPEED",
+    "velotric-tempo":"AFFILIATE_VELOTRIC_TEMPO","velotric-discover-3":"AFFILIATE_VELOTRIC_DISCOVER_3",
+    "surface604-rook":"AFFILIATE_SURFACE604_ROOK"
+  };
+  var el = document.querySelector(".buyaff");
+  if (!el) return;
+  var live = cfg[affMap[el.getAttribute("data-aff")]];
+  if (live) {
+    el.href = live;
+    el.textContent = "Go to the maker (affiliate link)";
+    el.setAttribute("rel", "sponsored nofollow noopener");
+    el.target = "_blank";
+    el.hidden = false;
+  } else {
+    el.remove();
+  }
+})();
+</script>"""
+
+BIKE_PAGE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .bikehero{padding:34px 0 8px}
+  .bikehero h1{font-size:clamp(26px,4.4vw,40px);line-height:1.12;margin:0 0 10px;max-width:26ch}
+  .pricebig{font:700 22px/1.2 Georgia,serif;margin:0 0 14px;font-variant-numeric:tabular-nums}
+  .pricebig .stock{display:inline-block;margin-left:10px;vertical-align:2px}
+  .specs{margin:0 0 6px;border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}
+  .specs div{display:flex;gap:16px;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .specs div:last-child{border-bottom:none}
+  .specs dt{flex:0 0 148px;margin:0;color:var(--muted);font-size:13.5px}
+  .specs dd{margin:0;font-weight:600;font-size:14.5px}
+  .buyrow{margin:18px 0 6px}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Prices and specs checked <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="bikehero" style="border-top:none">
+    <p class="crumb"><a href="../../">All five commuter e-bikes, compared</a> &rsaquo; __MAKER__</p>
+    <h1>__MAKER__ __MODEL__ in Canada</h1>
+    <p class="pricebig">__PRICE____STOCK__</p>
+    <p class="buyrow"><a class="buyaff" data-aff="__ID__" hidden></a></p>
+    <p class="deck">__DECK__</p>
+  </section>
+
+  <section id="specs">
+    <h2>Specifications</h2>
+    <p class="sub">Every figure below was read from __MAKER__'s own product page on __CHECKED__, and that exact page is linked at the bottom of this one. Where a maker publishes no figure, the field is absent rather than guessed.</p>
+    <dl class="specs">
+      __SPECS__
+    </dl>
+  </section>
+
+  <section id="who">
+    <h2>Who it suits</h2>
+    <div class="details"><article class="detail"><h3>__MAKER__ __MODEL__ <span class="dprice">__PRICE__</span></h3><p>__BESTFOR__</p></article></div>
+  </section>
+
+  <section id="next">
+    <h2>The other bikes</h2>
+    <ul class="otherbikes">__OTHERS__</ul>
+    <p class="cta" style="margin-top:20px">
+      <a class="btn" href="../../#compare">Compare all five side by side</a>
+      <a class="btn ghost" href="../../guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
+    </p>
+  </section>
+
+  <section id="source">
+    <h2>Where these numbers come from</h2>
+    <ul class="sources"><li><strong>__MAKER__ __MODEL__</strong> &mdash; <a href="__SOURCEURL__" target="_blank" rel="noopener nofollow">__SOURCEURL__</a><br><span class="fn">__SOURCENOTE__</span></li></ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this page has no live affiliate link for the __MODEL__. Nothing here is paid for and no purchase through this page earns anyone a commission today; the only product link above goes to __MAKER__'s own page. If a paid partner link is ever added, it will be labelled as one.</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../../data/products.json">products.json</a> &middot; <a href="../../">the comparison</a>.</p>
+</div></footer>
+
+__AFFJS__
+</body>
+</html>
+"""
+
+def bike_html(p):
+    specs = "\n      ".join(
+        ['<div><dt>Price (CAD)</dt><dd>%s</dd></div>' % esc(p["price_display"])] +
+        ['<div><dt>%s</dt><dd>%s</dd></div>' % (label, esc(p[key]))
+         for key, label in BIKE_FIELDS if p.get(key)])
+    others = "\n      ".join(
+        '<li><a href="../%s/">%s %s &mdash; %s</a></li>'
+        % (esc(q["id"]), esc(q["maker"]), esc(q["model"]), esc(q["price_display"]))
+        for q in ORDER if q["id"] != p["id"])
+    stock = ('<span class="stock">%s</span>' % esc(p["availability"])) if p.get("availability") else ""
+    stock_word = (" (%s)" % p["availability"]) if p.get("availability") else ""
+    title = "%s %s \u2014 %s in Canada | Commuter E-Bikes CA" % (p["maker"], p["model"], p["price_display"])
+    desc = ("%s %s for %s in Canada: %s, %s, %s battery, %s claimed range, %s. "
+            "Specs read from the maker's own product page, checked %s."
+            % (p["maker"], p["model"], p["price_display"], p["motor"], p["torque"],
+               p["battery"], p["range"], p["weight"], CHECKED))
+    deck = ("%s from %s's own Canadian storefront%s. The figures below were read from %s's product "
+            "page, not from memory, and that page is linked at the bottom."
+            % (p["price_display"], p["maker"], stock_word, p["maker"]))
+    return (BIKE_PAGE
+            .replace("__CSS__", CSS)
+            .replace("__TITLE__", esc(title))
+            .replace("__DESC__", esc(desc))
+            .replace("__CANONICAL__", "%s/bikes/%s/" % (SITE, p["id"]))
+            .replace("__CHECKED__", esc(CHECKED))
+            .replace("__MAKER__", esc(p["maker"]))
+            .replace("__MODEL__", esc(p["model"]))
+            .replace("__ID__", esc(p["id"]))
+            .replace("__PRICE__", esc(p["price_display"]))
+            .replace("__STOCK__", stock)
+            .replace("__DECK__", esc(deck))
+            .replace("__SPECS__", specs)
+            .replace("__BESTFOR__", esc(p["best_for"]))
+            .replace("__OTHERS__", others)
+            .replace("__SOURCEURL__", esc(p["source_url"]))
+            .replace("__SOURCENOTE__", esc(p["source_note"]))
+            .replace("__AFFJS__", BIKE_AFF_JS))
+
+for p in ORDER:
+    d = os.path.join(ROOT, "bikes", p["id"])
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(bike_html(p))
+    print("wrote bikes/%s/index.html" % p["id"])
+
+# ---------------------------------------------------------------- sitemap + robots
+URLS = ["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
+sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+           + "\n".join("  <url><loc>%s</loc><lastmod>%s</lastmod></url>" % (u, esc(CHECKED)) for u in URLS)
+           + "\n</urlset>\n")
+open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(sitemap)
+print("wrote sitemap.xml (%d urls)" % len(URLS))
+
+robots = "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE
+open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8").write(robots)
+print("wrote robots.txt")
 
 # ================================================================ PDF
 from reportlab.lib.pagesizes import landscape, letter
