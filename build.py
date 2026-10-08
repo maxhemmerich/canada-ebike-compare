@@ -93,6 +93,7 @@ PAGE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
 <title>Canadian Commuter E-Bike Comparison (CAD, 2026)</title>
 <meta name="description" content="Five commuter e-bikes you can buy in Canada for CA$1,899-CA$2,699, compared on price, motor, battery, range, weight and warranty, with every spec traced to the maker's own product page.">
 <style>
