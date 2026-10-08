@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # build.py — generates index.html and the decision-guide PDF from data/products.json.
 # Render with:  py -3.10 build.py
-import json, os, html
+import json, os, html, re
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA = json.load(open(os.path.join(ROOT, "data", "products.json"), encoding="utf-8"))
@@ -59,6 +59,60 @@ for _pid, _toks in _RANGE_TOKENS.items():
 
 def esc(s):
     return html.escape(str(s), quote=True)
+
+# ---------------------------------------------------------------- head-to-head pairs
+# The buyer queries this site has no page for yet: a shopper weighing up two specific bikes. A pair is
+# just two ids already in data/products.json; each pair becomes ONE page at vs/<slug-a>-vs-<slug-b>/,
+# two columns, every cell a field already published on those models' own pages. The URL slug is
+# derived from each model's own name, so it cannot be hand-typed out of step with the data and two
+# models cannot share a segment. Some pairs cover the closest calls on the comparison table.
+def _slug(name):
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", name.lower())).strip("-")
+
+MODEL_SLUG = {p["id"]: _slug(p["model"]) for p in ORDER}
+assert len(set(MODEL_SLUG.values())) == len(ORDER), \
+    "two models slug to the same URL segment: %s" % sorted(MODEL_SLUG.values())
+
+# Ordered: this order is the page order and the sitemap order.
+PAIRS = [
+    ("velotric-discover-3", "surface604-rook"),   # "Discover 3 vs Rook" - the two CA$2,699 commuters
+    ("velotric-tempo", "radkick-7speed"),         # "Tempo vs RadKick 7-Speed" - the two lightest here
+]
+
+def pair_slug(a, b):
+    return "%s-vs-%s" % (MODEL_SLUG[a], MODEL_SLUG[b])
+
+_PAIR_SEEN = set()
+for _pa, _pb in PAIRS:
+    assert _pa in BY_ID and _pb in BY_ID, "a pair names a model not in products.json: %s" % ((_pa, _pb),)
+    assert _pa != _pb, "a pair compares a model with itself: %s" % _pa
+    _s = pair_slug(_pa, _pb)
+    assert _s not in _PAIR_SEEN, "two pairs share one URL: %s" % _s
+    _PAIR_SEEN.add(_s)
+PAIR_SLUGS = [pair_slug(a, b) for a, b in PAIRS]
+
+def pair_label(a, b):
+    pa, pb = BY_ID[a], BY_ID[b]
+    return "%s %s vs %s %s" % (pa["maker"], pa["model"], pb["maker"], pb["model"])
+
+def pair_priceline(a, b):
+    pa, pb = BY_ID[a], BY_ID[b]
+    return ("%s each" % pa["price_display"]) if pa["price_display"] == pb["price_display"] \
+        else ("%s vs %s" % (pa["price_display"], pb["price_display"]))
+
+def pair_availability(a, b):
+    """Availability exactly as observed in data/products.json; nothing where none was observed."""
+    return ["%s %s: %s" % (BY_ID[q]["maker"], BY_ID[q]["model"], BY_ID[q]["availability"])
+            for q in (a, b) if BY_ID[q].get("availability")]
+
+def pair_card(a, b):
+    notes = "".join('<p class="pickstock">%s</p>' % esc(n) for n in pair_availability(a, b))
+    return ('<article class="pick"><h3><a href="vs/%s/">%s</a></h3>'
+            '<p class="pickwho">%s</p>%s'
+            '<p>Column by column, on the same published figures as the table above.</p></article>'
+            % (esc(pair_slug(a, b)), esc(pair_label(a, b)), esc(pair_priceline(a, b)), notes))
+
+PAIR_CARDS = "\n".join(pair_card(a, b) for a, b in PAIRS)
 
 # ---------------------------------------------------------------- decisions
 PICKS = [
@@ -253,6 +307,12 @@ __ROWS__
     </div>
   </section>
 
+  <section id="headtohead">
+    <h2>Head to head</h2>
+    <p class="sub">The closest calls in this set, compared column by column on the same published figures as the table above &mdash; two columns, one row per field, and nothing that is not on the makers' own pages.</p>
+    <div class="picks">__PAIRS__</div>
+  </section>
+
   <section id="guide">
     <h2>Which one for which household</h2>
     <p class="sub">The decision guide, in full. The same pages are in the free PDF.</p>
@@ -303,6 +363,7 @@ out = (PAGE
        .replace("__PICKS__", PICKS_HTML)
        .replace("__ROWS__", ROWS)
        .replace("__DETAILS__", DETAILS_HTML)
+       .replace("__PAIRS__", PAIR_CARDS)
        .replace("__SOURCES__", SOURCES_HTML))
 open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8").write(out)
 print("wrote index.html")
@@ -410,7 +471,7 @@ BIKE_PAGE = """<!doctype html>
       <a class="btn ghost" href="../../guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
     </p>
   </section>
-
+__VSSECTION__
   <section id="source">
     <h2>Where these numbers come from</h2>
     <ul class="sources"><li><strong>__MAKER__ __MODEL__</strong> &mdash; <a href="__SOURCEURL__" target="_blank" rel="noopener nofollow">__SOURCEURL__</a><br><span class="fn">__SOURCENOTE__</span></li></ul>
@@ -427,6 +488,21 @@ __AFFJS__
 </body>
 </html>
 """
+
+def bike_vs_section(p):
+    """Links from this bike's own page to every head-to-head page it appears on, so no vs page is an
+    orphan. A bike in no pair gets no section at all - never an empty heading."""
+    rows = [(a, b) for a, b in PAIRS if p["id"] in (a, b)]
+    if not rows:
+        return ""
+    items = "\n      ".join(
+        '<li><a href="../../vs/%s/">%s</a></li>' % (esc(pair_slug(a, b)), esc(pair_label(a, b)))
+        for a, b in rows)
+    return ('\n  <section id="headtohead">\n'
+            '    <h2>Head to head</h2>\n'
+            '    <p class="sub">This bike in a direct comparison, on the same published figures.</p>\n'
+            '    <ul class="otherbikes">\n      %s\n    </ul>\n'
+            '  </section>\n' % items)
 
 def bike_html(p):
     specs = "\n      ".join(
@@ -464,6 +540,7 @@ def bike_html(p):
             .replace("__OTHERS__", others)
             .replace("__SOURCEURL__", esc(p["source_url"]))
             .replace("__SOURCENOTE__", esc(p["source_note"]))
+            .replace("__VSSECTION__", bike_vs_section(p))
             .replace("__AFFJS__", BIKE_AFF_JS))
 
 for p in ORDER:
@@ -731,8 +808,173 @@ os.makedirs(os.path.join(ROOT, "how-far"), exist_ok=True)
 open(os.path.join(ROOT, "how-far", "index.html"), "w", encoding="utf-8").write(_picker_out)
 print("wrote how-far/index.html")
 
+# ================================================================ head-to-head "vs" pages
+# One page per pair in the PAIRS list at the top of this file: two columns, every cell a field already
+# published on that model's own page in data/products.json, and nothing else. No config.js and no
+# affiliate element is emitted here at all, so a page in this directory has nothing that could pay and
+# says nothing about the status of any program. Each page carries its own title, meta description and
+# canonical, is listed in sitemap.xml, and is linked from the landing page and from both models' pages.
+VS_FIELDS = [("price_display", "Price (CAD)")] + BIKE_FIELDS
+
+def vs_rows(a, b):
+    """One row per published field, both columns from products.json. A field only one maker publishes
+    is left out rather than half-filled: the page omits what is not in the data."""
+    pa, pb = BY_ID[a], BY_ID[b]
+    rows = []
+    for key, label in VS_FIELDS:
+        va, vb = pa.get(key), pb.get(key)
+        if va and vb:
+            rows.append('<tr><th scope="row">%s</th><td>%s</td><td>%s</td></tr>'
+                        % (esc(label), esc(va), esc(vb)))
+    return "\n        ".join(rows)
+
+def vs_col(p):
+    """A column head: the model's own bikes/<id>/ page, its maker's source page, and availability only
+    where products.json observed one."""
+    stock = (' <span class="stock">%s</span>' % esc(p["availability"])) if p.get("availability") else ""
+    return ('<a class="mname" href="../../bikes/%s/">%s %s</a>%s'
+            '<span class="mmaker">%s</span>'
+            '<a class="spec-link" href="%s" target="_blank" rel="noopener nofollow">maker specs \u2197</a>'
+            % (esc(p["id"]), esc(p["maker"]), esc(p["model"]), stock,
+               esc(p["maker"]), esc(p["source_url"])))
+
+VS_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .vshero{padding:34px 0 8px}
+  .vshero h1{font-size:clamp(25px,4.4vw,40px);line-height:1.12;margin:0 0 10px;max-width:30ch}
+  .vshero .disclosure{margin-top:16px}
+  table.vs{min-width:620px}
+  table.vs thead th{white-space:normal}
+  table.vs th[scope="row"]{color:var(--muted);font-weight:600;width:180px}
+  table.vs tbody td{font-weight:600;font-size:14px}
+  table.vs .mmaker{margin:2px 0 6px}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Prices and specs checked <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="vshero" style="border-top:none">
+    <p class="crumb"><a href="../../">All five commuter e-bikes, compared</a> &rsaquo; Head to head</p>
+    <h1>__H1__</h1>
+    <p class="deck">__DECK__</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today; every link goes to a maker's own page or to another page on this site.</p>
+  </section>
+
+  <section id="table">
+    <h2>Side by side</h2>
+    <p class="sub">Two columns, one row per published field. Each cell is the figure the maker publishes on its own product page, read __CHECKED__; where a maker publishes no figure for a field, the row is absent rather than filled in.</p>
+    <div class="tablewrap">
+      <table class="vs">
+        <caption>Specifications as published by each maker, read __CHECKED__. Prices are in Canadian dollars. Claimed range is the maker's own estimate, not a test result.</caption>
+        <thead><tr>
+          <th scope="col">Specification</th>
+          <th scope="col">__COLA__</th>
+          <th scope="col">__COLB__</th>
+        </tr></thead>
+        <tbody>
+        __ROWS__
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="who">
+    <h2>Who each one suits</h2>
+    <p class="sub">Each summary below is the one this site already publishes on that model's own page &mdash; not a new verdict written for this comparison.</p>
+    <div class="details">
+      __WHO__
+    </div>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      __NEXT__
+    </ul>
+  </section>
+
+  <section id="source">
+    <h2>Where these numbers come from</h2>
+    <ul class="sources">
+      __SOURCES__
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this page has no live affiliate links for either bike. Nothing here is paid for and no purchase through this page earns anyone a commission today; the only product links above go to the makers' own pages. If a paid partner link is ever added, it will be labelled as one.</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../../data/products.json">products.json</a> &middot; <a href="../../">the comparison</a> &middot; <a href="../../how-far/">the range picker</a>.</p>
+</div></footer>
+</body>
+</html>
+"""
+
+def vs_page(a, b):
+    pa, pb = BY_ID[a], BY_ID[b]
+    slug = pair_slug(a, b)
+    mn_a, mn_b = "%s %s" % (pa["maker"], pa["model"]), "%s %s" % (pb["maker"], pb["model"])
+    title = "%s vs %s in Canada \u2014 specs compared | Commuter E-Bikes CA" % (mn_a, mn_b)
+    desc = ("%s (%s) vs %s (%s): motor, torque, battery, claimed range, weight, brakes, class and "
+            "warranty side by side, from each maker's own product page, checked %s."
+            % (mn_a, pa["price_display"], mn_b, pb["price_display"], CHECKED))
+    deck = ("%s and %s both sell in Canada. Every figure below was read from the two makers' own product "
+            "pages on %s \u2014 not from memory, and not a test result." % (mn_a, mn_b, CHECKED))
+    who = "\n      ".join(
+        '<article class="detail"><h3>%s %s <span class="dprice">%s</span></h3>'
+        '<p><a href="../../bikes/%s/">Full %s %s specifications</a></p><p>%s</p></article>'
+        % (esc(q["maker"]), esc(q["model"]), esc(q["price_display"]), esc(q["id"]),
+           esc(q["maker"]), esc(q["model"]), esc(q["best_for"]))
+        for q in (pa, pb))
+    links = ['<li><a href="../../">All five commuter e-bikes, compared side by side</a></li>']
+    for q in (pa, pb):
+        links.append('<li><a href="../../bikes/%s/">%s %s &mdash; %s, full specifications</a></li>'
+                     % (esc(q["id"]), esc(q["maker"]), esc(q["model"]), esc(q["price_display"])))
+    links.append('<li><a href="../../how-far/">How far will it go? Range against your commute</a></li>')
+    links.append('<li><a href="../../guide/canada-commuter-ebike-guide.pdf" download>The free decision-guide PDF</a></li>')
+    for c, d in PAIRS:
+        if (c, d) != (a, b):
+            links.append('<li><a href="../%s/">%s</a></li>' % (esc(pair_slug(c, d)), esc(pair_label(c, d))))
+    out = (VS_PAGE
+           .replace("__CSS__", CSS)
+           .replace("__TITLE__", esc(title))
+           .replace("__DESC__", esc(desc))
+           .replace("__CANONICAL__", "%s/vs/%s/" % (SITE, slug))
+           .replace("__CHECKED__", esc(CHECKED))
+           .replace("__H1__", esc(pair_label(a, b)))
+           .replace("__DECK__", esc(deck))
+           .replace("__COLA__", vs_col(pa))
+           .replace("__COLB__", vs_col(pb))
+           .replace("__ROWS__", vs_rows(a, b))
+           .replace("__WHO__", who)
+           .replace("__NEXT__", "\n      ".join(links))
+           .replace("__SOURCES__", "\n      ".join(source_html(q) for q in (pa, pb))))
+    d = os.path.join(ROOT, "vs", slug)
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(out)
+    print("wrote vs/%s/index.html" % slug)
+
+for _pa, _pb in PAIRS:
+    vs_page(_pa, _pb)
+
 # ---------------------------------------------------------------- sitemap + robots
-URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER] + ["%s/how-far/" % SITE])
+URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
+        + ["%s/how-far/" % SITE] + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
            + "\n".join("  <url><loc>%s</loc><lastmod>%s</lastmod></url>" % (u, esc(CHECKED)) for u in URLS)
@@ -745,6 +987,11 @@ open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8").write(robots)
 print("wrote robots.txt")
 
 # ================================================================ PDF
+# invariant mode fixes reportlab's CreationDate/ModDate and the trailer file ID to a constant, so the
+# PDF - like every HTML/XML/TXT file above - is byte-identical across rebuilds. Content streams are
+# unchanged; only the two timestamp strings and the document ID would otherwise differ on every run.
+from reportlab import rl_config
+rl_config.invariant = 1
 from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib import colors
 from reportlab.lib.units import inch
