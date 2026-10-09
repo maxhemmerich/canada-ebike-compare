@@ -113,9 +113,9 @@ RANGE_PARSE = {
         high_from='the maker\'s single published figure "up to 97 km (maker estimate)"',
         low_from=None),
     "velotric-discover-3": dict(
-        high=129, low=105, low_label="throttle only, from the maker's 65 mi figure",
-        high_from='the maker\'s published pedal-assist figure "80 mi / ~129 km PAS (65 mi throttle)"',
-        low_from='the maker\'s published throttle-only figure "65 mi", converted to km (1 mi = 1.609344 km)'),
+        high=129, low=105, low_label="throttle only, from the maker's 105 km figure",
+        high_from='the maker\'s published pedal-assist figure "129 km PAS / 105 km throttle (maker)"',
+        low_from='the maker\'s published throttle-only figure "105 km"'),
     "surface604-rook": dict(
         high=150, low=None, low_label=None,
         high_from='the maker\'s single published figure "up to 150 km (maker, eco mode)"',
@@ -125,14 +125,14 @@ RANGE_PARSE = {
         high_from='the maker\'s published "Up to 46 Miles", converted to km (1 mi = 1.609344 km); their footnote names Eco mode and a 75 kg rider',
         low_from=None),
     "ohm-cruise-3": dict(
-        high=100, low=None, low_label=None,
-        high_from='the maker\'s own product-page summary "100 km range"; the specification table publishes no range figure',
+        high=150, low=None, low_label=None,
+        high_from='the maker\'s own product-page feature tile "150km Freedom"; the specification table publishes no range figure',
         low_from=None),
 }
 _RANGE_TOKENS = {"radster-road": ("104", "40"), "radkick-7speed": ("56", "24"),
-                 "velotric-tempo": ("97",), "velotric-discover-3": ("129", "65"),
+                 "velotric-tempo": ("97",), "velotric-discover-3": ("129", "105"),
                  "surface604-rook": ("150",), "aventon-soltera-2-5": ("74", "46"),
-                 "ohm-cruise-3": ("100",)}
+                 "ohm-cruise-3": ("150",)}
 assert set(RANGE_PARSE) == {q["id"] for q in PRODUCTS} == set(_RANGE_TOKENS), \
     "the range table is out of step with data/products.json"
 for _pid, _toks in _RANGE_TOKENS.items():
@@ -206,7 +206,7 @@ PICKS = [
      "At CA$1,699 the Soltera 2.5 is the lowest price here and still a real bike: Tektro hydraulic disc brakes, a torque sensor and lights front and rear, UL 2849 / UL 2271 certified. Its 345.6 Wh battery is the honest limit: short, light trips."),
     ("The longest commute on one charge",
      "surface604-rook",
-     "The Rook carries the biggest battery here (960 Wh) and claims the longest range of any bike on this page: up to 150 km in eco. It is also the only bike here that ships at Class 3."),
+     "The Rook carries the biggest battery here (960 Wh) and, at up to 150 km in eco, claims the joint-longest range on this page - the same figure OHM publishes for the Cruise 3. It is also the only bike here that ships at Class 3."),
     ("The best all-round daily commuter",
      "velotric-discover-3",
      "750 W is the highest motor rating in this set, and its 730 Wh battery is the second biggest - behind only the Rook's 960 Wh - with lights, fenders and a rack included."),
@@ -369,6 +369,7 @@ PAGE = r"""<!doctype html>
       <a class="btn ghost" href="#compare">Compare the __N_WORD__</a>
       <a class="btn ghost" href="how-far/">How far will it go?</a>
       <a class="btn ghost" href="commute-costs/">What a commute costs</a>
+      <a class="btn ghost" href="gear/">Gear: helmets, locks and lights</a>
     </div>
     <p class="disclosure" role="note">__DISCLOSURE__</p>
   </section>
@@ -562,6 +563,7 @@ BIKE_PAGE = """<!doctype html>
     <p class="cta" style="margin-top:20px">
       <a class="btn" href="../../#compare">Compare all __N_WORD__ side by side</a>
       <a class="btn ghost" href="../../guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
+      <a class="btn ghost" href="../../gear/">Gear: helmets, locks and lights</a>
     </p>
   </section>
 __VSSECTION__
@@ -784,8 +786,8 @@ __FIGROWS__
       <li><strong>It only ever quotes the maker.</strong> Each top figure and each lowest published figure above is a number the maker itself published, quoted in full in the table, with a link to the page it was read from.</li>
       <li><strong>Hills are not modelled.</strong> No maker here publishes a hills figure, so this page will not invent a percentage for you. The hills box changes which published figure you are measured against &mdash; the maker's own low end, where one exists.</li>
       <li><strong>A caveat on the Rook.</strong> Surface 604 describes its published figure as eco mode, so that top figure is the maker's best case, not a worst case.</li>
-      <li><strong>Conversions, named.</strong> The Discover 3's lowest figure is published in miles (65 mi) and the Soltera 2.5's range is published in miles only (46 mi); both are shown here converted to kilometres at 1 mi = 1.609344 km.</li>
-      <li><strong>Where two of these figures come from.</strong> The Soltera 2.5's figure carries Aventon's own footnote &mdash; Eco mode, a 75 kg rider, flat paved road &mdash; so it is a best case as well. The Cruise 3's 100 km is stated in OHM's own product-page summary rather than in its specification table, and no assist level is named with it.</li>
+      <li><strong>Conversions, named.</strong> Only the Soltera 2.5's range is published in miles (46 mi); it is shown here converted to kilometres at 1 mi = 1.609344 km. The Discover 3 publishes both its pedal-assist and its throttle range in kilometres.</li>
+      <li><strong>Where two of these figures come from.</strong> The Soltera 2.5's figure carries Aventon's own footnote &mdash; Eco mode, a 75 kg rider, flat paved road &mdash; so it is a best case as well. The Cruise 3's 150 km is stated on OHM's own product page in its feature grid rather than in its specification table, and no assist level is named with it.</li>
       <li><strong>Battery size is the whole story only sometimes.</strong> The Wh figure above is the maker's published capacity; two bikes can post the same miles from different Wh once weight and assist level are counted in.</li>
     </ol>
   </section>
@@ -1773,6 +1775,280 @@ assert _page_nums <= _allowed_nums, \
 print("commute-costs page: %d bytes, %d figures, every one substituted from a named source, no affiliate element"
       % (len(COST_TEXT), len(_page_nums)))
 
+# ================================================================ gear: helmets, locks and lights
+# Every other page here is a bike spec sheet. This is the one page aimed at the reader who already has
+# a bike and needs gear - a helmet, a lock, a set of lights - and it is deliberately crew-owned: it
+# loads NO config.js and emits NO .aff element, and it links to no product at all, so it earns nothing
+# today and can be pointed at a program later without a rebuild. Every figure on it is the makers' own
+# published figure for a bike already on this site, substituted from data/products.json; the template
+# carries no digit of its own and the build aborts on any number that is not one of those substitutions.
+GEAR_READ = COST_READ  # the same re-verification date the catalogue figures were read on
+GEAR_TITLE = ("E-bike gear in Canada: helmets, locks and lights, and what each bike here is rated to "
+              "carry | Commuter E-Bikes CA")
+GEAR_DESC = ("What to check on a helmet, a lock and a set of lights for a Canadian e-bike commute, plus "
+             "the maker's own maximum-load figure for each of the %s bikes on this site. No product "
+             "links and nothing paid for." % N_WORD)
+GEAR_INTRO = ("A helmet, a lock and a set of lights are the three things a commuter ends up buying in "
+              "the first month, and the three where the wrong buy is worthless or dangerous. This page "
+              "is what to check on each of them. It recommends no particular product: there is no "
+              "product link on it, nothing on it is paid for, and the only figures on it are the "
+              "makers' own published figures for the bikes on this site.")
+GEAR_DISCLOSURE = ("this page carries no affiliate link and no product link at all, and nothing on it "
+                   "earns a commission. It is general buying guidance, not legal, medical or safety "
+                   "advice for your particular riding or your province's rules.")
+
+GEAR_HELMET_HEAD = "Helmets: fit before features"
+GEAR_HELMET = [
+    ("In Canada a bicycle helmet must carry a certification mark from a recognised standards body, and "
+     "the label inside the shell is where you check it. What an e-bike changes is not the helmet's job "
+     "but the speed: the faster the motor can assist you, the more a helmet built and tested for that "
+     "speed matters. A bargain leisure-cycling shell and a lid rated for motor-assisted speeds are not "
+     "the same product even when they look alike."),
+    ("Fit does more than price. A helmet that shifts on your head is not protecting you: it should sit "
+     "level and low enough to cover your forehead, the straps should meet just under your ear, and it "
+     "should not rock when you shake your head with the buckle done up."),
+    ("Rotational-impact systems, of which MIPS is the best known, add a sliding layer between the shell "
+     "and your head. They are worth knowing about, but a certified helmet that fits properly beats an "
+     "expensive one that does not."),
+]
+GEAR_LOCK_HEAD = "Locks: two beats one"
+GEAR_LOCK = [
+    ("Two locks are better than one good lock. On a commuter e-bike the parts that walk away first are "
+     "the wheels, the battery and the seatpost, so a heavy lock through the frame plus a second lock or "
+     "cable through a wheel covers more than one heavier lock on its own."),
+    ("Look for an independent security rating rather than the maker's own claim. Sold Secure and ART "
+     "are the two scales you will see on locks sold in Canada; both test a lock by trying to cut, pick "
+     "and lever it. A bike worth a few thousand dollars deserves a lock at the top of one of them."),
+    ("Match the lock to the bike. Lock to an immovable object, fill the shackle so a jack cannot get "
+     "in, and take a removable battery with you. The dearer the bike, the shorter the life of a cheap "
+     "cable."),
+]
+GEAR_LIGHT_HEAD = "Lights: to see by, and to be seen"
+GEAR_LIGHT = [
+    ("A commuter's lights do two jobs: to see the road, and to be seen. In a city the second matters "
+     "more, and it is the one a bargain light fails at - a dim front lamp and a barely-there rear "
+     "blinky disappear at dusk beside car headlights."),
+    ("Front: bright enough to be seen by a driver in daylight, and aimed low so you do not dazzle "
+     "oncoming traffic. Rear: the light that keeps you alive after dark - a steady red on the bike, "
+     "and if you can, a second on your helmet or bag, because one rear light can be hidden by a "
+     "pannier or a passing car."),
+    ("Reflectors are required in most of Canada and most bikes ship with them. Check what is already "
+     "in the box before buying anything."),
+]
+
+def _gear_para(text):
+    return '<p class="gearsec">%s</p>' % esc(text)
+
+GEAR_HELMET_HTML = "\n    ".join(_gear_para(t) for t in GEAR_HELMET)
+GEAR_LOCK_HTML = "\n    ".join(_gear_para(t) for t in GEAR_LOCK)
+GEAR_LIGHT_HTML = "\n    ".join(_gear_para(t) for t in GEAR_LIGHT)
+
+GEAR_FIT_HEAD = "What each bike here is rated to carry"
+GEAR_FIT_SUB = ("The maximum total load each maker publishes for the whole bike - rider and cargo "
+                "together. It is the ceiling to stay under when you add a rack bag, a basket or a "
+                "child seat; where a maker publishes no such figure, the cell says so rather than "
+                "being filled in with a guess.")
+GEAR_FIT_CAPTION = ("Each load, weight, class and price below is the maker's own published figure, "
+                    "read from its product page on the date shown on that bike's own page.")
+
+def _gear_fit_row(q):
+    """One row per bike, every cell the published field itself. No affiliate element is emitted on this
+    page at all, so there is nothing here that could pay or that claims a link pays."""
+    return ('<tr><th scope="row" class="model"><a class="mname" href="../bikes/%s/">%s</a>'
+            '<span class="mmaker">%s</span></th>'
+            '<td>%s</td><td>%s</td><td>%s</td><td class="price">%s</td></tr>'
+            % (esc(q["id"]), esc(q["model"]), esc(q["maker"]), esc(q.get("payload") or "not published"),
+               esc(q["weight"]), esc(q["eclass"]), esc(q["price_display"])))
+
+GEAR_FIT_ROWS = "\n        ".join(_gear_fit_row(q) for q in ORDER)
+
+_GEAR_CHEAP = min(ORDER, key=lambda p: p["price_cad"])
+_GEAR_DEAR = max(ORDER, key=lambda p: p["price_cad"])
+GEAR_SPECIFIC = ("The bikes on this site run from %s, and the gear is not the same buy at each end. "
+                 "The cheapest here is the %s %s at %s; the dearest is the %s %s at %s. Gear is also "
+                 "the one purchase that follows you to the next bike, so it is the wrong place to cut "
+                 "to the price of the cheapest bike on the page."
+                 % (PRICE_SPAN, _GEAR_CHEAP["maker"], _GEAR_CHEAP["model"], _GEAR_CHEAP["price_display"],
+                    _GEAR_DEAR["maker"], _GEAR_DEAR["model"], _GEAR_DEAR["price_display"]))
+
+GEAR_SOURCES = "\n        ".join(
+    '<li><strong>%s %s</strong> &mdash; the maker\'s own product page, read %s: '
+    '<a href="%s" target="_blank" rel="noopener nofollow">%s</a></li>'
+    % (esc(q["maker"]), esc(q["model"]), esc(GEAR_READ), esc(q["source_url"]), esc(q["source_url"]))
+    for q in ORDER)
+
+GEAR_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Commuter E-Bikes CA">
+<meta property="og:title" content="__OGTITLE__">
+<meta property="og:description" content="__DESC__">
+<meta property="og:url" content="__CANONICAL__">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="__OGTITLE__">
+<meta name="twitter:description" content="__DESC__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .gearhero{padding:34px 0 8px}
+  .gearhero h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;margin:0 0 12px;max-width:28ch}
+  p.gearsec{margin:0 0 14px;color:#333842;max-width:74ch}
+  table.gear .model{font-weight:700}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Guidance written <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="gearhero" style="border-top:none">
+    <p class="crumb"><a href="../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; Gear</p>
+    <h1>Gear for a Canadian e-bike commute: helmets, locks and lights</h1>
+    <p class="deck">__INTRO__</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> __DISC__</p>
+  </section>
+
+  <section id="helmet">
+    <h2>__HELMET_HEAD__</h2>
+    __HELMET__
+  </section>
+
+  <section id="lock">
+    <h2>__LOCK_HEAD__</h2>
+    __LOCK__
+  </section>
+
+  <section id="lights">
+    <h2>__LIGHT_HEAD__</h2>
+    __LIGHT__
+  </section>
+
+  <section id="load">
+    <h2>__FIT_HEAD__</h2>
+    <p class="sub">__FIT_SUB__</p>
+    <div class="tablewrap">
+      <table class="gear">
+        <caption>__FIT_CAPTION__</caption>
+        <thead><tr>
+          <th scope="col">Model</th><th scope="col">Max total load (maker's figure)</th>
+          <th scope="col">Weight (maker's figure)</th><th scope="col">Class</th>
+          <th scope="col">Price (CAD)</th>
+        </tr></thead>
+        <tbody>
+        __FIT_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note">__SPECIFIC__</p>
+  </section>
+
+  <section id="sources">
+    <h2>Where the figures come from</h2>
+    <p class="sub">The load, weight, class and price in the table above are the makers' own published figures, read from their own product pages on __READ__ &mdash; the same date each bike page carries.</p>
+    <ul class="sources">__SOURCES__</ul>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
+      <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
+      <li><a href="../commute-costs/">What a commute actually costs, e-bike vs car vs transit</a></li>
+      <li><a href="../guide/">The free decision guide</a></li>
+      <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> __DISC__</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="../commute-costs/">what a commute costs</a>.</p>
+</div></footer>
+</body>
+</html>
+"""
+
+# The template may carry no figure of its own: every digit in the output must come from a substitution,
+# or a hand-typed number could go live on a page whose whole point is that nothing is typed by hand.
+_tmpl_probe = re.sub(r"(?s)<(style|script).*?</\1>", " ", GEAR_PAGE)
+_tmpl_probe = re.sub(r"(?s)<[^>]+>", " ", _tmpl_probe)
+_tmpl_probe = re.sub(r"__[A-Z_0-9]*__", "", _tmpl_probe)
+assert not re.search(r"\d", _tmpl_probe), \
+    "a figure is typed into the gear template instead of being substituted"
+
+_GEAR_SUBST = {
+    "__CSS__": CSS,
+    "__N_WORD__": esc(N_WORD),
+    "__CHECKED__": esc(CHECKED),
+    "__READ__": esc(GEAR_READ),
+    "__TITLE__": esc(GEAR_TITLE),
+    "__OGTITLE__": esc(GEAR_TITLE),
+    "__DESC__": esc(GEAR_DESC),
+    "__CANONICAL__": "%s/gear/" % SITE,
+    "__INTRO__": esc(GEAR_INTRO),
+    "__DISC__": esc(GEAR_DISCLOSURE),
+    "__HELMET_HEAD__": esc(GEAR_HELMET_HEAD),
+    "__HELMET__": GEAR_HELMET_HTML,
+    "__LOCK_HEAD__": esc(GEAR_LOCK_HEAD),
+    "__LOCK__": GEAR_LOCK_HTML,
+    "__LIGHT_HEAD__": esc(GEAR_LIGHT_HEAD),
+    "__LIGHT__": GEAR_LIGHT_HTML,
+    "__FIT_HEAD__": esc(GEAR_FIT_HEAD),
+    "__FIT_SUB__": esc(GEAR_FIT_SUB),
+    "__FIT_CAPTION__": esc(GEAR_FIT_CAPTION),
+    "__FIT_ROWS__": GEAR_FIT_ROWS,
+    "__SPECIFIC__": esc(GEAR_SPECIFIC),
+    "__SOURCES__": GEAR_SOURCES,
+}
+_gear_out = GEAR_PAGE
+for _k, _v in _GEAR_SUBST.items():
+    _gear_out = _gear_out.replace(_k, _v)
+write_page(os.path.join(ROOT, "gear", "index.html"), _gear_out, "gear")
+
+# ---- the page is read back and checked before the sitemap is written
+GEAR_FILE = os.path.join(ROOT, "gear", "index.html")
+GEAR_TEXT = open(GEAR_FILE, encoding="utf-8").read()
+
+# 1. nothing here can pay, and it says nothing about the status of any program.
+for _bad in ("config.js", "AFFILIATE_", 'data-aff=', 'class="buyaff"'):
+    assert _bad not in GEAR_TEXT, "affiliate element on the gear page: %r" % _bad
+
+# 2. its own head: title, description, canonical and the social card.
+assert '<link rel="canonical" href="%s/gear/">' % SITE in GEAR_TEXT
+for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="og:site_name"',
+              'property="og:title"', 'property="og:description"', 'property="og:url"',
+              'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"'):
+    assert _head in GEAR_TEXT, "gear page is missing %s" % _head
+
+# 3. no product link: every absolute link on the page is a maker's own product page, never a shop bag.
+_hrefs = re.findall(r'href="([^"]+)"', GEAR_TEXT)
+_ext = sorted(h for h in _hrefs if h.startswith("http") and not h.startswith(SITE))
+assert set(_ext) <= {q["source_url"] for q in ORDER}, \
+    "the gear page links off to a non-maker, non-site URL: %r" % [h for h in _ext if h not in {q["source_url"] for q in ORDER}]
+
+# 4. every number that reached the page must come from a substitution, precomputed above - the guard a
+#    hand-typed figure would trip.
+_allowed_nums = set()
+for _v in _GEAR_SUBST.values():
+    _allowed_nums |= set(re.findall(r"\d[\d,.]*", str(_v)))
+_body_text = re.sub(r"(?s)<(style|script).*?</\1>", " ", GEAR_TEXT.split("<body>", 1)[1])
+_body_text = html.unescape(re.sub(r"(?s)<[^>]+>", " ", _body_text))
+_page_nums = set(re.findall(r"\d[\d,.]*", _body_text))
+assert _page_nums <= _allowed_nums, \
+    "number on the gear page with no published source: %r" % sorted(_page_nums - _allowed_nums)
+print("gear page: %d bytes, %d figures, every one substituted from the makers' own data, no affiliate "
+      "element, no product link" % (len(GEAR_TEXT), len(_page_nums)))
+
 # ================================================================ the reader: /stats/
 # A count nobody can read is not a measurement. This page reads every key back through the service's
 # /get endpoint and shows what it finds, so "how much traffic does this lane get" has an answer that
@@ -1793,6 +2069,7 @@ METRIC_PAGES = (
     + [("how-far", "How far will it go? &mdash; the range picker")]
     + [("guide", "The decision guide &mdash; the free front-door page")]
     + [("commute-costs", "What a commute costs &mdash; e-bike vs car vs transit, per year")]
+    + [("gear", "Gear &mdash; helmets, locks and lights, and what each bike is rated to carry")]
     + [("vs/%s" % s, "%s" % pair_label(*pair)) for s, pair in zip(PAIR_SLUGS, PAIRS)]
     + [("stats", "This page &mdash; the counts")]
 )
@@ -1978,6 +2255,7 @@ print("stats reader: %d rows, every one a live beacon key, no placeholder token"
 # ---------------------------------------------------------------- sitemap + robots
 URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
         + ["%s/how-far/" % SITE] + ["%s/guide/" % SITE] + ["%s/commute-costs/" % SITE]
+        + ["%s/gear/" % SITE]
         + ["%s/stats/" % SITE]
         + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
 # The sitemap and the beacon list are the same set of pages, or one of them is lying. Asserted, not assumed.

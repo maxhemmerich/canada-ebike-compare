@@ -1,7 +1,7 @@
 {
   "title": "Canadian Commuter E-Bike Comparison",
   "subtitle": "Seven commuter e-bikes you can buy in Canada for CAD $1,699-$3,499, with specs taken from each maker's own product page.",
-  "checked_on": "2026-10-08",
+  "checked_on": "2026-10-09",
   "currency_note": "Every price below was read from the maker's Canadian storefront in Canadian dollars (CAD). Specs were read from the maker's own product/spec pages on the date above.",
   "products": [
     {
@@ -19,11 +19,11 @@
       "brakes": "Hydraulic disc",
       "eclass": "Class 1/2 (ships Class 2)",
       "sensor": "Torque sensor, 5 PAS",
-      "warranty": "1 year (Rad warranty page)",
+      "warranty": "2 years frame, components and battery; 1 year some items (Rad warranty page)",
       "payload": "320 lb total / 290 lb rider",
       "best_for": "A long, bike-feeling commute: the torque sensor and 100 Nm motor make pedalling feel assisted rather than motorised. It is the heaviest bike here, so it suits a garage or ground-floor lock-up.",
       "source_url": "https://radpowerbikes.ca/products/radster-road-electric-commuter-bike",
-      "source_note": "Technical Specifications block on the product page (Samsung 50GB / LG M50LT cells, UL 2271). Price from the product's Shopify .js endpoint, CAD. Re-read 2026-10-08: CA$2,699.00 CAD, in stock, Reg. 74.5 lb (33.8 kg), 100 Nm, 320 lb (145 kg) / 290 lb rider, 15 Ah 720 Wh."
+      "source_note": "Technical Specifications block on the product page (Samsung 50GB / LG M50LT cells, UL 2271). Price from the product's Shopify .js endpoint, CAD. Re-read 2026-10-08: CA$2,699.00 CAD, in stock, Reg. 74.5 lb (33.8 kg), 100 Nm, 320 lb (145 kg) / 290 lb rider, 15 Ah 720 Wh. Re-verified 2026-10-09 against the live page: CA$2,699.00 CAD, 500 W / 100 Nm, 15Ah 720 Wh, 40-104 km, 74.5 lb, hydraulic disc, Class 1/2 shipping Class 2, torque sensor, 320 lb / 290 lb rider - all unchanged. Rad's own warranty page (read 2026-10-09) publishes 2 years for frame, components and battery and 1 year for pedals, freewheel, crankset, cassette, derailleur, shifter and saddle, so the warranty cell now reads 2 years."
     },
     {
       "id": "radkick-7speed",
@@ -40,11 +40,11 @@
       "brakes": "Hydraulic disc (Gemma GA-950)",
       "eclass": "Class 2",
       "sensor": "Cadence sensor, 5 PAS",
-      "warranty": "1 year (Rad warranty page)",
+      "warranty": "2 years frame, components and battery; 1 year some items (Rad warranty page)",
       "payload": "300 lb total / 275 lb rider",
       "best_for": "Short trips and stairs: Rad's lightest bike at 55 lb, with a rear rack rated 55 lb. The small 360 Wh battery is the trade-off - it is the shortest-range bike in this set.",
       "source_url": "https://radpowerbikes.ca/products/radkick-7-speed-electric-lightweight-bike",
-      "source_note": "Technical Specifications / Geometry blocks on the product page (UL-2271 battery). Price from the product's Shopify .js endpoint, CAD. Re-read 2026-10-08: CA$1,899.00 CAD, in stock, 55 lb (25.2 kg), 40 Nm, 300 lb (136 kg) / 275 lb rider, 10 Ah 360 Wh, Class 2."
+      "source_note": "Technical Specifications / Geometry blocks on the product page (UL-2271 battery). Price from the product's Shopify .js endpoint, CAD. Re-read 2026-10-08: CA$1,899.00 CAD, in stock, 55 lb (25.2 kg), 40 Nm, 300 lb (136 kg) / 275 lb rider, 10 Ah 360 Wh, Class 2. Re-verified 2026-10-09 against the live page: CA$1,899.00 CAD, 500 W / 40 Nm, 10Ah 360 Wh, 24-56 km, 55 lb, hydraulic disc (Gemma GA-950), Class 2, cadence sensor, 300 lb / 275 lb rider - all unchanged. Warranty now read from Rad's own warranty page (2026-10-09) as 2 years frame/components/battery."
     },
     {
       "id": "velotric-tempo",
@@ -65,7 +65,7 @@
       "payload": "150 kg (331 lb) max bike load",
       "best_for": "Carrying-up-stairs and mixed bike/motor use: at 39 lb it is by far the lightest here, and light enough to ride with the motor off. The 374 Wh battery is the smallest, so plan short hops or charge often.",
       "source_url": "https://www.velotric.ca/products/velotric-tempo-ebike",
-      "source_note": "Key Features block and the Specification & Geometry table on the product page. Price shown as CA$2,099.00 CAD on the product page. Re-read 2026-10-08: the spec table now publishes Ebike Class 1/2/3 (default 32 km/h, adjustable 19-45) and Max Bike Load Capacity 150 kg, so those cells are no longer 'not stated'."
+      "source_note": "Key Features block and the Specification & Geometry table on the product page. Price shown as CA$2,099.00 CAD on the product page. Re-read 2026-10-08: the spec table now publishes Ebike Class 1/2/3 (default 32 km/h, adjustable 19-45) and Max Bike Load Capacity 150 kg, so those cells are no longer 'not stated'. Re-verified 2026-10-09 against the live page: CA$2,099.00 CAD, 36V 350W / 650W peak / 45Nm, 36V 10.14Ah (374Wh), pedal-assist range 97 km, 17.7 kg, Shimano hydraulic disc 180 mm both ends, Class 1/2/3 (32 km/h default, adjustable 19-45), torque and cadence sensor, max bike load 150 kg - all unchanged."
     },
     {
       "id": "velotric-discover-3",
@@ -77,7 +77,7 @@
       "motor": "Rear hub, 750 W (1,100 W peak)",
       "torque": "75 Nm",
       "battery": "730 Wh (15.2 Ah), Samsung/LG 21700",
-      "range": "80 mi / ~129 km PAS (65 mi throttle)",
+      "range": "129 km PAS / 105 km throttle (maker)",
       "weight": "62 lb / 28 kg",
       "brakes": "Tektro hydraulic disc, 180 mm rotors",
       "eclass": "Class 1/2/3 (20 mph default, adjustable to 28)",
@@ -86,7 +86,7 @@
       "payload": "440 lb max bike load / 66 lb rack",
       "best_for": "The all-round daily commuter: a 750 W motor, a 730 Wh battery and the second-longest claimed range here (~129 km of pedal assist), with lights, fenders and a rear rack included. It ships as Class 2; Class 3 (28 mph) is unlocked in the app where local rules allow.",
       "source_url": "https://www.velotric.ca/products/discover-3",
-      "source_note": "Specification & Geometry table on the product page. Price shown as CA$2,699.00 CAD (confirmed in the page's JSON-LD, priceCurrency CAD). Re-read 2026-10-08: Bike Weight now listed as 28 kg; 750 W / 1,100 W peak / 75 Nm, 15.2 Ah 730 Wh, 200 kg max load / 30 kg rack, PAS range 129 km; no sale price on the page."
+      "source_note": "Specification & Geometry table on the product page. Price shown as CA$2,699.00 CAD (confirmed in the page's JSON-LD, priceCurrency CAD). Re-read 2026-10-08: Bike Weight now listed as 28 kg; 750 W / 1,100 W peak / 75 Nm, 15.2 Ah 730 Wh, 200 kg max load / 30 kg rack, PAS range 129 km; no sale price on the page. Re-verified 2026-10-09 against the live page: CA$2,699.00 CAD, 48V 750W / 1100W peak / 75Nm, 15.2Ah (730Wh) Samsung/LG 21700, pedal-assist range 129 km and throttle range 105 km, 28 kg, Tektro hydraulic disc 180 mm both ends, Class 1/2/3, SensorSwap torque and cadence, 200 kg max load / 30 kg rack. The throttle figure is now quoted in the maker's own current unit (105 km); the earlier 65 mi is the same quantity."
     },
     {
       "id": "surface604-rook",
@@ -108,7 +108,7 @@
       "availability": "Out of stock when checked",
       "best_for": "The long-haul, high-speed pick: the biggest battery here (960 Wh) and the only bike in this set that ships at Class 3, with a 45 km/h claimed top speed. Vancouver-designed, with a 5-year frame warranty. It was Out of Stock when checked.",
       "source_url": "https://www.surface604bikes.com/electric-bikes/rook",
-      "source_note": "Product page and its Specifications tab (motor, torque, battery, class, brakes, weight, weight capacity, warranty). Price shown as CA$2,699.00 (page JSON-LD: priceCurrency CAD). This model showed Out of Stock on the date checked. Re-read 2026-10-08: the Specifications tab now publishes 500 W (peaks at 750 W) Bafang geared hub, 65 Nm, net weight 27.75 kg / 61 lb, and weight capacity 300 lb (136 kg)."
+      "source_note": "Product page and its Specifications tab (motor, torque, battery, class, brakes, weight, weight capacity, warranty). Price shown as CA$2,699.00 (page JSON-LD: priceCurrency CAD). This model showed Out of Stock on the date checked. Re-read 2026-10-08: the Specifications tab now publishes 500 W (peaks at 750 W) Bafang geared hub, 65 Nm, net weight 27.75 kg / 61 lb, and weight capacity 300 lb (136 kg). Re-verified 2026-10-09 against the live page: CA$2,699.00, 500W peaking at 750W Bafang geared hub, 65Nm, 48V 20Ah / 960Wh Samsung 21700, up to 150 km eco, 27.75 kg (61 lb), Tektro Auriga hydraulic disc, Class 3 (45 km/h), dropout torque sensor, 300 lb (136 kg) capacity, 5-year frame / 2-year components - all unchanged, still shown Out of Stock."
     },
     {
       "id": "aventon-soltera-2-5",
@@ -130,7 +130,7 @@
       "availability": "Limited stock when checked",
       "best_for": "A flat-city commuter on the lowest budget here: at 46 lb it is light, and it still carries hydraulic disc brakes, a torque sensor and front and rear lights. The 345.6 Wh battery and the maker's own Eco-mode range figure suit short, light trips rather than long ones.",
       "source_url": "https://www.aventon.com/en-ca/products/soltera-2-5-ebike",
-      "source_note": "Technical Specifications panel and the feature strip on Aventon's Canadian (en-ca) product page, read 2026-10-08: Speed Class 2, 36 V 350 W sustained / 540 W peak brushless hub motor, Motor Torque 45 Nm, battery 36 V 9.6 Ah (345.6 Wh) with LG cells, Sensors 'Double Sided Bottom Bracket Torque Sensor', Weight 46 lbs, Total Weight Limit 300 lbs, front and rear brake Tektro HD-T280 hydraulic disc with 180 mm rotors, Pedal Assist 4 levels, Front and rear lights integrated, UL 2849 / UL 2271 certified, and the page's own '2 Year Warranty' badge. Range is published as 'Up to 46 Miles' with the page's own footnote: 'Max range is estimated based on a rider weighing 165 lbs (75 kg) on a paved, flat road, in Eco Mode, with Ride Tune set to the default settings.' The miles figure is converted at 1 mi = 1.609344 km and shown as both. Price is the CA$1,699.00 shown on the en-ca page (variants at 169900). Stock wording seen on the page: 'Limited stock available. Order today.'"
+      "source_note": "Technical Specifications panel and the feature strip on Aventon's Canadian (en-ca) product page, read 2026-10-08: Speed Class 2, 36 V 350 W sustained / 540 W peak brushless hub motor, Motor Torque 45 Nm, battery 36 V 9.6 Ah (345.6 Wh) with LG cells, Sensors 'Double Sided Bottom Bracket Torque Sensor', Weight 46 lbs, Total Weight Limit 300 lbs, front and rear brake Tektro HD-T280 hydraulic disc with 180 mm rotors, Pedal Assist 4 levels, Front and rear lights integrated, UL 2849 / UL 2271 certified, and the page's own '2 Year Warranty' badge. Range is published as 'Up to 46 Miles' with the page's own footnote: 'Max range is estimated based on a rider weighing 165 lbs (75 kg) on a paved, flat road, in Eco Mode, with Ride Tune set to the default settings.' The miles figure is converted at 1 mi = 1.609344 km and shown as both. Price is the CA$1,699.00 shown on the en-ca page (variants at 169900). Stock wording seen on the page: 'Limited stock available. Order today.' Re-verified 2026-10-09 against the live en-ca page: CA$1,699.00, 350W sustained / 540W peak, 45Nm, 36V 9.6Ah (345.6Wh) LG cells, up to 46 miles (Eco), 46 lbs, Class 2, Tektro HD-T280 hydraulic disc with 180 mm rotors both ends, double-sided bottom-bracket torque sensor, total weight limit 300 lbs, 2-year warranty - all unchanged."
     },
     {
       "id": "ohm-cruise-3",
@@ -142,7 +142,7 @@
       "motor": "Shimano E7000, 250 W continuous / 500 W peak",
       "torque": "60 Nm",
       "battery": "504 Wh (in-tube)",
-      "range": "100 km (maker's page summary)",
+      "range": "150 km (maker's product-page tile)",
       "weight": "22.2 kg (49 lb)",
       "brakes": "Shimano MT-420 quad-piston hydraulic disc (180 mm front / 160 mm rear)",
       "eclass": "32 km/h speed assist (Canada); no class number published",
@@ -150,7 +150,7 @@
       "availability": "In stock when checked",
       "best_for": "The comfort-first step-through: an upright position, a Shimano E7000 system with 60 Nm, and a maker that has designed in North Vancouver since 2005 and states a 10-year parts guarantee. It is also the dearest bike on this page.",
       "source_url": "https://www.ohmcycles.com/products/cruise-3",
-      "source_note": "Technical Specifications accordion and the Bike Details tab on OHM's own product page, read 2026-10-08: Motor 'Shimano E7000, 250W continuous / 500W peak, 60Nm', Battery '504Wh, Li-ion, In-tube, State of Charge Display', Speed Assist '32 km/h (Canada)*' with the page's own footnote ('Motor is rated at 250W continuous output - the legally relevant figure under Canada's federal PAB regulations (500W max). Peak power rating reflects momentary output under load. Speed assist is firmware-configured to 32 km/h for Canadian compliance (28 mph available for US Class 3 regions)'), Brakes 'Shimano MT-420, Quad Piston, Hydraulic Disc' with 180 mm front / 160 mm rear rotors, Frame 'Premium Hydroformed Aluminium, Step-Through', and the page's own '2-Year Warranty' badge. Bike Details: Weight 22.2 kg (49 lb), MSRP $3,499 CAD. The 100 km figure is published in the product page's own summary text ('Shimano E7000, 60 Nm torque, 100 km range'); the specification table itself publishes no range figure and names no assist level, so the figure is labelled as coming from the page summary. The same page's FAQ answers 'Is it heavy?' with 52 lbs while the Bike Details tab says 22.2 kg (49 lb); the tab figure is the one used here. Price CA$3,499.00 CAD (Shopify product data; storefront currency CAD), 'Add to cart' enabled and no variant flagged sold out. The product page's own name is 'Cruise'; its URL, the maker's comparison page and its city collection call it Cruise 3."
+      "source_note": "Technical Specifications accordion and the Bike Details tab on OHM's own product page, read 2026-10-08: Motor 'Shimano E7000, 250W continuous / 500W peak, 60Nm', Battery '504Wh, Li-ion, In-tube, State of Charge Display', Speed Assist '32 km/h (Canada)*' with the page's own footnote ('Motor is rated at 250W continuous output - the legally relevant figure under Canada's federal PAB regulations (500W max). Peak power rating reflects momentary output under load. Speed assist is firmware-configured to 32 km/h for Canadian compliance (28 mph available for US Class 3 regions)'), Brakes 'Shimano MT-420, Quad Piston, Hydraulic Disc' with 180 mm front / 160 mm rear rotors, Frame 'Premium Hydroformed Aluminium, Step-Through', and the page's own '2-Year Warranty' badge. Bike Details: Weight 22.2 kg (49 lb), MSRP $3,499 CAD. Range: the specification table publishes no range figure and names no assist level. Until 2026-10-09 this entry quoted 100 km, from the page's own summary text ('Shimano E7000, 60 Nm torque, 100 km range'); that text is no longer published, and the only range figure the maker now gives on this product page is its own feature tile, \"150km Freedom\" (read 2026-10-09), so the figure is labelled as coming from that tile. The same page's FAQ answers 'Is it heavy?' with 52 lbs while the Bike Details tab says 22.2 kg (49 lb); the tab figure is the one used here. Price CA$3,499.00 CAD (Shopify product data; storefront currency CAD), 'Add to cart' enabled and no variant flagged sold out. The product page's own name is 'Cruise'; its URL, the maker's comparison page and its city collection call it Cruise 3. Everything else re-verified 2026-10-09 against the live page: CA$3,499.00 CAD, Shimano E7000 250W continuous / 500W peak / 60Nm, 504Wh in-tube battery, 22.2 kg (49 lb), Shimano MT-420 quad-piston hydraulic disc (180 mm front / 160 mm rear), 32 km/h speed assist (Canada), 2-year warranty - all unchanged."
     }
   ]
 }
