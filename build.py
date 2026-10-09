@@ -2909,6 +2909,24 @@ TRAILS = [
                 u"that are exclusively powered by a throttle; All other electric-powered vehicles that are not "
                 u"specified above. [...] Travel at speeds that allow you to react in time for whatever might "
                 u"arise. (Maximum 20 km/h)")),
+    dict(who=u"Alberta Parks \u2014 provincial parks, provincial recreation areas and wildland provincial parks",
+         src=u"Alberta Parks, \u201cFAQs \u2014 Cycling\u201d",
+         url="https://albertaparks.ca/faqs",
+         date=u"read 2026-10-09",
+         ride=u"Class 1 only on designated cycling trails; no other class",
+         rule=(u"Pedal-assist e-bikes are permitted on public roads in parks, and on pathways and trails where "
+               u"cycling is permitted. A permitted e-bike is non-throttled, provides up to 500 W of continuous "
+               u"maximum output and stops assisting when pedalling stops or 32 km/h is reached \u2014 a class 1 "
+               u"e-bike. Other types or classes of e-bike are not permitted on designated cycling pathways and "
+               u"trails in provincial parks, provincial recreation areas and wildland provincial parks."),
+         fig=u"Class 1; 500 W; 32 km/h",
+         quote=(u"Pedal assist electric-powered bikes (e-bikes) are permitted on public roads in parks and on "
+                u"pathways and trails where cycling is permitted. [...] Permitted e-bikes are defined as "
+                u"non-throttled electric powered bicycles that provide up to 500 Watts of continuous maximum "
+                u"output. The electronic assist must stop when either pedaling stops or 32 km/h is reached. This "
+                u"is sometimes referred to as a class 1 e-bike. [...] Other types or classes of e-bikes are not "
+                u"permitted on designated cycling pathways and trails in provincial parks, provincial recreation "
+                u"areas, and wildland provincial parks.")),
 ]
 
 TRAIL_HEAD = u"One row per land manager: who allows what on the ground"
@@ -2925,8 +2943,9 @@ TRAIL_TITLE = (u"Where you can ride an e-bike in Canada: trails, parks and paths
                u"| Commuter E-Bikes CA")
 TRAIL_OGTITLE = u"Where you can ride an e-bike in Canada: trails, parks and paths"
 TRAIL_DESC = (u"Where a Canadian e-bike may actually be ridden: national parks, BC's parks and recreation "
-              u"trails, and the National Capital Commission's pathway and Gatineau Park \u2014 each rule "
-              u"quoted from the authority's own page and dated, with no affiliate link.")
+              u"trails, Alberta's provincial parks, and the National Capital Commission's pathway and "
+              u"Gatineau Park \u2014 each rule quoted from the authority's own page and dated, with no "
+              u"affiliate link.")
 TRAIL_INTRO = (u"Road rules are one question; the ground under the wheels is another. An e-bike can be legal "
                u"in a province and still barred from the trail it is on, because the trail is the land "
                u"manager's decision, not the province's. This page sets out, manager by manager, what is "
@@ -3095,7 +3114,7 @@ for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="
     assert _head in TRAILS_TEXT, "trails page is missing %s" % _head
 
 # 3. no product link: every absolute link is a GOVERNMENT or park-authority page.
-_TRAIL_GOV = ("canada.ca", "gc.ca", "bcparks.ca", "gov.bc.ca")
+_TRAIL_GOV = ("canada.ca", "gc.ca", "bcparks.ca", "gov.bc.ca", "albertaparks.ca")
 _threfs = re.findall(r'href="([^"]+)"', TRAILS_TEXT)
 _thext = sorted(h for h in _threfs if h.startswith("http") and not h.startswith(SITE))
 _tbad = [h for h in _thext if not h.split("//", 1)[1].split("/", 1)[0].endswith(_TRAIL_GOV)]
