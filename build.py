@@ -370,6 +370,7 @@ PAGE = r"""<!doctype html>
       <a class="btn ghost" href="how-far/">How far will it go?</a>
       <a class="btn ghost" href="commute-costs/">What a commute costs</a>
       <a class="btn ghost" href="gear/">Gear: helmets, locks and lights</a>
+      <a class="btn ghost" href="rules/">Classes and rules: what the law says where you ride</a>
     </div>
     <p class="disclosure" role="note">__DISCLOSURE__</p>
   </section>
@@ -421,7 +422,7 @@ __ROWS__
 <footer><div class="wrap">
   <p><strong>Disclosure (repeated):</strong> this site carries no live affiliate links. Links marked "maker specs" go to the manufacturer's own page, unmonetised. If paid partner links are added later, they will be labelled as such here and on the button itself.</p>
   <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
-  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="data/products.json">products.json</a> &middot; page views: <a href="stats/">the counts</a>.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="data/products.json">products.json</a> &middot; classes and rules: <a href="rules/">what Class 1/2/3 mean in Canada</a> &middot; page views: <a href="stats/">the counts</a>.</p>
 </div></footer>
 
 <script src="config.js"></script>
@@ -564,6 +565,7 @@ BIKE_PAGE = """<!doctype html>
       <a class="btn" href="../../#compare">Compare all __N_WORD__ side by side</a>
       <a class="btn ghost" href="../../guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
       <a class="btn ghost" href="../../gear/">Gear: helmets, locks and lights</a>
+      <a class="btn ghost" href="../../rules/">Classes and rules: is it legal where you ride?</a>
     </p>
   </section>
 __VSSECTION__
@@ -576,7 +578,7 @@ __VSSECTION__
 <footer><div class="wrap">
   <p><strong>Disclosure:</strong> this page has no live affiliate link for the __MODEL__. Nothing here is paid for and no purchase through this page earns anyone a commission today; the only product link above goes to __MAKER__'s own page. If a paid partner link is ever added, it will be labelled as one.</p>
   <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
-  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../../data/products.json">products.json</a> &middot; <a href="../../">the comparison</a>.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../../data/products.json">products.json</a> &middot; <a href="../../">the comparison</a> &middot; <a href="../../rules/">is it legal where you ride?</a>.</p>
 </div></footer>
 
 __AFFJS__
@@ -2049,6 +2051,599 @@ assert _page_nums <= _allowed_nums, \
 print("gear page: %d bytes, %d figures, every one substituted from the makers' own data, no affiliate "
       "element, no product link" % (len(GEAR_TEXT), len(_page_nums)))
 
+# ================================================================ classes and rules: what Class 1/2/3 mean in Canada
+# Every other page here sells a bike; this is the page a rider needs before any of them - what the class
+# number on a spec sheet actually means, where a class may ride, what helmet is required, and how the
+# provinces differ. Crew-owned like /gear/: it loads NO config.js, emits NO .aff element and links to NO
+# product - every off-site link on it is a GOVERNMENT page, asserted below. Nothing on it is typed from
+# memory: each rule is stored with the government page it was read from, that page's own date, and a
+# verbatim quote, and the build checks that the figures in a province's row really are in its quote. The
+# template carries no digit of its own.
+RULES_READ = COST_READ  # the same date the catalogue and the cost page were last read on
+
+# ---- the three classes, in the words of a federal agency (Parks Canada) and of a province's own policy
+# (Recreation Sites and Trails BC). The honest headline of this page: Canada has no national Class 1/2/3
+# law. The three classes are a labelling convention federal land managers and makers use; the rule that
+# binds a rider on a public road is provincial and is written in watts and km/h, never as a class number.
+RULES_CLASS_SOURCES = [
+    dict(name="Parks Canada \u2014 Pacific Rim National Park Reserve",
+         url="https://parks.canada.ca/pn-np/bc/pacificrim/activ/cyclisme-cycling",
+         date="read 2026-10-09",
+         quote=("The three classes of e-bikes are defined as follows: Class 1: e-bikes that are pedal-assist "
+                "only, with no throttle, and have a maximum assisted speed of 32 kilometers per hour. "
+                "Class 2: e-bikes that also have a maximum speed of 32 kilometers per hour, but are "
+                "throttle-assisted. Class 3: e-bikes that are pedal-assist only, with no throttle, and have "
+                "a maximum assisted speed of 45 kilometers per hour.")),
+    dict(name="Recreation Sites and Trails BC \u2014 e-bike policy",
+         url=("https://www2.gov.bc.ca/assets/gov/sports-recreation-arts-and-culture/outdoor-recreation/"
+              "camping-and-hiking/recreation-sites-and-trails/ebike_policy_final_04-25-2019.pdf"),
+         date="policy dated 2019, read 2026-10-09",
+         quote=("A Class 1 e-bike means a bicycle equipped with a motor that provides assistance only when the "
+                "rider is pedaling (pedal assist) and that ceases to provide assistance when the bicycle "
+                "reaches 32 kilometers per hour and has a maximum continuous wattage output of 500 watts. "
+                "[...] A Class 2 e-bike means a bicycle equipped with a motor that can be used exclusively to "
+                "propel the bicycle (throttle equipped) and that ceases to provide assistance when the bicycle "
+                "reaches 32 kilometers per hour. [...] Class 3 e-bike means a bicycle equipped with a motor "
+                "that provides assistance only when the rider is pedaling (pedal assist) and that ceases to "
+                "provide assistance when the bicycle reaches 45 kilometers per hour.")),
+]
+RULES_CLASS_QUOTES = " ".join(s["quote"] for s in RULES_CLASS_SOURCES)
+
+RULES_CLASSES = [
+    dict(cls="Class 1", assist="Pedal-assist only: the motor helps while you pedal, and stops when you stop.",
+         speed="32 km/h", throttle="No throttle",
+         where=("This is the class Parks Canada permits on its designated trails and beaches. Its own rule: "
+                "only pedal-assist Class 1 e-bikes are allowed on the multi-use pathway in Pacific Rim "
+                "National Park Reserve, and Class 2 or 3 machines are not.")),
+    dict(cls="Class 2", assist="Pedal-assist or a throttle: the motor can drive the bike with no pedalling.",
+         speed="32 km/h", throttle="Throttle",
+         where=("The same ceiling as Class 1; the throttle is the whole difference. BC's own trails policy "
+                "goes further than Parks Canada and treats a Class 2 machine as a motor vehicle as well as a "
+                "cycle.")),
+    dict(cls="Class 3", assist="Pedal-assist only, no throttle, with a higher ceiling.",
+         speed="45 km/h", throttle="No throttle",
+         where=("45 km/h is above every assist ceiling written into provincial law in Canada (32 km/h, or "
+                "25 km/h for a light e-bike in British Columbia), so a Class 3 bike is a bicycle on a public "
+                "road only where it is ridden to the provincial limit.")),
+]
+
+
+def _rules_class_row(c):
+    return ('<tr><th scope="row" class="model">%s</th><td>%s</td><td class="num">%s</td>'
+            '<td>%s</td><td>%s</td></tr>'
+            % (esc(c["cls"]), esc(c["assist"]), esc(c["speed"]), esc(c["throttle"]), esc(c["where"])))
+
+
+RULES_CLASS_ROWS = "\n        ".join(_rules_class_row(c) for c in RULES_CLASSES)
+
+RULES_CLASSES_HEAD = "The three classes, in a government's own words"
+RULES_CLASSES_SUB = (u"Class 1, 2 and 3 are not a Canadian statute. They are the labelling convention "
+                     u"manufacturers print on a spec sheet and federal land managers use to decide which "
+                     u"machines may use a trail - the two sources below are where they are written down. "
+                     u"What actually binds you on a public road is provincial, and no province writes its "
+                     u"rules as a class number.")
+RULES_CLASSES_NOTE = (u"Read the table with the two sources in mind. Parks Canada publishes all three "
+                      u"classes and permits only Class 1 on its designated trails and beaches. BC's "
+                      u"Recreation Sites and Trails policy uses the same three and adds a sharper line: a "
+                      u"Class 1 e-bike meets the province's definition of a motor assisted cycle, while a "
+                      u"Class 2 or Class 3 machine is also a motor vehicle.")
+
+# ---- the federal layer: what Ottawa still does, and the day the old definition died
+RULES_FED_HEAD = u"Ottawa: the 500 W / 32 km/h definition was repealed"
+RULES_FEDERAL = [
+    (u"The figure every shop quotes - a 500 W motor helping up to 32 km/h - was a federal definition, and "
+     u"it is gone. Transport Canada's own page says so: \u201cAs of Feb. 4th 2021, the definition of power "
+     u"assisted bicycle formerly located in subsection 2(1) of the Motor Vehicle Safety Regulations is no "
+     u"longer in force, hence it is no longer a benchmark for assessing compliance at manufacturing or "
+     u"importation of e-bicycles.\u201d"),
+    (u"What replaced it is an import test, not a road rule: Transport Canada now assesses a machine's "
+     u"on-road or off-road design first, and an e-bicycle \u201cdesigned to operate at speeds no greater "
+     u"than 32 km/h (or 20 mph) will be considered non-regulated at importation while those that can "
+     u"operate at speeds greater than 32 km/h (or 20 mph) will be subject to import compliance requirements "
+     u"as restricted-use vehicles.\u201d"),
+    (u"So the honest statement of Canadian e-bike law is two-layered. Federally there is no 500 W ceiling "
+     u"and no 32 km/h ceiling on a public road any more - only a border test. The provinces kept the "
+     u"repealed wording and wrote it into their own law, which is why the same numbers appear province to "
+     u"province and why the province you ride in is the only rule that decides."),
+]
+RULES_FEDERAL_HTML = "\n    ".join('<p class="rulesec">%s</p>' % esc(t) for t in RULES_FEDERAL)
+
+# ---- where Canadian law does draw classes: BC's two, in force; Ontario's two, proposed
+RULES_BC_HEAD = u"Where Canadian law does draw classes: British Columbia"
+RULES_BC_SUB = (u"British Columbia replaced its e-bike regulation in 2024 and is the one province that now "
+                u"defines classes of e-bike in law - under different names and different numbers from the "
+                u"three-class convention above. Its Motor Assisted Cycle (E-Bike) Regulation establishes two "
+                u"classes, standard and light, and the province's own page publishes both side by side.")
+RULES_BC_FIELDS = [
+    ("Minimum rider age", "16", "14"),
+    ("Maximum motor-assisted speed", "32 km/h", "25 km/h"),
+    ("Maximum continuous power output", "500 W", "250 W"),
+    ("Throttle assist", "Allowed", "Not equipped"),
+]
+RULES_BC_ROWS = "\n        ".join(
+    '<tr><th scope="row">%s</th><td class="num">%s</td><td class="num">%s</td></tr>' % (esc(a), esc(b), esc(c))
+    for a, b, c in RULES_BC_FIELDS)
+RULES_BC_NOTE = (u"A light e-bike is the one machinery difference that matters: its motor may not propel "
+                 u"the cycle unless the rider is pedalling, it may not exceed 250 W, it may not assist above "
+                 u"25 km/h, and it may not be equipped with a throttle at all. Everything else that meets the "
+                 u"province's criteria is a standard e-bike. Neither class needs a driver's licence, "
+                 u"registration or insurance, and a helmet is required on both.")
+
+RULES_ON_HEAD = u"Ontario: two classes proposed, not in force"
+RULES_ON_NOTE = (u"Ontario is the other province moving this way, and it is worth being precise about how "
+                 u"far it has got. The Ministry of Transportation posted a proposal on the Environmental "
+                 u"Registry (notice 026-0422, posted 23 April 2026, comment period closed 7 June 2026) to "
+                 u"update the definition of a power-assisted bicycle and to \u201cestablish distinct classes "
+                 u"of e-bikes with tailored operator, vehicle and safety requirements\u201d. That is a "
+                 u"proposal: as of the date read here, Ontario still has one category and one set of rules, "
+                 u"and this page will not print class figures for a regulation that does not exist.")
+
+# ---- province by province. Every row is a government page, read on the date shown. motor/speed/age are
+# the figures the row prints, and the build checks each of those numbers really appears in that province's
+# own quote below - a paraphrase that drifted from the page would stop the build.
+RULES_PROVINCES = [
+    dict(name="British Columbia",
+         law=u"Motor Assisted Cycle (E-Bike) Regulation, B.C. Reg. 64/2024 (in force 5 April 2024)",
+         motor=u"500 W or less (standard) / 250 W or less (light)", speed=u"32 km/h (standard) / 25 km/h (light)",
+         age=u"16 (standard) / 14 (light)", helmet=u"Required \u2014 a bicycle safety helmet, all ages",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Public roads where cycles are permitted; some municipalities set their own rules, and a " 
+               u"Class 1 machine is the only one allowed on Parks Canada trails.",
+         url="https://www2.gov.bc.ca/gov/content/transportation/driving-and-cycling/cycling/"
+             "cycling-regulations-restrictions-rules/e-bikes",
+         src=u"Province of British Columbia, \u201cE-bike requirements\u201d",
+         date=u"page last updated 4 November 2025",
+         quote=(u"| Minimum rider age | 16 | 14 | Maximum motor-assisted speed | 32 km/h | 25 km/h | "
+                u"Maximum continuous power output* | 500W | 250W | Throttle assist | Yes | No | "
+                u"\"Wearing a bicycle safety helmet is required when operating an e-bike.\"")),
+    dict(name="Alberta",
+         law=u"Traffic Safety Act; Use of Highway and Rules of the Road Regulation, Alta. Reg. 304/2002",
+         motor=u"500 W or less, all motors combined", speed=u"32 km/h on level ground",
+         age=u"12", helmet=u"Required \u2014 all ages: an approved motorcycle helmet, or a bicycle helmet",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Highways and roads, riding as far to the right as is practicable. A rider under the age of "
+               u"16 may not carry a passenger.",
+         url="https://www.transportation.alberta.ca/Content/docType41/Production/small_vehicle_booklet_final.pdf",
+         src=u"Alberta Transportation, \u201cRules & Regulations Applying to Small Vehicles\u201d",
+         date=u"booklet updated November 2018, read 2026-10-09",
+         quote=(u"\"it has a total continuous power output rating, measured at the shaft of each motor, of "
+                u"500 W or less [...] it is incapable of providing further assistance when the bicycle "
+                u"attains a speed of 32 km/h on level ground [...] Minimum driving age: The minimum driving "
+                u"age to operate a power bicycle is 12 years.\"")),
+    dict(name="Saskatchewan",
+         law=u"The Traffic Safety Act, s. 247.1",
+         motor=u"500 W or less", speed=u"32 km/h",
+         age=u"14", helmet=u"Required \u2014 all ages: an approved bicycle or motorcycle helmet",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Under the rules of the road for a bicycle, and not in any area restricted by a municipal "
+               u"bylaw.",
+         url="https://sgi.sk.ca/motorcycle/-/knowledge_base/motorcycle-handbook/power-assisted-bicycles1",
+         src=u"SGI, \u201cE-bikes (power-assisted bicycles)\u201d",
+         date=u"read 2026-10-09",
+         quote=(u"\"is equipped with an electric assist motor that is no larger than 500 watts [...] cannot "
+                u"be operated at a speed of greater than 32 km/h (20 mph) on any level service [...] Age "
+                u"restriction: 14 years of age or older [...] Operator requires an approved bicycle or "
+                u"motorcycle helmet\"")),
+    dict(name="Manitoba",
+         law=u"The Highway Traffic Act, C.C.S.M. c. H60, ss. 1(1), 145",
+         motor=u"500 W or less, measured at the shaft", speed=u"32 km/h",
+         age=u"14", helmet=u"Required \u2014 all ages: a properly fitted and fastened protective helmet",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Highways and bicycle facilities, with the rights and duties of a driver of a motor "
+               u"vehicle, except that a power-assisted bicycle may not be driven on a sidewalk.",
+         url="https://www.gov.mb.ca/sd/parks/_resources/en/pdf/power-assisted-bicycles.pdf",
+         src=u"Manitoba Parks, \u201cThe Use of Power-Assisted Bicycles in Provincial Parks\u201d, quoting "
+             u"The Highway Traffic Act",
+         date=u"read 2026-10-09",
+         quote=(u"\"the motor has a continuous power output rating, measured at its shaft, of 500 W or less "
+                u"[...] the motor cannot provide the vehicle with motive power when it is travelling at more "
+                u"than 32 km/h\" / s. 145: \"No person shall operate a power-assisted bicycle [...] unless he "
+                u"or she is 14 years of age or older\" and \"unless he or she is wearing a properly fitted "
+                u"and fastened protective helmet\"")),
+    dict(name="Ontario",
+         law=u"Highway Traffic Act, R.S.O. 1990, c. H.8, and O. Reg. 369/09",
+         motor=u"500 W or less", speed=u"32 km/h",
+         age=u"16", helmet=u"Required \u2014 all ages: an approved bicycle or motorcycle helmet",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Most roads and highways where conventional bicycles are permitted. Not on the 400-series "
+               u"and other controlled-access highways, and not where a municipal bylaw bans e-bikes.",
+         url="https://www.ontario.ca/page/riding-e-bike",
+         src=u"Government of Ontario, \u201cRiding an e-bike\u201d",
+         date=u"page updated 19 July 2024, read 2026-10-09",
+         quote=(u"\"a maximum assisted speed of 32 km/h [...] a maximum weight of 120 kg [...] an electric "
+                u"motor not exceeding 500 watts [...] you must [...] be 16 or older [...] wear an approved "
+                u"bicycle or motorcycle helmet\"")),
+    dict(name="Quebec",
+         law=u"Highway Safety Code, and the Protective Helmets Regulation",
+         motor=u"500 W or less", speed=u"32 km/h",
+         age=u"18", helmet=u"Required \u2014 all ages: a helmet meeting a listed standard",
+         papers=u"None at 18 or over; a moped licence (Class 6D) at ages 14 to 17",
+         where=u"All public roadways except highways and their access and exit ramps. An electric bike "
+               u"cannot be registered, and a combustion engine on a bicycle is prohibited.",
+         url="https://saaq.gouv.qc.ca/en/road-safety/modes-transportation/electric-bike",
+         src=u"SAAQ, \u201cRiding an Electric Bike\u201d",
+         date=u"last updated 25 May 2026",
+         quote=(u"\"the bike's electric motor must have a maximum power rating of no more than 500 watts and "
+                u"must cease to generate power once the bicycle reaches a speed of no more than 32 km/h\" / "
+                u"\"You must be aged 18 or older to ride an electric bike. However, people aged 14 to 17 who "
+                u"hold a Class 6D (moped or scooter) licence are also authorized\"")),
+    dict(name="New Brunswick",
+         law=u"Motor Vehicle Act (read through Service New Brunswick's registration page)",
+         motor=u"500 W or less", speed=u"32 km/h",
+         age=u"Not set on the page read", helmet=u"Required \u2014 all ages (the province's general bicycle rule)",
+         papers=u"None for a compliant machine; over the limit it cannot be registered unless certified",
+         where=u"Treated as a bicycle, so the requirements placed on cyclists apply.",
+         url="https://www.gnb.ca/en/topic/driving-transportation/registration-inspection/motor-vehicle-registration.html",
+         src=u"Government of New Brunswick, \u201cMotor vehicle registration\u201d",
+         date=u"read 2026-10-09",
+         quote=(u"\"If the vehicle can be powered by human force and has a motor equal to or less than 500W, "
+                u"and the motor is not capable of assisting when the vehicle is travelling at a speed "
+                u"greater than 32km/h then it can be considered a bicycle and all the requirements placed on "
+                u"bicyclists are applicable.\"")),
+]
+RULES_PROV_HEAD = u"Province by province: what each one writes into law"
+RULES_PROV_SUB = (u"One row per province, each read from that province's own government page on the date "
+                  u"shown. Every figure below is in the verbatim quote in the sources at the foot of this "
+                  u"page - the build checks that before it writes the file.")
+RULES_PROV_NOTE = (u"Read the motor column as the one hard line. Every province here caps a power-assisted "
+                   u"bicycle at a 500 W continuous rating, and every one stops motor assistance at a "
+                   u"published speed - so a motor rated above 500 W, or assistance that continues past the "
+                   u"cut-off, is what turns a bicycle into a motor vehicle that needs a licence and "
+                   u"insurance. Two provinces leave a rider rule open: Alberta sets a minimum age without a "
+                   u"licence requirement, and New Brunswick's registration page sets no minimum age at all. "
+                   u"Where a rule is not published, this page says so instead of filling the gap.")
+RULES_PROV_MISSING = (u"Not on this page: Nova Scotia, Prince Edward Island, Newfoundland and Labrador, "
+                      u"Yukon, the Northwest Territories and Nunavut. This page only states what it read on "
+                      u"a government page, and those jurisdictions' own pages have not been read yet - so "
+                      u"they are named here rather than guessed at.")
+
+
+def _rules_prov_row(p):
+    return ('<tr><th scope="row" class="model">%s<span class="law">%s</span>'
+            '<span class="src"><a href="%s" target="_blank" rel="noopener nofollow">%s</a> &middot; %s</span></th>'
+            '<td>%s</td><td>%s</td><td class="num">%s</td><td>%s</td><td>%s</td><td>%s</td></tr>'
+            % (esc(p["name"]), esc(p["law"]), esc(p["url"]), esc(p["src"]), esc(p["date"]),
+               esc(p["motor"]), esc(p["speed"]), esc(p["age"]), esc(p["helmet"]), esc(p["papers"]),
+               esc(p["where"])))
+
+
+RULES_PROV_ROWS = "\n        ".join(_rules_prov_row(p) for p in RULES_PROVINCES)
+
+# ---- what the classes mean for the bikes on this site: the maker's own published class, from data/products.json
+RULES_BIKES_HEAD = u"The class each bike on this site is sold as"
+RULES_BIKES_SUB = (u"Not one of these is this page's judgement. Each class string below is the maker's own "
+                   u"published wording, read from the maker's product page on the same date as every other "
+                   u"figure on this site, and held in this site's own data file.")
+RULES_BIKES_NOTE = (u"Two things follow from the table. A class number is a maker's label, not a permission: "
+                    u"the province you ride in decides whether the machine on it is a bicycle or a motor "
+                    u"vehicle, and it decides that in watts and km/h. And where a maker's own wording leaves "
+                    u"the ceiling adjustable, the provincial cut-off is the number that binds - a bike set "
+                    u"above the provincial assist speed is outside the rule for the road it is on, whatever "
+                    u"the spec sheet calls it.")
+
+
+def _rules_bike_row(q):
+    return ('<tr><th scope="row" class="model"><a href="../bikes/%s/">%s</a>'
+            '<span class="mmaker">%s</span></th><td>%s</td><td class="num">%s</td></tr>'
+            % (esc(q["id"]), esc(q["model"]), esc(q["maker"]), esc(q["eclass"]), esc(q["price_display"])))
+
+
+RULES_BIKE_ROWS = "\n        ".join(_rules_bike_row(q) for q in ORDER)
+
+# ---- the sources: every government page, its own date, and the verbatim quote the figures came from
+RULES_SRC_HEAD = u"Every source, and what it says"
+RULES_SRC_SUB = (u"Each source below was read on the date shown, and the rule in the table above is taken "
+                 u"from the quoted text. Nothing on this page comes from memory, and where a government "
+                 u"page did not state a rule, this page says so rather than filling the gap.")
+
+
+def _rules_src_block(s, extra=""):
+    return ('<li><strong>%s</strong> \u00b7 %s \u00b7 %s: '
+            '<a href="%s" target="_blank" rel="noopener nofollow">%s</a>%s'
+            '<blockquote class="quote">%s</blockquote></li>'
+            % (s["name"], s["date"], s.get("src", ""), esc(s["url"]), esc(s["url"]), extra, esc(s["quote"])))
+
+
+RULES_SOURCES = "\n        ".join(
+    [_rules_src_block(s) for s in RULES_CLASS_SOURCES]
+    + [_rules_src_block(dict(name=u"Transport Canada \u2014 Importing non-regulated vehicles",
+                             url="https://tc.canada.ca/en/road-transportation/importing-vehicle/"
+                                 "importing-non-regulated-vehicles",
+                             date=u"read 2026-10-09",
+                             quote=(u"As of Feb. 4th 2021, the definition of power assisted bicycle formerly "
+                                    u"located in subsection 2(1) of the Motor Vehicle Safety Regulations is no "
+                                    u"longer in force, hence it is no longer a benchmark for assessing "
+                                    u"compliance at manufacturing or importation of e-bicycles. [...] "
+                                    u"E-bicycles with off-road characteristics designed to operate at speeds "
+                                    u"no greater than 32 km/h (or 20 mph) will be considered non-regulated at "
+                                    u"importation while those that can operate at speeds greater than "
+                                    u"32 km/h (or 20 mph) will be subject to import compliance requirements "
+                                    u"as restricted-use vehicles.")))]
+    + [_rules_src_block(dict(name=u"Ontario Ministry of Transportation \u2014 Environmental Registry "
+                                  u"notice 026-0422",
+                             url="https://ero.ontario.ca/notice/026-0422",
+                             date=u"posted 23 April 2026, comment period closed 7 June 2026",
+                             quote=(u"The Ministry of Transportation (MTO) is proposing to update and "
+                                    u"modernize the definition of power-assisted bicycles (also known as "
+                                    u"e-bikes) in Ontario through a new regulation governing their use and "
+                                    u"safety. [...] the ability to establish distinct classes of e-bikes "
+                                    u"with tailored operator, vehicle and safety requirements.")))]
+    + [_rules_src_block(p) for p in RULES_PROVINCES])
+
+RULES_TITLE = (u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and what each province requires "
+               u"| Commuter E-Bikes CA")
+RULES_OGTITLE = u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and where the provinces differ"
+RULES_DESC = (u"What Class 1, 2 and 3 e-bikes mean in Canada, what speed and power each province allows, "
+              u"which helmet is required and where you may ride - every rule quoted from a government page "
+              u"and dated, with no affiliate link.")
+RULES_INTRO = (u"Before the price, the motor or the battery: is the machine legal where you ride it? "
+               u"Canadian e-bike law is written in watts and kilometres per hour, province by province - "
+               u"not as Class 1, 2 or 3. This page sets out what the three classes are (in the words of a "
+               u"federal agency that uses them), what Ottawa repealed and when, where a provincial law "
+               u"really does define classes, and what each province requires: motor limit, assist speed, "
+               u"minimum age, helmet and paperwork. Every figure is quoted from a named government page and "
+               u"dated; where a province has not published a rule, the page says so.")
+RULES_DISCLOSURE = (u"this page has no affiliate link and nothing to buy. It carries no partner link, no "
+                    u"commission and no product link at all; every off-site link on it is a government page, "
+                    u"and this is general information about the law, not legal advice.")
+
+RULES_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Commuter E-Bikes CA">
+<meta property="og:title" content="__OGTITLE__">
+<meta property="og:description" content="__DESC__">
+<meta property="og:url" content="__CANONICAL__">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="__OGTITLE__">
+<meta name="twitter:description" content="__DESC__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .ruleshero{padding:34px 0 8px}
+  .ruleshero h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;margin:0 0 12px;max-width:30ch}
+  p.rulesec{margin:0 0 14px;color:#333842;max-width:76ch}
+  table.rules .model{font-weight:700}
+  table.rules .law{display:block;color:var(--muted);font-size:12.5px;font-weight:400;margin-top:2px}
+  table.rules .src{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:4px}
+  table.rules td{vertical-align:top}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+  ul.sources li{margin:0 0 16px}
+  blockquote.quote{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--card);
+    border-radius:6px;color:#3a3f49;font-size:13.5px;max-width:80ch}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Rules read <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="ruleshero" style="border-top:none">
+    <p class="crumb"><a href="../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; Classes and rules</p>
+    <h1>What e-bike classes mean in Canada, and where the provinces differ</h1>
+    <p class="deck">__INTRO__</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> __DISC__</p>
+  </section>
+
+  <section id="classes">
+    <h2>__CLASSES_HEAD__</h2>
+    <p class="sub">__CLASSES_SUB__</p>
+    <div class="tablewrap">
+      <table class="rules">
+        <caption>The three classes, as published by the sources at the foot of this page.</caption>
+        <thead><tr>
+          <th scope="col">Class</th><th scope="col">What the motor does</th>
+          <th scope="col" class="num">Assist stops at</th><th scope="col">Throttle</th>
+          <th scope="col">Where that class may ride</th>
+        </tr></thead>
+        <tbody>
+        __CLASS_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note">__CLASSES_NOTE__</p>
+  </section>
+
+  <section id="federal">
+    <h2>__FED_HEAD__</h2>
+    __FED__
+  </section>
+
+  <section id="bc">
+    <h2>__BC_HEAD__</h2>
+    <p class="sub">__BC_SUB__</p>
+    <div class="tablewrap">
+      <table class="rules">
+        <caption>British Columbia's two classes of motor assisted cycle, from the province's own page.</caption>
+        <thead><tr>
+          <th scope="col">Requirement</th><th scope="col" class="num">Standard e-bike</th>
+          <th scope="col" class="num">Light e-bike</th>
+        </tr></thead>
+        <tbody>
+        __BC_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note">__BC_NOTE__</p>
+  </section>
+
+  <section id="ontario">
+    <h2>__ON_HEAD__</h2>
+    <p class="rulesec">__ON_NOTE__</p>
+  </section>
+
+  <section id="provinces">
+    <h2>__PROV_HEAD__</h2>
+    <p class="sub">__PROV_SUB__</p>
+    <div class="tablewrap">
+      <table class="rules">
+        <caption>One row per province: motor limit, assist cut-off, minimum age, helmet and paperwork, each from that province's own government page.</caption>
+        <thead><tr>
+          <th scope="col">Province</th><th scope="col">Motor limit</th>
+          <th scope="col">Assist cut-off</th><th scope="col" class="num">Min. age</th>
+          <th scope="col">Helmet</th><th scope="col">Licence / registration / insurance</th>
+          <th scope="col">Where you may ride</th>
+        </tr></thead>
+        <tbody>
+        __PROV_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note">__PROV_NOTE__</p>
+    <p class="note">__PROV_MISSING__</p>
+  </section>
+
+  <section id="bikes">
+    <h2>__BIKES_HEAD__</h2>
+    <p class="sub">__BIKES_SUB__</p>
+    <div class="tablewrap">
+      <table class="rules">
+        <caption>Each class string below is the maker's own published wording for the bike, from this site's data file.</caption>
+        <thead><tr>
+          <th scope="col">Model</th><th scope="col">Class as the maker publishes it</th>
+          <th scope="col" class="num">Price (CAD)</th>
+        </tr></thead>
+        <tbody>
+        __BIKE_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note">__BIKES_NOTE__</p>
+  </section>
+
+  <section id="sources">
+    <h2>__SRC_HEAD__</h2>
+    <p class="sub">__SRC_SUB__</p>
+    <ul class="sources">__SOURCES__</ul>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
+      <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
+      <li><a href="../commute-costs/">What a commute actually costs, e-bike vs car vs transit</a></li>
+      <li><a href="../gear/">Gear: helmets, locks and lights, and each bike's load rating</a></li>
+      <li><a href="../guide/">The free decision guide</a></li>
+      <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> __DISC__</p>
+  <p>This is general information about published e-bike rules, not legal advice, and not advice about your particular riding, health or local by-laws. Rules change; read your province's own page before you buy or ride.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Sources: Transport Canada, Parks Canada, Recreation Sites and Trails BC, and each province's own page &mdash; all named above. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a>.</p>
+</div></footer>
+</body>
+</html>
+"""
+
+# The template may carry no figure of its own: every digit in the output must come from a substitution.
+_tmpl_probe = re.sub(r"(?s)<(style|script).*?</\1>", " ", RULES_PAGE)
+_tmpl_probe = re.sub(r"(?s)<[^>]+>", " ", _tmpl_probe)
+_tmpl_probe = re.sub(r"__[A-Z_0-9]*__", "", _tmpl_probe)
+assert not re.search(r"\d", _tmpl_probe), \
+    "a figure is typed into the rules template instead of being substituted"
+
+_RULES_SUBST = {
+    "__CSS__": CSS,
+    "__N_WORD__": esc(N_WORD),
+    "__CHECKED__": esc(CHECKED),
+    "__TITLE__": esc(RULES_TITLE),
+    "__OGTITLE__": esc(RULES_OGTITLE),
+    "__DESC__": esc(RULES_DESC),
+    "__CANONICAL__": "%s/rules/" % SITE,
+    "__INTRO__": esc(RULES_INTRO),
+    "__DISC__": esc(RULES_DISCLOSURE),
+    "__CLASSES_HEAD__": esc(RULES_CLASSES_HEAD),
+    "__CLASSES_SUB__": esc(RULES_CLASSES_SUB),
+    "__CLASS_ROWS__": RULES_CLASS_ROWS,
+    "__CLASSES_NOTE__": esc(RULES_CLASSES_NOTE),
+    "__FED_HEAD__": esc(RULES_FED_HEAD),
+    "__FED__": RULES_FEDERAL_HTML,
+    "__BC_HEAD__": esc(RULES_BC_HEAD),
+    "__BC_SUB__": esc(RULES_BC_SUB),
+    "__BC_ROWS__": RULES_BC_ROWS,
+    "__BC_NOTE__": esc(RULES_BC_NOTE),
+    "__ON_HEAD__": esc(RULES_ON_HEAD),
+    "__ON_NOTE__": esc(RULES_ON_NOTE),
+    "__PROV_HEAD__": esc(RULES_PROV_HEAD),
+    "__PROV_SUB__": esc(RULES_PROV_SUB),
+    "__PROV_ROWS__": RULES_PROV_ROWS,
+    "__PROV_NOTE__": esc(RULES_PROV_NOTE),
+    "__PROV_MISSING__": esc(RULES_PROV_MISSING),
+    "__BIKES_HEAD__": esc(RULES_BIKES_HEAD),
+    "__BIKES_SUB__": esc(RULES_BIKES_SUB),
+    "__BIKE_ROWS__": RULES_BIKE_ROWS,
+    "__BIKES_NOTE__": esc(RULES_BIKES_NOTE),
+    "__SRC_HEAD__": esc(RULES_SRC_HEAD),
+    "__SRC_SUB__": esc(RULES_SRC_SUB),
+    "__SOURCES__": RULES_SOURCES,
+}
+_rules_out = RULES_PAGE
+for _k, _v in _RULES_SUBST.items():
+    _rules_out = _rules_out.replace(_k, _v)
+write_page(os.path.join(ROOT, "rules", "index.html"), _rules_out, "rules")
+
+# ---- the page is read back and checked before the sitemap is written
+RULES_FILE = os.path.join(ROOT, "rules", "index.html")
+RULES_TEXT = open(RULES_FILE, encoding="utf-8").read()
+
+# 1. nothing here can pay, and it says nothing about the status of any program.
+for _bad in ("config.js", "AFFILIATE_", 'data-aff=', 'class="buyaff"'):
+    assert _bad not in RULES_TEXT, "affiliate element on the rules page: %r" % _bad
+
+# 2. its own head: title, description, canonical and the social card.
+assert '<link rel="canonical" href="%s/rules/">' % SITE in RULES_TEXT
+for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="og:site_name"',
+              'property="og:title"', 'property="og:description"', 'property="og:url"',
+              'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"'):
+    assert _head in RULES_TEXT, "rules page is missing %s" % _head
+
+# 3. no product link: every absolute link on the page is a GOVERNMENT page, never a shop or a maker.
+_RULES_GOV = ("canada.ca", "gov.bc.ca", "alberta.ca", "sgi.sk.ca", "gov.mb.ca", "ontario.ca",
+              "saaq.gouv.qc.ca", "gnb.ca")
+_rhrefs = re.findall(r'href="([^"]+)"', RULES_TEXT)
+_rext = sorted(h for h in _rhrefs if h.startswith("http") and not h.startswith(SITE))
+_rbad = [h for h in _rext if not h.split("//", 1)[1].split("/", 1)[0].endswith(_RULES_GOV)]
+assert not _rbad, "the rules page links off to a non-government URL: %r" % _rbad
+assert len(_rext) >= len(RULES_PROVINCES), "the rules page dropped its province source links"
+
+# 4. every number that reached the page must come from a substitution, precomputed above.
+_allowed_nums = set()
+for _v in _RULES_SUBST.values():
+    _allowed_nums |= set(re.findall(r"\d[\d,.]*", str(_v)))
+_body_text = re.sub(r"(?s)<(style|script).*?</\1>", " ", RULES_TEXT.split("<body>", 1)[1])
+_body_text = html.unescape(re.sub(r"(?s)<[^>]+>", " ", _body_text))
+_page_nums = set(re.findall(r"\d[\d,.]*", _body_text))
+assert _page_nums <= _allowed_nums, \
+    "number on the rules page with no published source: %r" % sorted(_page_nums - _allowed_nums)
+
+# 5. a province's figures must be IN that province's own quote, or the row is a paraphrase that drifted
+#    from the page it cites. Spaces and commas are dropped on both sides so "500 W" matches "500W".
+def _digits(s):
+    return set(re.findall(r"\d+", str(s).replace(",", "").replace(" ", "")))
+
+
+for _p in RULES_PROVINCES:
+    _claimed = _digits(_p["motor"]) | _digits(_p["speed"]) | _digits(_p["age"])
+    _in_quote = _digits(_p["quote"])
+    assert _claimed <= _in_quote, \
+        "%s: figures %r are not in that province's own quote %r" % (_p["name"], sorted(_claimed - _in_quote),
+                                                                   _p["quote"])
+print("rules page: %d bytes, %d figures, every one substituted from a named government source, "
+      "no affiliate element, no product link, %d provinces" % (len(RULES_TEXT), len(_page_nums),
+                                                               len(RULES_PROVINCES)))
+
 # ================================================================ the reader: /stats/
 # A count nobody can read is not a measurement. This page reads every key back through the service's
 # /get endpoint and shows what it finds, so "how much traffic does this lane get" has an answer that
@@ -2070,6 +2665,7 @@ METRIC_PAGES = (
     + [("guide", "The decision guide &mdash; the free front-door page")]
     + [("commute-costs", "What a commute costs &mdash; e-bike vs car vs transit, per year")]
     + [("gear", "Gear &mdash; helmets, locks and lights, and what each bike is rated to carry")]
+    + [("rules", "Classes and rules &mdash; what Class 1/2/3 mean in Canada, province by province")]
     + [("vs/%s" % s, "%s" % pair_label(*pair)) for s, pair in zip(PAIR_SLUGS, PAIRS)]
     + [("stats", "This page &mdash; the counts")]
 )
@@ -2255,7 +2851,7 @@ print("stats reader: %d rows, every one a live beacon key, no placeholder token"
 # ---------------------------------------------------------------- sitemap + robots
 URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
         + ["%s/how-far/" % SITE] + ["%s/guide/" % SITE] + ["%s/commute-costs/" % SITE]
-        + ["%s/gear/" % SITE]
+        + ["%s/gear/" % SITE] + ["%s/rules/" % SITE]
         + ["%s/stats/" % SITE]
         + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
 # The sitemap and the beacon list are the same set of pages, or one of them is lying. Asserted, not assumed.
@@ -2427,3 +3023,155 @@ _stray = [n for n in _page_nums if n not in _PDF_TEXT]
 assert not _stray, "number(s) on the guide page that the guide PDF does not carry: %r" % (_stray,)
 print("guide page vs PDF: %d shared strings and %d numbers, all present in the PDF's own text"
       % (len(_SHARED) + len(_FIGURES) + len(_VERDICTS) + len(_BESTFOR), len(_page_nums)))
+
+# ================================================================ the share card: one Open Graph image per page
+# Every page carried OG/Twitter tags and no og:image, so a link pasted anywhere previewed as bare text.
+# This block emits one deterministic 1200x630 PNG per generated page and points that page's og:image and
+# twitter:image at it. No external asset and no account: the typeface is Vera, which ships inside the
+# reportlab package this build already uses for the PDF, and the card is drawn from the page's own title -
+# never a hand-written string - so a page cannot have a card that contradicts it.
+#
+# Named deviation, not a silent one: reportlab's own raster backend (reportlab.graphics.renderPM) has no
+# backend installed on this box - rlPyCairo and the _renderPM C extension are both absent, checked
+# 2026-10-09 - so the layout is measured with reportlab's own font engine (pdfmetrics.stringWidth) and the
+# raster is written by Pillow, which is installed. The output is a plain PNG: no metadata, no timestamp,
+# byte-identical across rebuilds (built twice and diffed).
+from PIL import Image, ImageDraw, ImageFont
+import reportlab
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+_FONT_DIR = os.path.join(os.path.dirname(reportlab.__file__), "fonts")
+VERA_TTF = os.path.join(_FONT_DIR, "Vera.ttf")
+VERA_BD_TTF = os.path.join(_FONT_DIR, "VeraBd.ttf")
+assert os.path.exists(VERA_TTF) and os.path.exists(VERA_BD_TTF), \
+    "the Vera typeface that ships inside reportlab is missing from %s" % _FONT_DIR
+pdfmetrics.registerFont(TTFont("Vera", VERA_TTF))
+pdfmetrics.registerFont(TTFont("VeraBd", VERA_BD_TTF))
+
+OG_W, OG_H = 1200, 630
+OG_PAPER, OG_INK = (247, 244, 238), (22, 24, 29)
+OG_MUTED, OG_ACCENT, OG_RULE = (122, 116, 104), (14, 107, 83), (222, 216, 205)
+OG_DIR = os.path.join(ROOT, "og")
+
+
+def _og_wrap(text, font_name, size, max_w, max_lines=None):
+    """reportlab measures every line; the wrap is therefore the same engine that sets the PDF."""
+    lines, cur = [], ""
+    for word in text.split():
+        trial = (cur + " " + word).strip()
+        if cur and pdfmetrics.stringWidth(trial, font_name, size) > max_w:
+            lines.append(cur)
+            cur = word
+        else:
+            cur = trial
+    if cur:
+        lines.append(cur)
+    if max_lines is not None and len(lines) > max_lines:
+        lines = lines[:max_lines]
+        lines[-1] = lines[-1].rstrip(",;: ") + "\u2026"
+    return lines
+
+
+def _og_card(title, out_path):
+    """One deterministic share card. Nothing on it is typed here: the title comes off the page itself."""
+    im = Image.new("RGB", (OG_W, OG_H), OG_PAPER)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 14, OG_H], fill=OG_ACCENT)
+    d.rectangle([64, OG_H - 132, OG_W - 64, OG_H - 132], fill=OG_RULE)
+
+    # Shrink the title until it sets in three lines; only then allow a fourth. A title is never cut short
+    # while there is still room to set it smaller, so no card carries an ellipsis it did not have to.
+    size = 78
+    while size > 40 and len(_og_wrap(title, "VeraBd", size, OG_W - 180)) > 3:
+        size -= 3
+    lines = _og_wrap(title, "VeraBd", size, OG_W - 180, 4)
+    f_title = ImageFont.truetype(VERA_BD_TTF, size)
+    f_kick = ImageFont.truetype(VERA_TTF, 30)
+    f_foot = ImageFont.truetype(VERA_TTF, 26)
+
+    d.text((70, 76), "Commuter E-Bikes CA", font=f_kick, fill=OG_MUTED)
+    y = 232
+    for line in lines:
+        d.text((70, y), line, font=f_title, fill=OG_INK)
+        y += int(size * 1.22)
+    d.text((70, OG_H - 104), "canada-ebike-compare \u00b7 every figure from a named source, dated",
+           font=f_foot, fill=OG_MUTED)
+    im.save(out_path, "PNG")
+
+
+def _og_title_of(html_text):
+    m = re.search(r"(?s)<title>(.*?)</title>", html_text)
+    assert m, "a page with no <title> cannot have a share card"
+    t = html.unescape(m.group(1)).strip()
+    return re.sub(r"\s*\|\s*Commuter E-Bikes CA\s*$", "", t)
+
+
+os.makedirs(OG_DIR, exist_ok=True)
+OG_BY_PAGE = {}
+for _path, _label in METRIC_PAGES:
+    _seg = metric_segment(_path)
+    _file = os.path.join(ROOT, _path, "index.html")
+    _text = open(_file, encoding="utf-8").read()
+
+    # 1. the card, from the page's own title
+    _png = os.path.join(OG_DIR, "%s.png" % _seg)
+    _og_card(_og_title_of(_text), _png)
+    OG_BY_PAGE[_path] = _png
+
+    # 2. the head. The page's own title, description and canonical are reused verbatim, and only the tags
+    #    the page is missing are added - so nothing already on the page is rewritten or re-worded.
+    _img_url = "%s/og/%s.png" % (SITE, _seg)
+    _title = _og_title_of(_text)
+    _desc_m = re.search(r'<meta name="description" content="(.*?)">', _text, re.S)
+    _canon_m = re.search(r'<link rel="canonical" href="(.*?)">', _text)
+    assert _desc_m, "%s: no description to build a social card from" % _file
+    _desc = _desc_m.group(1)
+    _canon = _canon_m.group(1) if _canon_m else ("%s/%s" % (SITE, (_path + "/") if _path else ""))
+    _add = []
+    for _tag, _want in (('property="og:type"', '<meta property="og:type" content="article">'),
+                        ('property="og:site_name"', '<meta property="og:site_name" content="Commuter E-Bikes CA">'),
+                        ('property="og:title"', '<meta property="og:title" content="%s">' % esc(_title)),
+                        ('property="og:description"', '<meta property="og:description" content="%s">' % esc(_desc)),
+                        ('property="og:url"', '<meta property="og:url" content="%s">' % esc(_canon)),
+                        ('name="twitter:title"', '<meta name="twitter:title" content="%s">' % esc(_title)),
+                        ('name="twitter:description"',
+                         '<meta name="twitter:description" content="%s">' % esc(_desc))):
+        if _tag not in _text:
+            _add.append(_want)
+    _add.append('<meta property="og:image" content="%s">' % esc(_img_url))
+    _add.append('<meta property="og:image:alt" content="%s">' % esc(_title))
+    _add.append('<meta name="twitter:image" content="%s">' % esc(_img_url))
+    if 'name="twitter:card"' not in _text:
+        _add.append('<meta name="twitter:card" content="summary_large_image">')
+    else:
+        _text = _text.replace('<meta name="twitter:card" content="summary">',
+                              '<meta name="twitter:card" content="summary_large_image">', 1)
+    assert "</head>" in _text, "%s has no </head> to place a social card in" % _file
+    _text = _text.replace("</head>", "%s\n</head>" % "\n".join(_add), 1)
+    open(_file, "w", encoding="utf-8").write(_text)
+
+# 3. read every page back: the card it names must exist, be exactly one reference, and be a real 1200x630 PNG.
+import struct
+assert set(OG_BY_PAGE) == {p for p, _l in METRIC_PAGES}, "a page has no share card"
+for _path, _label in METRIC_PAGES:
+    _file = os.path.join(ROOT, _path, "index.html")
+    _text = open(_file, encoding="utf-8").read()
+    _seg = metric_segment(_path)
+    _url = "%s/og/%s.png" % (SITE, _seg)
+    for _attr in ('property="og:image"', 'name="twitter:image"'):
+        assert _text.count('<meta %s content="%s">' % (_attr, esc(_url))) == 1, \
+            "%s: %s is not exactly one reference to %s" % (_file, _attr, _url)
+    assert 'content="summary_large_image"' in _text, "%s: twitter card is not the large one" % _file
+    for _need in ('property="og:type"', 'property="og:site_name"', 'property="og:title"',
+                  'property="og:description"', 'property="og:url"', 'property="og:image"',
+                  'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"',
+                  'name="twitter:image"'):
+        assert _need in _text, "%s is missing %s after the share-card pass" % (_file, _need)
+    _png = OG_BY_PAGE[_path]
+    _raw = open(_png, "rb").read()
+    assert _raw[:8] == b"\x89PNG\r\n\x1a\n", "%s is not a PNG" % _png
+    assert struct.unpack(">II", _raw[16:24]) == (OG_W, OG_H), "%s is not %dx%d" % (_png, OG_W, OG_H)
+    assert len(_raw) > 4000, "%s is a suspiciously empty PNG" % _png
+print("share cards: %d pages, one %dx%d PNG each in og/, every page naming its own card and no other"
+      % (len(METRIC_PAGES), OG_W, OG_H))
