@@ -371,6 +371,7 @@ PAGE = r"""<!doctype html>
       <a class="btn ghost" href="commute-costs/">What a commute costs</a>
       <a class="btn ghost" href="gear/">Gear: helmets, locks and lights</a>
       <a class="btn ghost" href="rules/">Classes and rules: what the law says where you ride</a>
+      <a class="btn ghost" href="trails/">Where you may ride: trails, parks and paths</a>
     </div>
     <p class="disclosure" role="note">__DISCLOSURE__</p>
   </section>
@@ -2488,6 +2489,44 @@ RULES_SOURCES = "\n        ".join(
                                     u"with tailored operator, vehicle and safety requirements.")))]
     + [_rules_src_block(p) for p in RULES_PROVINCES])
 
+# ---- the change ledger: what moved between reads. Rank 19 corrected Manitoba's s.145 only because a session
+# went looking for it. A page that carries a quote and a date but no record of what changed between reads
+# forces every future re-read to start from archaeology. One dated list turns the page's honesty into
+# something a reader - and the next session - can audit. A read that finds nothing is recorded too, because a
+# silent no-change is exactly how a drifted figure hides.
+RULES_LEDGER_HEAD = u"Change ledger: what moved between reads"
+RULES_LEDGER_SUB = (u"Every line below is a change to this page since it was first built, dated and tied to "
+                    u"the jurisdiction it touches. The verbatim quotes the table above prints were last "
+                    u"re-read against their government pages on the date in the sources at the foot of this "
+                    u"page; where that re-read found nothing, the line says so, because an unrecorded "
+                    u"no-change is how a drifted figure hides.")
+RULES_CHANGELOG = [
+    dict(date=u"2026-10-09", jur=u"Manitoba",
+         change=(u"Highway Traffic Act s.145 was rewritten in gender-neutral wording, so this page's quoted "
+                 u"\u201cunless he or she is 14 years of age or older\u201d no longer matched the Act. The "
+                 u"quote now reads the Act's current \u201cunless they are 14 years of age or older\u201d, and "
+                 u"the row's source moved from a parks policy PDF to the Act itself (web2.gov.mb.ca).")),
+    dict(date=u"2026-10-09", jur=u"Nova Scotia, Prince Edward Island, Newfoundland and Labrador, Yukon, Northwest Territories, Nunavut",
+         change=(u"Six jurisdictions added, so the table now covers all ten provinces and all three "
+                 u"territories. Each is quoted from its own government page: Nova Scotia's Motor Vehicle Act "
+                 u"(its cut-off is written out in words, \u201cthirty kilometres per hour\u201d), PEI's "
+                 u"Power-Assisted Bicycles Regulations, the RCMP's Newfoundland and Labrador advisory, the "
+                 u"Yukon Motor Vehicles Act, the NWT Department of Infrastructure's operator manual, and "
+                 u"Nunavut's Traffic Safety Act.")),
+    dict(date=u"2026-10-09", jur=u"British Columbia, Alberta, Saskatchewan, Ontario, Quebec, New Brunswick, Manitoba",
+         change=(u"First build of this page: seven provinces, each read from its own government page, with the "
+                 u"federal repeal of the 500 W / 32 km/h definition dated to 4 February 2021 and Ontario's two "
+                 u"proposed classes named as a proposal and not a rule.")),
+]
+
+
+def _rules_ledger_row(e):
+    return ('<li><span class="ldate">%s</span> <span class="ljur">%s</span> \u2014 %s</li>'
+            % (esc(e["date"]), esc(e["jur"]), esc(e["change"])))
+
+
+RULES_LEDGER_ROWS = "\n        ".join(_rules_ledger_row(e) for e in RULES_CHANGELOG)
+
 RULES_TITLE = (u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and what each province and territory requires "
                u"| Commuter E-Bikes CA")
 RULES_OGTITLE = u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and where the provinces differ"
@@ -2535,6 +2574,11 @@ RULES_PAGE = r"""<!doctype html>
   ul.sources li{margin:0 0 16px}
   blockquote.quote{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--card);
     border-radius:6px;color:#3a3f49;font-size:13.5px;max-width:80ch}
+  ul.ledger{list-style:none;padding:0;margin:0}
+  ul.ledger li{margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line);max-width:80ch;color:#333842}
+  ul.ledger li:last-child{border-bottom:none}
+  ul.ledger .ldate{font-weight:700;font-variant-numeric:tabular-nums}
+  ul.ledger .ljur{color:var(--accent);font-weight:700}
 </style>
 </head>
 <body>
@@ -2643,6 +2687,14 @@ RULES_PAGE = r"""<!doctype html>
     <ul class="sources">__SOURCES__</ul>
   </section>
 
+  <section id="ledger">
+    <h2>__LEDGER_HEAD__</h2>
+    <p class="sub">__LEDGER_SUB__</p>
+    <ul class="ledger">
+      __LEDGER_ROWS__
+    </ul>
+  </section>
+
   <section id="next">
     <h2>Read the rest</h2>
     <ul class="otherbikes">
@@ -2650,6 +2702,7 @@ RULES_PAGE = r"""<!doctype html>
       <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
       <li><a href="../commute-costs/">What a commute actually costs, e-bike vs car vs transit</a></li>
       <li><a href="../gear/">Gear: helmets, locks and lights, and each bike's load rating</a></li>
+      <li><a href="../trails/">Where you may ride: trails, parks and paths, one land manager at a time</a></li>
       <li><a href="../guide/">The free decision guide</a></li>
       <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
     </ul>
@@ -2706,6 +2759,9 @@ _RULES_SUBST = {
     "__SRC_HEAD__": esc(RULES_SRC_HEAD),
     "__SRC_SUB__": esc(RULES_SRC_SUB),
     "__SOURCES__": RULES_SOURCES,
+    "__LEDGER_HEAD__": esc(RULES_LEDGER_HEAD),
+    "__LEDGER_SUB__": esc(RULES_LEDGER_SUB),
+    "__LEDGER_ROWS__": RULES_LEDGER_ROWS,
 }
 _rules_out = RULES_PAGE
 for _k, _v in _RULES_SUBST.items():
@@ -2763,6 +2819,313 @@ print("rules page: %d bytes, %d figures, every one substituted from a named gove
       "no affiliate element, no product link, %d provinces" % (len(RULES_TEXT), len(_page_nums),
                                                                len(RULES_PROVINCES)))
 
+# ================================================================ where you may ride: trails, parks and paths
+# The rules page answers what a ROAD allows. It does not answer which trail, park or conservation area takes a
+# Class 1 e-bike and which bans a throttle bike - the next question a rider asks. Crew-owned like /rules/ and
+# /gear/: NO config.js, NO .aff element and NO product link; every off-site link is a GOVERNMENT or park-
+# authority page, asserted host by host below, and every figure a row prints must sit inside that authority's
+# own verbatim, dated quote or the build stops. The template carries no digit of its own.
+TRAILS = [
+    dict(who=u"Parks Canada \u2014 national parks and national historic sites",
+         src=u"Parks Canada, \u201cVisitor guidelines \u2014 Pedal assist e-bikes\u201d",
+         url="https://parks.canada.ca/voyage-travel/regles-rules",
+         date=u"read 2026-10-09",
+         ride=u"Pedal-assist only, on designated bike trails",
+         rule=(u"Pedal-assist e-bikes are allowed on designated bike trails at select national parks \u2014 "
+               u"contact the park to find out which. A pedal-assist e-bike is capped at 500 W and at 32 km/h "
+               u"on level ground, and a bike with a throttle is not a pedal-assist e-bike and may be ridden "
+               u"only on roads."),
+         fig=u"500 W, 32 km/h",
+         quote=(u"Pedal assist electric bicycles (e-bikes) are allowed on designated bike trails at select "
+                u"national parks. Contact the park you are planning to visit to find out which trails you are "
+                u"allowed to ride. [...] The motor can generate a maximum of 500W. Power assistance stops "
+                u"when the bicycle attains a speed of 32 km/h on level ground. Please note that e-bikes "
+                u"equipped with an accelerator (a throttle) are not pedal assist e-bikes and can only be "
+                u"ridden on roads.")),
+    dict(who=u"Parks Canada \u2014 Banff National Park (superintendent's order)",
+         src=u"Parks Canada, Banff National Park, \u201cRestricted Activity: Electric bicycles (e-bikes)\u201d",
+         url="https://parks.canada.ca/pn-np/ab/banff/bulletins/8942f86e-3565-4b9a-a424-7c86d7c97701",
+         date=u"issued 28 March 2025, read 2026-10-09",
+         ride=u"Pedal-assist only, on named trail segments; otherwise roads only",
+         rule=(u"E-bikes are prohibited in Banff National Park except on paved roads and highways. "
+               u"Pedal-assist e-bikes are allowed on named trail segments and networks, capped at 500 W and "
+               u"32 km/h and with the motor disengaged below 3 km/h; a breach carries a maximum penalty of "
+               u"$25 000."),
+         fig=u"500 W, 32 km/h, 3 km/h, 25000",
+         quote=(u"The use of electric bicycles (e-bikes) is prohibited in Banff National Park except on paved "
+                u"roads and highways. Exceptions: Pedal assist e-bikes are permitted on trail segments, and "
+                u"networks listed below. [...] Trail segments and networks where pedal assist e-bikes are "
+                u"permitted [...] it has a total power output rating of 500 W or less, [...] is incapable of "
+                u"providing further assistance when the bicycle attains a speed of 32 km/h on level ground, "
+                u"[...] is equipped with a safety mechanism that prevents the motor from being engaged before "
+                u"the bicycle attains a speed of 3 km/h. [...] Violators may be charged under the Canada "
+                u"National Parks Act: maximum penalty $25 000.")),
+    dict(who=u"BC Parks \u2014 provincial parks, protected areas and conservancies",
+         src=u"BC Parks, \u201cCycling \u2014 E-bikes\u201d",
+         url="https://bcparks.ca/plan-your-trip/things-to-do/cycling/",
+         date=u"read 2026-10-09",
+         ride=u"Class 1 wherever cycling is allowed; Class 2 and 3 where motor vehicles are",
+         rule=(u"Class 1 e-bikes are allowed wherever cycling is already permitted, unless a sign closes the "
+               u"trail to e-bikes. Class 2 and Class 3 e-bikes \u2014 the classes that may accelerate to "
+               u"32 km/h and to 45 km/h \u2014 are usually allowed only where motor vehicles are permitted."),
+         fig=u"32 km/h, 45 km/h",
+         quote=(u"Electric bikes are welcome in many BC Parks. [...] Class 1 e-bikes are allowed where cycling "
+                u"is already permitted, unless signs indicate that a trail is closed to e-bikes. Class 2 and 3 "
+                u"e-bikes are usually allowed where motor vehicles are permitted, such as on roads and "
+                u"off-roading tracks. [...] Class 1: 32 km per hour; Class 2: 32 km per hour; Class 3: "
+                u"45 km per hour.")),
+    dict(who=u"Recreation Sites and Trails BC \u2014 established recreation trails on Crown land",
+         src=u"Recreation Sites and Trails BC, \u201cE-bike Policy\u201d",
+         url=("https://www2.gov.bc.ca/assets/gov/sports-recreation-arts-and-culture/outdoor-recreation/"
+              "camping-and-hiking/recreation-sites-and-trails/ebike_policy_final_04-25-2019.pdf"),
+         date=u"policy dated 2019, read 2026-10-09",
+         ride=u"Class 1 on non-motorized trails; all classes where motorized use is allowed",
+         rule=(u"All classes of e-bike are permitted on a trail open to motorized use; Class 1 alone is "
+               u"permitted on a trail open to non-motorized use unless e-bikes are specifically prohibited; "
+               u"Class 2 and Class 3 are not permitted where motor vehicles are prohibited."),
+         fig=u"Class 1, Class 2, Class 3",
+         quote=(u"Default Designations. The following default designations apply unless specific exemptions, "
+                u"prohibitions or allowances are provided [...] (a) All classes of e-bikes are permitted on "
+                u"Established Recreation Trails open to both motorized and non-motorized use, (b) Class 1 "
+                u"e-bikes / MAC are permitted on Established Recreation Trails open to non-motorized use "
+                u"unless e-bikes are specifically prohibited. (c) Class 2 and 3 e-bikes are not permitted on "
+                u"Established Recreation Trails that prohibit motorized vehicles.")),
+    dict(who=u"National Capital Commission \u2014 Capital Pathway and Gatineau Park",
+         src=u"National Capital Commission, \u201cShare the Path\u201d",
+         url="https://ncc-ccn.gc.ca/places/share-the-path",
+         date=u"read 2026-10-09",
+         ride=u"Bicycle-style pedal e-bikes; throttle-only devices banned",
+         rule=(u"Bicycle-style power-assisted e-bikes with operable pedals are permitted on the Capital "
+               u"Pathway; devices powered exclusively by a throttle, and electric kick-style scooters, are "
+               u"prohibited, and the pathway speed limit is 20 km/h."),
+         fig=u"20 km/h",
+         quote=(u"Rules for electric power-assisted vehicles. Here are the devices permitted and prohibited "
+                u"on the Capital Pathway and parkways when they are open for active use only. Permitted: "
+                u"Electric power-assisted bicycles (\u201ce-bikes\u201d), with operable pedals, that resemble "
+                u"conventional bicycles; Electric power-assisted cargo bicycles (\u201ccargo e-bikes\u201d), "
+                u"with operable pedals, for personal use; Motorized mobility aids, including but not limited "
+                u"to powered wheelchairs and scooters with three to five wheels. Prohibited: Electric "
+                u"power-assisted cargo bicycles for commercial use; Electric kick-style scooters; All devices "
+                u"that are exclusively powered by a throttle; All other electric-powered vehicles that are not "
+                u"specified above. [...] Travel at speeds that allow you to react in time for whatever might "
+                u"arise. (Maximum 20 km/h)")),
+]
+
+TRAIL_HEAD = u"One row per land manager: who allows what on the ground"
+TRAIL_SUB = (u"Each row is one authority's own page, read on the date shown, and the rule is quoted from it. "
+             u"The rule column prints only what that quote says; where a manager sets no e-bike rule of its "
+             u"own, that is a gap this page reports rather than fills.")
+TRAIL_NOTE = (u"Read the two columns against each other, because they disagree on purpose. The class numbers "
+              u"are the manufacturers' convention; a land manager often decides the other way round \u2014 "
+              u"Parks Canada and the NCC allow a pedal-assist machine that looks like a bicycle and turn away "
+              u"a throttle bike \u2014 while BC Parks sorts by class and lets a Class 2 or Class 3 machine onto "
+              u"a trail only where a motor vehicle may go. The same bike can be welcome on one manager's trail "
+              u"and barred from the trail beside it.")
+TRAIL_TITLE = (u"Where you can ride an e-bike in Canada: trails, parks and paths, one land manager at a time "
+               u"| Commuter E-Bikes CA")
+TRAIL_OGTITLE = u"Where you can ride an e-bike in Canada: trails, parks and paths"
+TRAIL_DESC = (u"Where a Canadian e-bike may actually be ridden: national parks, BC's parks and recreation "
+              u"trails, and the National Capital Commission's pathway and Gatineau Park \u2014 each rule "
+              u"quoted from the authority's own page and dated, with no affiliate link.")
+TRAIL_INTRO = (u"Road rules are one question; the ground under the wheels is another. An e-bike can be legal "
+               u"in a province and still barred from the trail it is on, because the trail is the land "
+               u"manager's decision, not the province's. This page sets out, manager by manager, what is "
+               u"allowed on the trails, in each authority's own words and dated. Every figure is published by "
+               u"the authority named; nothing here is this site's opinion.")
+TRAIL_DISCLOSURE = (u"this page has no affiliate link and nothing to buy. It carries no partner link, no "
+                    u"commission and no product link; every off-site link on it is a government or "
+                    u"park-authority page, and this is general information, not legal advice.")
+
+
+def _trail_row(t):
+    return ('<tr><th scope="row" class="model">%s<span class="src">'
+            '<a href="%s" target="_blank" rel="noopener nofollow">%s</a> &middot; %s</span></th>'
+            '<td>%s</td><td>%s</td></tr>'
+            % (esc(t["who"]), esc(t["url"]), esc(t["src"]), esc(t["date"]), esc(t["ride"]), esc(t["rule"])))
+
+
+TRAIL_ROWS = "\n        ".join(_trail_row(t) for t in TRAILS)
+
+TRAIL_SRC_HEAD = u"Every authority, and what it says"
+TRAIL_SRC_SUB = (u"Each page below was read on the date shown, and the rule in the table above is taken from "
+                 u"the quoted text. Nothing on this page comes from memory.")
+
+
+def _trail_src_block(t):
+    return ('<li><strong>%s</strong> \u00b7 %s \u00b7 %s: '
+            '<a href="%s" target="_blank" rel="noopener nofollow">%s</a>'
+            '<blockquote class="quote">%s</blockquote></li>'
+            % (esc(t["who"]), esc(t["date"]), esc(t["src"]), esc(t["url"]), esc(t["url"]), esc(t["quote"])))
+
+
+TRAIL_SOURCES = "\n        ".join(_trail_src_block(t) for t in TRAILS)
+
+TRAILS_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Commuter E-Bikes CA">
+<meta property="og:title" content="__OGTITLE__">
+<meta property="og:description" content="__DESC__">
+<meta property="og:url" content="__CANONICAL__">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="__OGTITLE__">
+<meta name="twitter:description" content="__DESC__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .trailhero{padding:34px 0 8px}
+  .trailhero h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;margin:0 0 12px;max-width:34ch}
+  table.trails .model{font-weight:700}
+  table.trails .src{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:4px}
+  table.trails td{vertical-align:top}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+  ul.sources li{margin:0 0 16px}
+  blockquote.quote{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--card);
+    border-radius:6px;color:#3a3f49;font-size:13.5px;max-width:80ch}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Pages read <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="trailhero" style="border-top:none">
+    <p class="crumb"><a href="../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; Where you may ride</p>
+    <h1>Where you may ride an e-bike: trails, parks and paths, one land manager at a time</h1>
+    <p class="deck">__INTRO__</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> __DISC__</p>
+  </section>
+
+  <section id="trails">
+    <h2>__TRAIL_HEAD__</h2>
+    <p class="sub">__TRAIL_SUB__</p>
+    <div class="tablewrap">
+      <table class="rules trails">
+        <caption>One row per land manager. Each rule is quoted from that manager's own page on the date shown.</caption>
+        <thead><tr>
+          <th scope="col">Who manages the ground</th>
+          <th scope="col">What may ride there</th>
+          <th scope="col">The rule, in the manager's own words</th>
+        </tr></thead>
+        <tbody>
+        __TRAIL_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note">__TRAIL_NOTE__</p>
+  </section>
+
+  <section id="sources">
+    <h2>__SRC_HEAD__</h2>
+    <p class="sub">__SRC_SUB__</p>
+    <ul class="sources">__SOURCES__</ul>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
+      <li><a href="../rules/">Classes and rules: what the three classes mean in Canada, province by province</a></li>
+      <li><a href="../commute-costs/">What a commute actually costs, e-bike vs car vs transit</a></li>
+      <li><a href="../gear/">Gear: helmets, locks and lights</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> __DISC__</p>
+  <p>This is general information about published trail and park rules, not legal advice, and not advice about your particular riding, health or by-laws. Rules change; read the land manager's own page before you ride.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Every authority is named above; data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="../rules/">classes and rules</a>.</p>
+</div></footer>
+</body>
+</html>
+"""
+
+# The template may carry no figure of its own: every digit in the output must come from a substitution.
+_trail_probe = re.sub(r"(?s)<(style|script).*?</\1>", " ", TRAILS_PAGE)
+_trail_probe = re.sub(r"(?s)<[^>]+>", " ", _trail_probe)
+_trail_probe = re.sub(r"__[A-Z_0-9]*__", "", _trail_probe)
+assert not re.search(r"\d", _trail_probe), \
+    "a figure is typed into the trails template instead of being substituted"
+
+_TRAILS_SUBST = {
+    "__CSS__": CSS,
+    "__N_WORD__": esc(N_WORD),
+    "__CHECKED__": esc(CHECKED),
+    "__TITLE__": esc(TRAIL_TITLE),
+    "__OGTITLE__": esc(TRAIL_OGTITLE),
+    "__DESC__": esc(TRAIL_DESC),
+    "__CANONICAL__": "%s/trails/" % SITE,
+    "__INTRO__": esc(TRAIL_INTRO),
+    "__DISC__": esc(TRAIL_DISCLOSURE),
+    "__TRAIL_HEAD__": esc(TRAIL_HEAD),
+    "__TRAIL_SUB__": esc(TRAIL_SUB),
+    "__TRAIL_ROWS__": TRAIL_ROWS,
+    "__TRAIL_NOTE__": esc(TRAIL_NOTE),
+    "__SRC_HEAD__": esc(TRAIL_SRC_HEAD),
+    "__SRC_SUB__": esc(TRAIL_SRC_SUB),
+    "__SOURCES__": TRAIL_SOURCES,
+}
+_trails_out = TRAILS_PAGE
+for _k, _v in _TRAILS_SUBST.items():
+    _trails_out = _trails_out.replace(_k, _v)
+write_page(os.path.join(ROOT, "trails", "index.html"), _trails_out, "trails")
+
+# ---- the page is read back and checked before the sitemap is written
+TRAILS_FILE = os.path.join(ROOT, "trails", "index.html")
+TRAILS_TEXT = open(TRAILS_FILE, encoding="utf-8").read()
+
+# 1. nothing here can pay.
+for _bad in ("config.js", "AFFILIATE_", 'data-aff=', 'class="buyaff"'):
+    assert _bad not in TRAILS_TEXT, "affiliate element on the trails page: %r" % _bad
+
+# 2. its own head.
+assert '<link rel="canonical" href="%s/trails/">' % SITE in TRAILS_TEXT
+for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="og:site_name"',
+              'property="og:title"', 'property="og:description"', 'property="og:url"',
+              'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"'):
+    assert _head in TRAILS_TEXT, "trails page is missing %s" % _head
+
+# 3. no product link: every absolute link is a GOVERNMENT or park-authority page.
+_TRAIL_GOV = ("canada.ca", "gc.ca", "bcparks.ca", "gov.bc.ca")
+_threfs = re.findall(r'href="([^"]+)"', TRAILS_TEXT)
+_thext = sorted(h for h in _threfs if h.startswith("http") and not h.startswith(SITE))
+_tbad = [h for h in _thext if not h.split("//", 1)[1].split("/", 1)[0].endswith(_TRAIL_GOV)]
+assert not _tbad, "the trails page links off to a non-government URL: %r" % _tbad
+assert len(_thext) >= len(TRAILS), "the trails page dropped its authority source links"
+
+# 4. every number that reached the page must come from a substitution.
+_allowed_tn = set()
+for _v in _TRAILS_SUBST.values():
+    _allowed_tn |= set(re.findall(r"\d[\d,.]*", str(_v)))
+_tbody = re.sub(r"(?s)<(style|script).*?</\1>", " ", TRAILS_TEXT.split("<body>", 1)[1])
+_tbody = html.unescape(re.sub(r"(?s)<[^>]+>", " ", _tbody))
+_tnums = set(re.findall(r"\d[\d,.]*", _tbody))
+assert _tnums <= _allowed_tn, \
+    "number on the trails page with no published source: %r" % sorted(_tnums - _allowed_tn)
+
+
+# 5. a row's figures must be IN that authority's own quote, or the row is a paraphrase that drifted.
+def _tdig(s):
+    return set(re.findall(r"\d+", str(s).replace(",", "").replace(" ", "")))
+
+
+for _t in TRAILS:
+    _claimed = _tdig(_t["rule"]) | _tdig(_t["fig"]) | _tdig(_t["ride"])
+    _inq = _tdig(_t["quote"])
+    assert _claimed <= _inq, \
+        "%s: figures %r are not in that authority's own quote" % (_t["who"], sorted(_claimed - _inq))
+print("trails page: %d bytes, %d figures, every one substituted from a named authority's page, "
+      "no affiliate element, no product link, %d authorities" % (len(TRAILS_TEXT), len(_tnums), len(TRAILS)))
+
 # ================================================================ the reader: /stats/
 # A count nobody can read is not a measurement. This page reads every key back through the service's
 # /get endpoint and shows what it finds, so "how much traffic does this lane get" has an answer that
@@ -2785,6 +3148,7 @@ METRIC_PAGES = (
     + [("commute-costs", "What a commute costs &mdash; e-bike vs car vs transit, per year")]
     + [("gear", "Gear &mdash; helmets, locks and lights, and what each bike is rated to carry")]
     + [("rules", "Classes and rules &mdash; what Class 1/2/3 mean in Canada, province by province")]
+    + [("trails", "Where you may ride &mdash; trails, parks and paths, one land manager at a time")]
     + [("vs/%s" % s, "%s" % pair_label(*pair)) for s, pair in zip(PAIR_SLUGS, PAIRS)]
     + [("stats", "This page &mdash; the counts")]
 )
@@ -2970,7 +3334,7 @@ print("stats reader: %d rows, every one a live beacon key, no placeholder token"
 # ---------------------------------------------------------------- sitemap + robots
 URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
         + ["%s/how-far/" % SITE] + ["%s/guide/" % SITE] + ["%s/commute-costs/" % SITE]
-        + ["%s/gear/" % SITE] + ["%s/rules/" % SITE]
+        + [("%s/gear/" % SITE)] + [("%s/rules/" % SITE)] + [("%s/trails/" % SITE)]
         + ["%s/stats/" % SITE]
         + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
 # The sitemap and the beacon list are the same set of pages, or one of them is lying. Asserted, not assumed.
