@@ -193,6 +193,12 @@ PAIRS = [
     ("velotric-tempo", "radkick-7speed"),         # "Tempo vs RadKick 7-Speed" - the two lightest here
     ("aventon-soltera-2-5", "velotric-tempo"),    # "Soltera 2.5 vs Tempo" - the two light, cheap city bikes
     ("ohm-cruise-3", "velotric-discover-3"),      # "Cruise 3 vs Discover 3" - premium mid-drive vs the all-rounder
+    ("radster-road", "velotric-discover-3"),      # "Radster Road vs Discover 3" - the two CA$2,699 flagship commuters,
+                                                  # and the pair that owns a query the site did not: the Radster Road is
+                                                  # this catalogue's flagship from its highest-search-volume maker and it
+                                                  # appeared in NO head-to-head page at all, while the Discover 3 is the
+                                                  # site's own "best all-round daily commuter" pick. Two buyers' flagship
+                                                  # shortlist, compared on the makers' own published figures and nothing else.
 ]
 
 def pair_slug(a, b):
