@@ -140,11 +140,15 @@ and the PDF carry the same figures). The pages are plain HTML/CSS/JS.
   the counts, with its own title, description and canonical URL. Linked from the comparison page footer
 - `guide/index.html` — generated; the decision guide as an indexable page, from the same source as the
   PDF, with its own title, description, canonical URL and social card, and no affiliate element
-- `sitemap.xml` — generated; the twenty indexable URLs (the comparison, the seven bikes, the range
-  picker, the decision guide, `commute-costs/`, `gear/`, `rules/`, `trails/`, `stats/` and the five
-  head-to-head pages)
+- `sitemap.xml` — generated; the twenty-one indexable URLs (the comparison, the seven bikes, the range
+  picker, the decision guide, `commute-costs/`, `gear/`, `rules/`, `trails/`, `price-band/`, `stats/`
+  and the five head-to-head pages)
 - `commute-costs/index.html` — generated; what a commute costs per year by e-bike, car and transit, in
   seven cities, every figure substituted from a named source
+- `price-band/index.html` — generated; the budget band, "the best commuter e-bike under CA$2,000 in
+  Canada" — the models at or below the limit, what separates them, and what the cheapest model above the
+  line adds for the money. Every figure a maker's own published string or this build's subtraction on two
+  of them; no affiliate element and no product link of its own
 - `gear/index.html`, `rules/index.html`, `trails/index.html` — generated; gear checklists and each
   bike's load rating, the Canadian class and province rules, and the land managers' own trail rules.
   Each quotes a named authority's own words and carries no affiliate element of any kind
