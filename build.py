@@ -2218,16 +2218,16 @@ BAND_UP_NOTE = ("For the %s more you move from %s to %s, from a %s battery to %s
 
 
 def _band_row(p):
-    """One row of the band table, every cell the published field itself. No data-aff hook, no buy button:
-    this page has nothing that could pay and nothing that claims a link pays."""
+    """One row of the band table, every cell the published field itself and the same ten columns the
+    comparison page carries - no data-aff hook, no buy button, no per-row source link: this page has
+    nothing that could pay and nothing that claims a link pays. The sources are listed in full below."""
     return ('<tr><th scope="row" class="model"><a class="mname" href="../bikes/%s/">%s</a>'
             '<span class="mmaker">%s</span></th>'
             '<td class="price">%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>'
-            '<td>%s</td><td>%s</td><td>%s</td>'
-            '<td><a href="%s" target="_blank" rel="noopener nofollow">maker\'s page &nearr;</a></td></tr>'
+            '<td>%s</td><td>%s</td><td>%s</td></tr>'
             % (esc(p["id"]), esc(p["model"]), esc(p["maker"]), esc(p["price_display"]), esc(p["motor"]),
                esc(p["torque"]), esc(p["battery"]), esc(p["range"]), esc(p["weight"]), esc(p["brakes"]),
-               esc(p["eclass"]), esc(p["warranty"]), esc(p["source_url"])))
+               esc(p["eclass"]), esc(p["warranty"])))
 
 
 BAND_ROWS = "\n        ".join(_band_row(p) for p in BAND)
@@ -2287,7 +2287,6 @@ BAND_PAGE = r"""<!doctype html>
   .bandhero{padding:34px 0 8px}
   .bandhero h1{font-size:clamp(26px,4.4vw,40px);line-height:1.12;margin:0 0 12px;max-width:30ch}
   p.bandsec{margin:0 0 14px;color:#333842;max-width:74ch}
-  table.band{min-width:820px}
   table.band .model{font-weight:700}
   table.diff{min-width:560px}
   table.diff th[scope="row"]{color:var(--muted);font-weight:600;width:220px}
@@ -2319,7 +2318,7 @@ BAND_PAGE = r"""<!doctype html>
           <th scope="col">Model</th><th scope="col">Price (CAD)</th><th scope="col">Motor</th>
           <th scope="col">Torque</th><th scope="col">Battery</th><th scope="col">Range (maker's figure)</th>
           <th scope="col">Weight</th><th scope="col">Brakes</th><th scope="col">Class</th>
-          <th scope="col">Warranty</th><th scope="col">Source</th>
+          <th scope="col">Warranty</th>
         </tr></thead>
         <tbody>
         __BAND_ROWS__
