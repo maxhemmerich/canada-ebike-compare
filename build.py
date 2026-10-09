@@ -287,6 +287,7 @@ PAGE = r"""<!doctype html>
 <meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
 <title>Canadian Commuter E-Bike Comparison (CAD, 2026)</title>
 <meta name="description" content="__N_WORD_CAP__ commuter e-bikes you can buy in Canada for __PRICE_SPAN_DASH__, compared on price, motor, battery, range, weight and warranty, with every spec traced to the maker's own product page.">
+<link rel="alternate" type="application/rss+xml" title="Commuter E-Bikes CA &mdash; price and availability" href="feed.xml">
 <style>
   :root{
     --paper:#faf8f4; --ink:#16181d; --muted:#5d6270; --line:#e3ddd1;
@@ -423,6 +424,7 @@ __ROWS__
 <footer><div class="wrap">
   <p><strong>Disclosure (repeated):</strong> this site carries no live affiliate links. Links marked "maker specs" go to the manufacturer's own page, unmonetised. If paid partner links are added later, they will be labelled as such here and on the button itself.</p>
   <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
+  <p>Stock and price change; the <a href="feed.xml">status feed</a> (RSS) carries each model's price and availability and changes when this page is re-read &mdash; subscribe in any reader, no email and no account.</p>
   <p>Built __CHECKED__ by the GAMMA project. Data: <a href="data/products.json">products.json</a> &middot; classes and rules: <a href="rules/">what Class 1/2/3 mean in Canada</a> &middot; page views: <a href="stats/">the counts</a>.</p>
 </div></footer>
 
@@ -2927,6 +2929,51 @@ TRAILS = [
                 u"is sometimes referred to as a class 1 e-bike. [...] Other types or classes of e-bikes are not "
                 u"permitted on designated cycling pathways and trails in provincial parks, provincial recreation "
                 u"areas, and wildland provincial parks.")),
+    dict(who=u"Manitoba Parks \u2014 provincial parks and protected spaces",
+         src=u"Manitoba Parks, \u201cElectric Bikes\u201d (Recreation and Activities \u2014 Trails)",
+         url="https://gov.mb.ca/sd/parks/recreation-and-activities/trails/index.html",
+         date=u"read 2026-10-09",
+         ride=u"Wherever mountain bikes are allowed; e-bike closures signed",
+         rule=(u"In general an e-bike is allowed anywhere in a Manitoba provincial park that a mountain bike "
+               u"is allowed, and a trail that closes to e-bikes while staying open to mountain bikes must say "
+               u"so on site. A power-assisted bicycle is limited to a 500 W continuous motor, cannot assist "
+               u"above 32 km/h, and (where a throttle is fitted) must cut power when the brake is applied; the "
+               u"rider must be 14 or older and wear a helmet. E-scooters are not permitted on trails or "
+               u"beaches."),
+         fig=u"500 W; 32 km/h; 14",
+         quote=(u"Electric bicycles, commonly known as e-bikes or power-assisted bicycles, are welcome in many "
+                u"provincial parks. In general, e-bikes are allowed in Manitoba parks anywhere mountain bikes "
+                u"are allowed. Occasionally, there may be some trails or areas where mountain bikes are allowed "
+                u"but e-bikes are not. In those cases, the area will be signed to indicate that e-bikes are not "
+                u"permitted. Other types of \u201cmicromobility devices,\u201d such as e-scooters, are not "
+                u"permitted on trails or beaches in provincial parks. [...] the motor has a continuous power "
+                u"output rating, measured at its shaft, of 500 W or less, [...] the motor cannot provide the "
+                u"vehicle with motive power when it is travelling at more than 32 km/h [...] You must be 14 "
+                u"years of age or older to operate a power-assisted bicycle in Manitoba [...] You must wear a "
+                u"helmet when operating a power-assisted bicycle")),
+    dict(who=u"S\u00e9paq \u2014 Parc national du Mont-Sainte-Anne (Qu\u00e9bec's national parks)",
+         src=u"S\u00e9paq, \u201cParc du Mont-Sainte-Anne\u201d",
+         url="https://www.sepaq.com/destinations/parc-mont-sainte-anne/",
+         date=u"read 2026-10-09",
+         ride=u"Pedal-assist e-bikes allowed on the trails; throttle e-bikes barred",
+         rule=(u"S\u00e9paq's own page for this national park draws the Qu\u00e9bec line in one sentence: a "
+               u"throttle-style electric bike is not permitted on the trails, while a pedal-assist bike is "
+               u"\u2014 the same split between a machine you pedal and a machine you throttle that Parks "
+               u"Canada and the NCC draw, written in French on a S\u00e9paq page."),
+         fig=u"",
+         quote=(u"Important! Les v\u00e9los \u00e9lectriques sont interdits alors que les v\u00e9los \u00e0 "
+                u"assistance \u00e9lectrique sont autoris\u00e9s sur les sentiers.")),
+    dict(who=u"Saskatchewan Parks \u2014 provincial parks and recreation sites",
+         src=u"Saskatchewan Parks, \u201cBiking\u201d and \u201cFrequently Asked Questions\u201d",
+         url="https://www.saskparks.com/biking",
+         date=u"read 2026-10-09",
+         ride=u"No e-bike rule published",
+         rule=(u"Saskatchewan Parks publishes no e-bike rule of its own. Its Biking page and its FAQ, both "
+               u"read on the date shown, do not mention e-bikes at all, and the province's own park-management "
+               u"pages are silent too \u2014 a gap this page reports rather than fills. Until the authority "
+               u"publishes one, ask the park office before you ride."),
+         fig=u"",
+         quote=None),
 ]
 
 TRAIL_HEAD = u"One row per land manager: who allows what on the ground"
@@ -2943,9 +2990,9 @@ TRAIL_TITLE = (u"Where you can ride an e-bike in Canada: trails, parks and paths
                u"| Commuter E-Bikes CA")
 TRAIL_OGTITLE = u"Where you can ride an e-bike in Canada: trails, parks and paths"
 TRAIL_DESC = (u"Where a Canadian e-bike may actually be ridden: national parks, BC's parks and recreation "
-              u"trails, Alberta's provincial parks, and the National Capital Commission's pathway and "
-              u"Gatineau Park \u2014 each rule quoted from the authority's own page and dated, with no "
-              u"affiliate link.")
+              u"trails, the provincial park systems of Alberta, Saskatchewan and Manitoba, Qu\u00e9bec's "
+              u"S\u00e9paq national parks, and the National Capital Commission's pathway and Gatineau Park "
+              u"\u2014 each rule quoted from the authority's own page and dated, with no affiliate link.")
 TRAIL_INTRO = (u"Road rules are one question; the ground under the wheels is another. An e-bike can be legal "
                u"in a province and still barred from the trail it is on, because the trail is the land "
                u"manager's decision, not the province's. This page sets out, manager by manager, what is "
@@ -2971,10 +3018,15 @@ TRAIL_SRC_SUB = (u"Each page below was read on the date shown, and the rule in t
 
 
 def _trail_src_block(t):
-    return ('<li><strong>%s</strong> \u00b7 %s \u00b7 %s: '
-            '<a href="%s" target="_blank" rel="noopener nofollow">%s</a>'
-            '<blockquote class="quote">%s</blockquote></li>'
-            % (esc(t["who"]), esc(t["date"]), esc(t["src"]), esc(t["url"]), esc(t["url"]), esc(t["quote"])))
+    if t.get("quote"):
+        tail = '<blockquote class="quote">%s</blockquote>' % esc(t["quote"])
+    else:
+        tail = ('<p class="norule">No e-bike rule is published on this page. Nothing is quoted because the '
+                'authority has not published a rule of its own on the page read; that absence is the finding, '
+                'not a gap this site fills.</p>')
+    return ('<li><strong>%s</strong> &middot; %s &middot; %s: '
+            '<a href="%s" target="_blank" rel="noopener nofollow">%s</a>%s</li>'
+            % (esc(t["who"]), esc(t["date"]), esc(t["src"]), esc(t["url"]), esc(t["url"]), tail))
 
 
 TRAIL_SOURCES = "\n        ".join(_trail_src_block(t) for t in TRAILS)
@@ -3007,6 +3059,8 @@ TRAILS_PAGE = r"""<!doctype html>
   ul.sources li{margin:0 0 16px}
   blockquote.quote{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--card);
     border-radius:6px;color:#3a3f49;font-size:13.5px;max-width:80ch}
+  p.norule{margin:8px 0 0;padding:8px 12px;border-left:3px solid var(--line);background:var(--card);
+    border-radius:6px;color:var(--muted);font-size:13.5px;max-width:80ch;font-style:italic}
 </style>
 </head>
 <body>
@@ -3114,7 +3168,8 @@ for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="
     assert _head in TRAILS_TEXT, "trails page is missing %s" % _head
 
 # 3. no product link: every absolute link is a GOVERNMENT or park-authority page.
-_TRAIL_GOV = ("canada.ca", "gc.ca", "bcparks.ca", "gov.bc.ca", "albertaparks.ca")
+_TRAIL_GOV = ("canada.ca", "gc.ca", "bcparks.ca", "gov.bc.ca", "albertaparks.ca",
+              "gov.mb.ca", "manitoba.ca", "sepaq.com", "saskparks.com")
 _threfs = re.findall(r'href="([^"]+)"', TRAILS_TEXT)
 _thext = sorted(h for h in _threfs if h.startswith("http") and not h.startswith(SITE))
 _tbad = [h for h in _thext if not h.split("//", 1)[1].split("/", 1)[0].endswith(_TRAIL_GOV)]
@@ -3139,9 +3194,13 @@ def _tdig(s):
 
 for _t in TRAILS:
     _claimed = _tdig(_t["rule"]) | _tdig(_t["fig"]) | _tdig(_t["ride"])
-    _inq = _tdig(_t["quote"])
-    assert _claimed <= _inq, \
-        "%s: figures %r are not in that authority's own quote" % (_t["who"], sorted(_claimed - _inq))
+    if _t.get("quote"):
+        _inq = _tdig(_t["quote"])
+        assert _claimed <= _inq, \
+            "%s: figures %r are not in that authority's own quote" % (_t["who"], sorted(_claimed - _inq))
+    else:
+        assert not _claimed, \
+            "%s: a row with no quoted source may print no figure, but has %r" % (_t["who"], sorted(_claimed))
 print("trails page: %d bytes, %d figures, every one substituted from a named authority's page, "
       "no affiliate element, no product link, %d authorities" % (len(TRAILS_TEXT), len(_tnums), len(TRAILS)))
 
@@ -3370,6 +3429,44 @@ print("wrote sitemap.xml (%d urls)" % len(URLS))
 robots = "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE
 open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8").write(robots)
 print("wrote robots.txt")
+
+# ---------------------------------------------------------------- the status feed: a capture point at $0
+# The critique's third finding: the guide is given away with no string, so no relationship forms. An email
+# list needs an inbox this lane does not own, and a signup form needs an account; a feed needs neither. It
+# is one static file the visitor subscribes to in their own reader, no mailbox and no account with us, and
+# it changes exactly when this build re-reads the makers. Built from the same data/products.json as every
+# page, so it cannot drift from them, and it carries the same CHECKED date the pages do.
+import datetime as _dt
+_FEED_DATE = _dt.datetime.strptime(CHECKED, "%Y-%m-%d").strftime("%a, %d %b %Y 00:00:00 -0400")
+_FEED_ITEM = ("  <item>\n"
+              "    <title>%s</title>\n"
+              "    <link>%s/bikes/%s/</link>\n"
+              "    <guid isPermaLink=\"true\">%s/bikes/%s/</guid>\n"
+              "    <description>%s</description>\n"
+              "    <pubDate>%s</pubDate>\n"
+              "  </item>")
+_FEED_ITEMS = "\n".join(
+    _FEED_ITEM % (esc("%s %s \u2014 %s" % (p["maker"], p["model"], p["price_display"])),
+                  SITE, p["id"], SITE, p["id"],
+                  esc("Price %s as published by the maker; availability: %s; specs read %s."
+                      % (p["price_display"], p.get("availability", "not stated"), CHECKED)),
+                  _FEED_DATE)
+    for p in ORDER)
+FEED = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0">\n'
+        '<channel>\n'
+        '  <title>Commuter E-Bikes CA \u2014 price and availability</title>\n'
+        '  <link>%s/</link>\n'
+        '  <description>One item per commuter e-bike on Commuter E-Bikes CA: the published price, the '
+        'availability observed when the specs were last read, and the date they were read. Subscribe to '
+        'hear when a model is back in stock. No email, no account.</description>\n'
+        '  <language>en-ca</language>\n'
+        '  <lastBuildDate>%s</lastBuildDate>\n'
+        '%s\n'
+        '</channel>\n'
+        '</rss>\n') % (SITE, _FEED_DATE, _FEED_ITEMS)
+open(os.path.join(ROOT, "feed.xml"), "w", encoding="utf-8", newline="\n").write(FEED)
+print("wrote feed.xml (%d items)" % len(ORDER))
 
 # ================================================================ PDF
 # invariant mode fixes reportlab's CreationDate/ModDate and the trailer file ID to a constant, so the
