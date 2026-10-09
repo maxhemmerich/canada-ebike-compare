@@ -680,7 +680,7 @@ for p in ORDER:
 # from them. No affiliate constant is read or written here; there is nothing on this page to point at.
 PICKER_DATA = json.dumps([
     {"id": q["id"], "maker": q["maker"], "model": q["model"], "price": q["price_display"],
-     "battery": q["battery"], "range": q["range"], "url": "bikes/%s/" % q["id"],
+     "battery": q["battery"], "range": q["range"], "url": "../bikes/%s/" % q["id"],
      "high": RANGE_PARSE[q["id"]]["high"], "low": RANGE_PARSE[q["id"]]["low"],
      "highFrom": RANGE_PARSE[q["id"]]["high_from"], "lowLabel": RANGE_PARSE[q["id"]]["low_label"]}
     for q in ORDER], ensure_ascii=False).replace("<", "\\u003c")
@@ -3930,3 +3930,61 @@ for _path, _label in METRIC_PAGES:
     assert len(_raw) > 4000, "%s is a suspiciously empty PNG" % _png
 print("share cards: %d pages, one %dx%d PNG each in og/, every page naming its own card and no other"
       % (len(METRIC_PAGES), OG_W, OG_H))
+
+# ================================================================ every internal link resolves, or the build stops
+# Found by hand on the live site 2026-10-09, not by this build: the range picker's result cards are built in
+# JavaScript from the "url" fields of its own JSON block, and those fields were written as site-root paths
+# ("bikes/<id>/"). Served from /how-far/, the browser resolved each one to /how-far/bikes/<id>/ - both links on
+# every result card a 404 - and nothing caught it, because no part of the build had ever read its own links
+# back. So it does now, from the files on disk after everything is written. Two checks:
+#   1. every literal relative href/src on every generated page resolves to a file that exists in the tree
+#      (fragment-only refs, mailto:/tel:, and absolute URLs are not this check's business);
+#   2. every URL inside a page's own <script type="application/json"> data block resolves from THAT page's
+#      directory - the JavaScript-built link the literal sweep cannot see.
+import posixpath
+
+def _tree_target(page_dir, ref):
+    """Where one relative reference lands inside the built tree, as a posix path ('' == the root)."""
+    t = posixpath.normpath(posixpath.join(page_dir, ref))
+    return "" if t in (".", "/") else t
+
+def _exists(target):
+    full = os.path.join(ROOT, *[x for x in target.split("/") if x])
+    if os.path.isdir(full):
+        full = os.path.join(full, "index.html")
+    return os.path.isfile(full)
+
+_LINK_RE = re.compile(r'(?<![\w-])(?:href|src)="([^"]*)"')
+_JSON_RE = re.compile(r'<script type="application/json"[^>]*>(.*?)</script>', re.S)
+# A script body is code, not markup: an inline template like '<a href="' + m.url + '">' would otherwise be read
+# as a link of its own. Strip every script element before the literal sweep; the JSON check below covers the
+# one data block whose values ARE links.
+_SCRIPT_RE = re.compile(r"<script\b[^>]*>.*?</script>", re.S)
+_SKIP = ("#", "//", "http:", "https:", "mailto:", "tel:", "data:", "javascript:")
+_links = 0
+for _path, _label in METRIC_PAGES:
+    _text = open(os.path.join(ROOT, _path, "index.html"), encoding="utf-8").read()
+    for _ref in _LINK_RE.findall(_SCRIPT_RE.sub("", _text)):
+        if not _ref or _ref.startswith(_SKIP):
+            continue
+        _ref = _ref.split("#", 1)[0]
+        if not _ref:
+            continue
+        _t = _tree_target(_path, _ref)
+        assert _exists(_t), "%s: %r points at %r, which is not in the tree" % (_path or "index.html", _ref, _t)
+        _links += 1
+    for _block in _JSON_RE.findall(_text):
+        try:
+            _data = json.loads(_block)
+        except ValueError:
+            continue
+        for _item in (_data if isinstance(_data, list) else []):
+            if not (isinstance(_item, dict) and "url" in _item):
+                continue
+            _ref = str(_item["url"]).split("#", 1)[0]
+            _t = _tree_target(_path, _ref)
+            assert _exists(_t), \
+                "%s: a data url %r points at %r, which is not in the tree" % (_path, _ref, _t)
+            _links += 1
+print("internal links: %d relative references over %d pages, every one resolving inside the tree"
+      % (_links, len(METRIC_PAGES)))
