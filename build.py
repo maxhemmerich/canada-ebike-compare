@@ -199,6 +199,25 @@ PAIRS = [
                                                   # appeared in NO head-to-head page at all, while the Discover 3 is the
                                                   # site's own "best all-round daily commuter" pick. Two buyers' flagship
                                                   # shortlist, compared on the makers' own published figures and nothing else.
+    ("aventon-soltera-2-5", "velotric-discover-3"), # "Soltera 2.5 vs Discover 3" - the ONLY unbuilt pair where BOTH
+                                                  # bikes sit behind a named affiliate program this lane can actually
+                                                  # apply to (Aventon via AvantLink; Velotric via Impact - the money
+                                                  # switch), so this page funnels a reader to the two model pages that
+                                                  # can pay the day either paste lands. It also owns a buyer question
+                                                  # the site did not answer: the comparison's own CHEAPEST bike (the
+                                                  # CA$1,699 Soltera 2.5, the "cheapest way in" pick) against its own
+                                                  # "best all-round daily commuter" (the CA$2,699 Discover 3) - the
+                                                  # value gap a shopper actually weighs, and one no page here compared.
+                                                  # Rejected alternatives, with reasons: the two Rad Power bikes
+                                                  # (Radster Road vs RadKick 7-Speed) own a query but sit behind NO
+                                                  # program at all; that pair was the runner-up on traffic and lost on
+                                                  # the money the brief ranks first, since it funnels to nothing that
+                                                  # can pay. The lone remaining "CA$2,699 flagship" pairing (Radster
+                                                  # Road vs Rook) would be a near-duplicate of the Radster Road vs
+                                                  # Discover 3 framing shipped at rank 33. This pair duplicates
+                                                  # nothing: /price-band/'s computed head-to-head is the two models
+                                                  # UNDER CA$2,000 (RadKick vs Soltera), and the Discover 3 is above
+                                                  # the line.
 ]
 
 def pair_slug(a, b):
@@ -3710,6 +3729,16 @@ METRIC_PAGES = (
     + [("stats", "This page &mdash; the counts")]
 )
 
+# The reader's own pace, in milliseconds between reads. It is ONE constant because the /stats/ prose, the
+# reader's GAP and the gate below all describe the same number: the counting service allows 30 reads per
+# 10 seconds per address, the reader fires N of them one at a time, and every sentence that names the pace
+# has to stay true as the site grows. It was 450 ms (0.45 s) through twenty-two pages, where N * 0.45 s was
+# 9.9 s; the twenty-third page would have pushed a full read past ten seconds, so the pace is tightened to
+# 400 ms (2.5 a second, 9.2 s for 23 rows) and the gate reads THIS value rather than a number typed twice.
+STATS_GAP_MS = 400
+_STATS_GAP_RATE = "%.1f" % (1000.0 / STATS_GAP_MS)          # "2.5" - reads a second
+_STATS_GAP_SECS = "%.1f" % (len(METRIC_PAGES) * STATS_GAP_MS / 1000.0)  # a full read, in seconds
+
 STATS_PAGE = r"""<!doctype html>
 <html lang="en">
 <head>
@@ -3769,7 +3798,7 @@ __ROWS__
       <li><strong>Counted:</strong> one anonymous increment per page load, fired by a few lines of script that every page on this site carries. The counter names the <em>page</em>, and nothing else.</li>
       <li><strong>Not counted:</strong> any visitor with JavaScript switched off &mdash; and <strong>counted:</strong> any software that loads a page and runs scripts, crawlers included. These numbers are a floor, not a census; a small number is not proof that nobody looked.</li>
       <li><strong>What leaves a visitor's browser:</strong> one plain GET carrying no cookie (<code>credentials: omit</code>), no referring page (<code>referrerPolicy: no-referrer</code>) and no identifier of any kind. A counting service, like any web server, necessarily sees the requesting IP address; nothing else about a visitor is sent or stored.</li>
-      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="__BASE__" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>__NS__</code>. Every row above reads its own key back the same way, and any value is a plain address you can open yourself &mdash; for example this site's landing-page counter, <a href="__BASE__/get/__NS__/__EXAMPLEKEY__"><code>__BASE__/get/__NS__/__EXAMPLEKEY__</code></a>. Every key on this page is a real counter that a page on this site fires when it loads; there is no placeholder. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero. It also allows only 30 reads per 10 seconds per address, and this page reads __NROWS__ counters &mdash; so it reads them one at a time, about two a second, and waits out a rate-limited read instead of calling the counter dead.</li>
+      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="__BASE__" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>__NS__</code>. Every row above reads its own key back the same way, and any value is a plain address you can open yourself &mdash; for example this site's landing-page counter, <a href="__BASE__/get/__NS__/__EXAMPLEKEY__"><code>__BASE__/get/__NS__/__EXAMPLEKEY__</code></a>. Every key on this page is a real counter that a page on this site fires when it loads; there is no placeholder. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero. It also allows only 30 reads per 10 seconds per address, and this page reads __NROWS__ counters &mdash; so it reads them one at a time, about __GAPRATE__ a second, and waits out a rate-limited read instead of calling the counter dead.</li>
       <li><strong>Nothing is sold, profiled or shared.</strong> There is no analytics product here, no cross-site tracking and no attempt to identify anyone. The only use made of these numbers is knowing whether this site is being read.</li>
     </ol>
   </section>
@@ -3794,10 +3823,11 @@ __ROWS__
 
   /* The counting service allows 30 requests per 10 seconds per IP and this page reads __NROWS__ counters. Fired
      all at once, a second look at this page inside one window made most rows read "unavailable" - measured
-     on the live page, twice, not guessed. So the reads are paced at about two a second (a full read is
-     ~10 s, which keeps two consecutive looks inside the limit) and a rate-limited read is waited out and
-     retried rather than reported as a dead counter. A row reads "unavailable" only after every retry. */
-  var GAP = 450, RETRY_AFTER = 4000, TRIES = 4;
+     on the live page, twice, not guessed. So the reads are paced at about __GAPRATE__ a second (a full read
+     is ~__GAPSEC__ s, which keeps two consecutive looks inside the limit) and a rate-limited read is waited
+     out and retried rather than reported as a dead counter. A row reads "unavailable" only after every
+     retry. */
+  var GAP = __GAP__, RETRY_AFTER = 4000, TRIES = 4;
 
   function pause(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 
@@ -3853,19 +3883,24 @@ _stats_out = (STATS_PAGE
               # real number of rows, and the assertion below stops the build if the site ever grows past
               # the pace the sentence describes.
               .replace("__NROWS__", str(len(METRIC_PAGES)))
+              # The reader's pace, from the ONE constant above, so the sentence and the reader cannot drift.
+              .replace("__GAPRATE__", _STATS_GAP_RATE)
+              .replace("__GAPSEC__", _STATS_GAP_SECS)
+              .replace("__GAP__", str(STATS_GAP_MS))
               .replace("__NS__", esc(METRIC_NS))
               .replace("__BASE__", esc(METRIC_BASE))
               # Named, real key - the landing page's own counter - so the page explains itself with an
               # address that actually answers instead of a <key> template that reads like a broken row.
               .replace("__EXAMPLEKEY__", esc(metric_key(metric_segment(""))))
               .replace("__CHECKED__", esc(CHECKED)))
-# The note tells the reader the reader reads N counters one at a time "about two a second", and that is
-# what keeps two consecutive looks inside the counter service's 30-reads-per-10-seconds window. The reader's
-# pause is 0.45 s, so a full read is N * 0.45 s. At twenty-one pages that is 9.5 s; at twenty-three it would
-# pass ten seconds and the sentence would be false, so the build stops rather than publishing it.
-assert len(METRIC_PAGES) * 0.45 <= 10.0, \
-    "/stats/ reads %d counters; at one read every 0.45 s that is %.1f s, past the 10 s window its own note names" \
-    % (len(METRIC_PAGES), len(METRIC_PAGES) * 0.45)
+# The note tells the reader the reader reads N counters one at a time at STATS_GAP_MS, and that is what keeps
+# two consecutive looks inside the counter service's 30-reads-per-10-seconds window. The pace is ONE constant
+# above, and this gate reads it: a full read is N * STATS_GAP_MS. At twenty-three pages at 400 ms that is
+# 9.2 s, inside ten; at 450 ms it would be 10.4 s and the sentence would be false, so the build stops rather
+# than publishing it - which is exactly how this wake was forced to tighten the pace when the page count grew.
+assert len(METRIC_PAGES) * STATS_GAP_MS / 1000.0 <= 10.0, \
+    "/stats/ reads %d counters; at one read every %d ms that is %.1f s, past the 10 s window its own note names" \
+    % (len(METRIC_PAGES), STATS_GAP_MS, len(METRIC_PAGES) * STATS_GAP_MS / 1000.0)
 assert ("reads %d counters" % len(METRIC_PAGES)) in _stats_out and \
     not re.search(r"reads (?!(%d)\b)\d+ counters" % len(METRIC_PAGES), _stats_out), \
     "/stats/ names a counter count that is not the number of rows it reads"
