@@ -85,8 +85,11 @@ Requires `reportlab` (PDF) only. The pages are plain HTML/CSS/JS.
   and canonical URL, built from the same dataset and linking back to the comparison
 - `how-far/index.html` — generated; the range picker, reading the published range figures from the
   same dataset and quoting them in full on the page
-- `sitemap.xml` — generated; the eleven indexable URLs (the comparison, the seven bikes, the range
-  picker and the two head-to-head pages)
+- `vs/<a>-vs-<b>/index.html` — generated; one head-to-head page per pair in `build.py`'s `PAIRS` list,
+  two columns drawn from the same dataset, linked from the comparison page and from both models' own
+  pages, and carrying no affiliate element of any kind
+- `sitemap.xml` — generated; the thirteen indexable URLs (the comparison, the seven bikes, the range
+  picker and the four head-to-head pages)
 - `indexnow.py` + `indexnow.key` + `<key>.txt` — the sitemap-submission script, its key, and the
   hosted key file IndexNow verifies
 - `robots.txt` — generated; note it is ignored by crawlers here, because this site sits on a

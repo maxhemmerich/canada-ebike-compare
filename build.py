@@ -105,6 +105,8 @@ assert len(set(MODEL_SLUG.values())) == len(ORDER), \
 PAIRS = [
     ("velotric-discover-3", "surface604-rook"),   # "Discover 3 vs Rook" - the two CA$2,699 commuters
     ("velotric-tempo", "radkick-7speed"),         # "Tempo vs RadKick 7-Speed" - the two lightest here
+    ("aventon-soltera-2-5", "velotric-tempo"),    # "Soltera 2.5 vs Tempo" - the two light, cheap city bikes
+    ("ohm-cruise-3", "velotric-discover-3"),      # "Cruise 3 vs Discover 3" - premium mid-drive vs the all-rounder
 ]
 
 def pair_slug(a, b):
