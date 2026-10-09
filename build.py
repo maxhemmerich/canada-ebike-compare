@@ -2503,6 +2503,13 @@ RULES_LEDGER_SUB = (u"Every line below is a change to this page since it was fir
                     u"page; where that re-read found nothing, the line says so, because an unrecorded "
                     u"no-change is how a drifted figure hides.")
 RULES_CHANGELOG = [
+    dict(date=u"2026-10-09", jur=u"All thirteen jurisdictions, the class sources and the federal layer",
+         change=(u"Dated re-read: every verbatim quote above was opened again against its government page and "
+                 u"not one figure had drifted, so nothing was corrected at the source and nothing needed "
+                 u"restamping. Two access limits are named rather than counted as checks: laws.yukon.ca still "
+                 u"sits behind a Cloudflare challenge that refused every automated fetch, and Transport "
+                 u"Canada's page answers an automated browser with a gateway error while the quoted text "
+                 u"itself, read directly, is intact.")),
     dict(date=u"2026-10-09", jur=u"Manitoba",
          change=(u"Highway Traffic Act s.145 was rewritten in gender-neutral wording, so this page's quoted "
                  u"\u201cunless he or she is 14 years of age or older\u201d no longer matched the Act. The "
@@ -2974,6 +2981,55 @@ TRAILS = [
                u"publishes one, ask the park office before you ride."),
          fig=u"",
          quote=None),
+    dict(who=u"Ontario Parks \u2014 provincial parks and conservation reserves",
+         src=u"Ontario Parks, \u201cSummary of Provincial Park Offences\u201d (Park Rules \u2014 Vehicles)",
+         url="https://www.ontarioparks.ca/park/arrowhead/rules",
+         date=u"read 2026-10-09",
+         ride=u"No e-bike rule published: bicycles, on park roads and designated bike trails",
+         rule=(u"Ontario Parks publishes no province-wide e-bike rule. Its own park-rules page, read on the "
+               u"date shown, sets out where bicycles and off-road vehicles may go and never once uses the "
+               u"word \u201ce-bike\u201d, so the e-bike question is left to each park \u2014 ask the park "
+               u"office before you ride."),
+         fig=u"",
+         quote=(u"Bicycles are only allowed on park roads and on designated bike trails.")),
+    dict(who=u"Hamilton Conservation Authority \u2014 conservation areas and trails",
+         src=u"Hamilton Conservation Authority, \u201cConservation Area Rules and Regulations\u201d",
+         url="https://conservationhamilton.ca/rules-and-regulations-at-conservation-areas",
+         date=u"read 2026-10-09",
+         ride=u"Pedal-assist e-bikes permitted wherever bicycles are allowed; scooter-style barred",
+         rule=(u"Hamilton's conservation areas draw the same line the province's land managers do: a "
+               u"pedal-assist e-bike that meets Ontario's rules and is built to be pedalled is permitted "
+               u"wherever a bicycle is allowed, while a scooter-style electric vehicle or any other "
+               u"motorized device is prohibited on the authority's trails."),
+         fig=u"",
+         quote=(u"Pedal-assist e-bikes that meet Ontario regulations and are designed primarily for pedalling "
+                u"are permitted where bicycles are allowed. Scooter-style electric vehicles and other "
+                u"motorized devices are prohibited on HCA trails.")),
+    dict(who=u"Grand River Conservation Authority \u2014 rail trails (Cambridge to Paris, Elora Cataract)",
+         src=u"Grand River Conservation Authority, \u201cCambridge to Paris Trail\u201d",
+         url="https://www.grandriver.ca/outdoor-recreation/trails/cambridge-to-paris-trail/",
+         date=u"read 2026-10-09",
+         ride=u"Biking welcome all year; motorized vehicles of any kind, e-bikes included, barred",
+         rule=(u"The Grand River authority's rail trails welcome biking all year and then shut the door on "
+               u"the motor: the permitted-use list for the Cambridge-to-Paris Trail ends with an outright ban "
+               u"on motorized vehicles of any kind, and it names the e-bike as covered. The Elora Cataract "
+               u"Trailway carries the same line."),
+         fig=u"",
+         quote=(u"NOT permitted: motorized vehicles of any kind, including e-bikes.")),
+    dict(who=u"Credit Valley Conservation \u2014 conservation areas and park trails",
+         src=u"Credit Valley Conservation, \u201cCycling\u201d",
+         url="https://cvc.ca/explore-activities/cycling/",
+         date=u"read 2026-10-09",
+         ride=u"Pedal-assist e-bikes allowed on any trail where cycling is permitted",
+         rule=(u"Credit Valley draws the line the other way. Motor vehicles are barred from its park trails, "
+               u"but a pedal-assist e-bike may use any trail where cycling is already permitted, to assist "
+               u"with pedalling. At Jim Tovey Lakeview the Waterfront Trail is the one trail in the park where "
+               u"cycling, e-bikes and e-scooters are all permitted; at Ken Whillans, cycling is allowed only "
+               u"on the Caledon Trailway."),
+         fig=u"",
+         quote=(u"Motorized vehicles are not permitted on Credit Valley Park trails. E-bikes with electric "
+                u"assist can be used on trails that permit cycling to assist with pedaling in difficult "
+                u"areas.")),
 ]
 
 TRAIL_HEAD = u"One row per land manager: who allows what on the ground"
@@ -2985,12 +3041,16 @@ TRAIL_NOTE = (u"Read the two columns against each other, because they disagree o
               u"Parks Canada and the NCC allow a pedal-assist machine that looks like a bicycle and turn away "
               u"a throttle bike \u2014 while BC Parks sorts by class and lets a Class 2 or Class 3 machine onto "
               u"a trail only where a motor vehicle may go. The same bike can be welcome on one manager's trail "
-              u"and barred from the trail beside it.")
+              u"and barred from the trail beside it. Ontario is the sharpest case: read on the same day, "
+              u"Ontario Parks writes no e-bike rule at all, Hamilton and Credit Valley admit a pedal-assist "
+              u"machine wherever a bicycle may go, and the Grand River authority bars the e-bike from its "
+              u"rail trails outright.")
 TRAIL_TITLE = (u"Where you can ride an e-bike in Canada: trails, parks and paths, one land manager at a time "
                u"| Commuter E-Bikes CA")
 TRAIL_OGTITLE = u"Where you can ride an e-bike in Canada: trails, parks and paths"
 TRAIL_DESC = (u"Where a Canadian e-bike may actually be ridden: national parks, BC's parks and recreation "
-              u"trails, the provincial park systems of Alberta, Saskatchewan and Manitoba, Qu\u00e9bec's "
+              u"trails, the provincial park systems of Alberta, Saskatchewan, Manitoba and Ontario, Ontario's "
+              u"conservation authorities (Hamilton, Grand River and Credit Valley), Qu\u00e9bec's "
               u"S\u00e9paq national parks, and the National Capital Commission's pathway and Gatineau Park "
               u"\u2014 each rule quoted from the authority's own page and dated, with no affiliate link.")
 TRAIL_INTRO = (u"Road rules are one question; the ground under the wheels is another. An e-bike can be legal "
@@ -3169,7 +3229,8 @@ for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="
 
 # 3. no product link: every absolute link is a GOVERNMENT or park-authority page.
 _TRAIL_GOV = ("canada.ca", "gc.ca", "bcparks.ca", "gov.bc.ca", "albertaparks.ca",
-              "gov.mb.ca", "manitoba.ca", "sepaq.com", "saskparks.com")
+              "gov.mb.ca", "manitoba.ca", "sepaq.com", "saskparks.com",
+              "ontarioparks.ca", "conservationhamilton.ca", "grandriver.ca", "cvc.ca")
 _threfs = re.findall(r'href="([^"]+)"', TRAILS_TEXT)
 _thext = sorted(h for h in _threfs if h.startswith("http") and not h.startswith(SITE))
 _tbad = [h for h in _thext if not h.split("//", 1)[1].split("/", 1)[0].endswith(_TRAIL_GOV)]
