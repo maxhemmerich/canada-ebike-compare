@@ -15,8 +15,9 @@ figure, the table says "not stated" rather than guessing.
 
 - Source of truth: `data/products.json` (each product carries its `source_url` and a note on
   what was read).
-- `build.py` renders `index.html`, the per-model pages, the **range picker** and
-  `guide/canada-commuter-ebike-guide.pdf` from that one file, so no two of them can disagree.
+- `build.py` renders `index.html`, the per-model pages, the **range picker**, the **decision guide as a
+  page** (`guide/index.html`) and `guide/canada-commuter-ebike-guide.pdf` from that one file, so no two
+  of them can disagree.
 - Nothing on a per-model page is written by hand either: its title, description, canonical URL and
   every specification row are generated from the same record. A figure a maker does not publish is
   absent from the row list rather than guessed.
@@ -57,6 +58,25 @@ percentage of our own making. The conversions are named on the page (the Discove
 figure, and the Soltera 2.5's 46 mi range, which the maker publishes in miles only). The whole table of
 figures, quoted verbatim, is on the page for the reader to check.
 
+## The decision guide, as a page and as a PDF
+
+`guide/` is the guide itself — the free front-door document a writer or a forum can link to. It is
+generated from the **same source objects** as the PDF (`GUIDE_TITLE`, `GUIDE_INTRO`,
+`GUIDE_TABLE`, the `PICKS` verdicts, `DETAILS_HTML`, `SOURCES_HTML`), so the two cannot drift: the
+one-line verdicts, the comparison table, the household section and the sources list are one
+definition each, rendered twice.
+
+That claim is checked, not asserted. After the PDF is written, `build.py` reads its **text layer**
+back and requires every figure, heading, note and verdict the page carries to be present in it
+(whitespace-normalised, because reportlab wraps lines); it then extracts every *number* from the
+page's own text and requires each one to appear in the PDF as well. A figure typed onto the page and
+not into the guide stops the build. The page also carries its own `<title>`, meta description,
+canonical URL and Open Graph / Twitter card, is linked from the comparison page and the range
+picker, and is listed in `sitemap.xml`.
+
+**No affiliate element is emitted on it at all** — no `config.js`, no `.aff` element — and it
+repeats the disclosure.
+
 ## Measuring whether anyone is reading it
 
 This site counts its own page views, anonymously, with **no account and no analytics product**. Every
@@ -74,8 +94,11 @@ every counter back and shows it.
   a crawler that renders pages is. The number is a floor, not a census, and `stats/` says so.
 - `build.py` owns all of it: every page is written through one `write_page()` call that inserts the
   beacon, and the build then reads each generated page back off disk and asserts its beacon key matches
-  the key its row on `stats/` will fetch. A drifted key, a missing page or a page with two beacons
-  stops the build before `sitemap.xml` is written.
+  the key its row on `stats/` will fetch, that no page is left carrying an unsubstituted `__TOKEN__`,
+  and that `sitemap.xml` and the page list are the same set of URLs. A drifted key, a missing page or a
+  page with two beacons stops the build before `sitemap.xml` is written.
+- Every row on `stats/` reads its own real key: the build asserts the list of keys the page will fetch
+  is exactly the list of beacons the pages fire, and that the page carries no `<key>`-style placeholder.
 
 ## Telling crawlers the pages exist
 
@@ -96,7 +119,8 @@ py -3.10 indexnow.py             # POST it and print the literal HTTP response
 py -3.10 build.py        # regenerates every page below from data/products.json
 ```
 
-Requires `reportlab` (PDF) only. The pages are plain HTML/CSS/JS.
+Requires `reportlab` (for the PDF) and `pypdf` (which reads that PDF's text back to prove the guide page
+and the PDF carry the same figures). The pages are plain HTML/CSS/JS.
 
 ## Layout
 
@@ -110,8 +134,10 @@ Requires `reportlab` (PDF) only. The pages are plain HTML/CSS/JS.
   pages, and carrying no affiliate element of any kind
 - `stats/index.html` — generated; reads every page counter back from the counting service and shows
   the counts, with its own title, description and canonical URL. Linked from the comparison page footer
-- `sitemap.xml` — generated; the fourteen indexable URLs (the comparison, the seven bikes, the range
-  picker, the four head-to-head pages and `stats/`)
+- `guide/index.html` — generated; the decision guide as an indexable page, from the same source as the
+  PDF, with its own title, description, canonical URL and social card, and no affiliate element
+- `sitemap.xml` — generated; the fifteen indexable URLs (the comparison, the seven bikes, the range
+  picker, the decision guide, `stats/` and the four head-to-head pages)
 - `indexnow.py` + `indexnow.key` + `<key>.txt` — the sitemap-submission script, its key, and the
   hosted key file IndexNow verifies
 - `robots.txt` — generated; note it is ignored by crawlers here, because this site sits on a

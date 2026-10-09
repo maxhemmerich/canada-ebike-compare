@@ -365,6 +365,7 @@ PAGE = r"""<!doctype html>
     <p class="deck">__PRICE_SPAN__. Real specs from each maker's own product page, so you can tell which bike fits a real commute instead of a spec sheet.</p>
     <div class="cta">
       <a class="btn" href="guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
+      <a class="btn ghost" href="guide/">Read the guide as a page</a>
       <a class="btn ghost" href="#compare">Compare the __N_WORD__</a>
       <a class="btn ghost" href="how-far/">How far will it go?</a>
     </div>
@@ -403,7 +404,7 @@ __ROWS__
 
   <section id="guide">
     <h2>Which one for which household</h2>
-    <p class="sub">The decision guide, in full. The same pages are in the free PDF.</p>
+    <p class="sub">The decision guide, in full &mdash; also as <a href="guide/">a page you can read or link to</a>, and as <a href="guide/canada-commuter-ebike-guide.pdf" download>a free PDF</a>.</p>
     <div class="details">__DETAILS__</div>
   </section>
 
@@ -793,6 +794,7 @@ __FIGROWS__
     <ul class="otherbikes">
       <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
       __BIKELINKS__
+      <li><a href="../guide/">The decision guide &mdash; the free front-door page</a></li>
       <li><a href="../guide/canada-commuter-ebike-guide.pdf" download>The free decision-guide PDF</a></li>
     </ul>
   </section>
@@ -896,6 +898,234 @@ _picker_out = (PICKER_PAGE
                .replace("__BIKELINKS__", BIKE_LINKS)
                .replace("__PICKERDATA__", PICKER_DATA))
 write_page(os.path.join(ROOT, "how-far", "index.html"), _picker_out, "how-far")
+
+# ================================================================ the free decision guide, as a real page
+# The guide ships twice: the printable PDF, and /guide/ — the version a stranger can link to, with its own
+# title, description, canonical and social card. The PDF is not a link target: a writer cannot cite it and
+# a crawler cannot index it. BOTH artefacts are generated from the SAME source objects defined here and
+# consumed again by the PDF further down this file, so the page cannot drift from the PDF. Nothing on the
+# page is hand-written a second time: the one-line verdicts are the PICKS list, "which one for which
+# household" is DETAILS_HTML, "where every number comes from" is SOURCES_HTML, and the comparison table is
+# built from GUIDE_TABLE. What is asserted, not promised: the build reads this page and the finished PDF
+# back and compares them (see the end of this file).
+
+# ---- the guide's own source: ONE definition, used by this page and by the PDF
+GUIDE_TITLE = "Canadian commuter e-bikes, sorted out"
+GUIDE_INTRO = ("%s bikes you can buy in Canada for %s. Every figure in this guide was read from the maker's "
+               "own product page on %s - no remembered specs. Prices move, so confirm before you buy."
+               % (N_WORD_CAP, PRICE_SPAN, CHECKED))
+GUIDE_DISCLOSURE = ("this guide was not paid for and carries no live affiliate links. Product names link "
+                    "to the makers' own pages. If paid partner links are ever added, they will be labelled "
+                    "as such.")
+GUIDE_PICKS_HEAD = "Which one, in one line each"
+GUIDE_COMPARE_HEAD = "The comparison"
+GUIDE_COMPARE_NOTE = ("Cheapest to dearest; %s. Claimed range is the maker's estimate, not a test. Weight "
+                      "is the maker's figure. Where a maker does not publish a figure, the cell says so."
+                      % TIE_NOTE)
+GUIDE_COMPARE_NOTE2 = ("Cheapest is not the same as best value: the Soltera 2.5 costs the least but carries "
+                       "the smallest battery here. Match the battery to your round-trip distance, not the "
+                       "price tag.")
+GUIDE_HOUSEHOLD_HEAD = "Which one for which household"
+GUIDE_SOURCES_HEAD = "Where every number comes from"
+GUIDE_SOURCES_NOTE = ("Each bike below links to the exact page the figures were read from, on %s."
+                      % CHECKED)
+GUIDE_CAVEATS = ("Two caveats worth naming. Claimed range is the maker's figure and depends on rider weight, "
+                 "hills, temperature and assist level. Weight is the maker's figure too. Where a maker does "
+                 "not publish a figure on the page we read, this guide says so rather than guessing. This is "
+                 "general product information, not advice about your riding or your province's e-bike rules "
+                 "- check those before you buy.")
+
+# The guide's comparison table, once: (column heading, the products.json field it prints). None = the model
+# cell, which carries the model, its maker, any observed availability and the link to the maker's own page.
+# The heading holds a newline the PDF uses to wrap a narrow column; the page prints it as a space.
+GUIDE_TABLE = [
+    ("Model", None),
+    ("Price\n(CAD)", "price_display"),
+    ("Motor", "motor"),
+    ("Torque", "torque"),
+    ("Battery", "battery"),
+    ("Claimed\nrange", "range"),
+    ("Weight", "weight"),
+    ("Brakes", "brakes"),
+    ("Class", "eclass"),
+    ("Warranty", "warranty"),
+]
+
+def guide_row(p):
+    """One table row, every cell the published field itself. No .aff element and no config.js is emitted
+    on this page at all, so there is nothing here that could pay or that claims a link pays."""
+    cells = []
+    for _label, _field in GUIDE_TABLE:
+        if _field is None:
+            cells.append('<th scope="row" class="model">'
+                         '<a class="mname" href="../bikes/%s/">%s</a><span class="mmaker">%s</span>%s'
+                         '<a class="spec-link" href="%s" target="_blank" rel="noopener nofollow">maker specs \u2197</a>'
+                         '</th>' % (esc(p["id"]), esc(p["model"]), esc(p["maker"]), stock_badge(p),
+                                    esc(p["source_url"])))
+        elif _field == "price_display":
+            cells.append('<td class="price">%s</td>' % esc(p[_field]))
+        else:
+            cells.append('<td>%s</td>' % esc(p[_field]))
+    return "<tr>%s</tr>" % "".join(cells)
+
+GUIDE_ROWS = "\n".join(guide_row(p) for p in ORDER)
+GUIDE_COLS = "\n            ".join('<th scope="col">%s</th>' % esc(l.replace("\n", " "))
+                                  for l, _f in GUIDE_TABLE)
+
+GUIDE_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Commuter E-Bikes CA">
+<meta property="og:title" content="__OGTITLE__">
+<meta property="og:description" content="__DESC__">
+<meta property="og:url" content="__CANONICAL__">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="__OGTITLE__">
+<meta name="twitter:description" content="__DESC__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .guidehero{padding:34px 0 8px}
+  .guidehero h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;margin:0 0 12px;max-width:26ch}
+  .cta{margin:0 0 22px}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Prices and specs checked <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="guidehero" style="border-top:none">
+    <p class="crumb"><a href="../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; The decision guide</p>
+    <h1>The commuter e-bike decision guide</h1>
+    <p class="deck">__INTRO__</p>
+    <p class="cta">
+      <a class="btn" href="canada-commuter-ebike-guide.pdf" download>Download the free PDF</a>
+      <a class="btn ghost" href="../#compare">Compare all __N_WORD__ side by side</a>
+      <a class="btn ghost" href="../how-far/">How far will it go?</a>
+    </p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> __DISC__</p>
+  </section>
+
+  <section id="picks">
+    <h2>__PICKSHEAD__</h2>
+    <p class="sub">Match the bike to your ride, not to the biggest number on the box. These are the same one-line verdicts the comparison page and the PDF carry, from the same list.</p>
+    <div class="picks">__PICKS__</div>
+  </section>
+
+  <section id="compare">
+    <h2>__COMPAREHEAD__</h2>
+    <p class="sub">Every price is in Canadian dollars as the maker publishes it, and every spec links to the page it was read from. Scroll the table sideways on a phone.</p>
+    <div class="tablewrap">
+      <table>
+        <caption>__COMPARENOTE__</caption>
+        <thead><tr>
+            __COLS__
+        </tr></thead>
+        <tbody>
+__ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:14px">__COMPARENOTE2__</p>
+  </section>
+
+  <section id="household">
+    <h2>__HOUSEHOLDHEAD__</h2>
+    <p class="sub">Which bike suits which rider, one paragraph each, the same text the PDF carries.</p>
+    <div class="details">__DETAILS__</div>
+  </section>
+
+  <section id="sources">
+    <h2>__SOURCESHEAD__</h2>
+    <p class="sub">__SOURCESNOTE__</p>
+    <ul class="sources">__SOURCES__</ul>
+    <p class="note" style="margin-top:18px">__CAVEATS__</p>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
+      <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
+      <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> __DISC__</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="../how-far/">the range picker</a>.</p>
+</div></footer>
+</body>
+</html>
+"""
+
+_guide_title = "The free commuter e-bike decision guide (Canada) | Commuter E-Bikes CA"
+_guide_desc = ("%s commuter e-bikes you can buy in Canada, sorted into which one suits which rider, with the "
+               "full comparison table and every figure traced to the maker's own product page. Free, no "
+               "signup." % N_WORD_CAP)
+_guide_out = (GUIDE_PAGE
+              .replace("__CSS__", CSS)
+              .replace("__N_WORD__", esc(N_WORD))
+              .replace("__TITLE__", esc(_guide_title))
+              .replace("__OGTITLE__", esc(_guide_title))
+              .replace("__DESC__", esc(_guide_desc))
+              .replace("__CANONICAL__", "%s/guide/" % SITE)
+              .replace("__CHECKED__", esc(CHECKED))
+              .replace("__INTRO__", esc(GUIDE_INTRO))
+              .replace("__DISC__", esc(GUIDE_DISCLOSURE))
+              .replace("__PICKSHEAD__", esc(GUIDE_PICKS_HEAD))
+              .replace("__COMPAREHEAD__", esc(GUIDE_COMPARE_HEAD))
+              .replace("__COMPARENOTE__", esc(GUIDE_COMPARE_NOTE))
+              .replace("__COMPARENOTE2__", esc(GUIDE_COMPARE_NOTE2))
+              .replace("__COLS__", GUIDE_COLS)
+              .replace("__ROWS__", GUIDE_ROWS)
+              .replace("__HOUSEHOLDHEAD__", esc(GUIDE_HOUSEHOLD_HEAD))
+              .replace("__DETAILS__", DETAILS_HTML)
+              .replace("__SOURCESHEAD__", esc(GUIDE_SOURCES_HEAD))
+              .replace("__SOURCESNOTE__", esc(GUIDE_SOURCES_NOTE))
+              .replace("__SOURCES__", SOURCES_HTML)
+              .replace("__CAVEATS__", esc(GUIDE_CAVEATS))
+              .replace("__PICKS__", PICKS_HTML))
+write_page(os.path.join(ROOT, "guide", "index.html"), _guide_out, "guide")
+
+# ---- the page is checked against its own source before the sitemap is written
+GUIDE_FILE = os.path.join(ROOT, "guide", "index.html")
+GUIDE_TEXT = open(GUIDE_FILE, encoding="utf-8").read()
+
+# 1. every published field of every model is PRINTED here: an omission stops the build, so the page
+#    cannot quietly become a partial copy of the guide.
+for _p in ORDER:
+    for _lbl, _f in GUIDE_TABLE:
+        if _f and _p.get(_f):
+            assert esc(_p[_f]) in GUIDE_TEXT, \
+                "guide page omits %s of %s: %r" % (_f, _p["id"], _p[_f])
+    for _f in ("best_for", "source_url", "source_note", "maker", "model"):
+        assert esc(_p[_f]) in GUIDE_TEXT, "guide page omits %s of %s" % (_f, _p["id"])
+
+# 2. nothing on this page can pay, and it says nothing about the status of any program.
+for _bad in ("config.js", "AFFILIATE_", 'data-aff=', 'class="buyaff"'):
+    assert _bad not in GUIDE_TEXT, "affiliate element on the guide page: %r" % _bad
+
+# 3. its own head: title, description, canonical and the social card.
+assert "<link rel=\"canonical\" href=\"%s/guide/\">" % SITE in GUIDE_TEXT
+for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="og:site_name"',
+              'property="og:title"', 'property="og:description"', 'property="og:url"',
+              'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"'):
+    assert _head in GUIDE_TEXT, "guide page is missing %s" % _head
+print("guide page: %d bytes, every published field present, no affiliate element" % len(GUIDE_TEXT))
 
 # ================================================================ head-to-head "vs" pages
 # One page per pair in the PAIRS list at the top of this file: two columns, every cell a field already
@@ -1077,6 +1307,7 @@ METRIC_PAGES = (
     + [("bikes/%s" % p["id"], "%s %s \u2014 %s" % (p["maker"], p["model"], p["price_display"]))
        for p in ORDER]
     + [("how-far", "How far will it go? &mdash; the range picker")]
+    + [("guide", "The decision guide &mdash; the free front-door page")]
     + [("vs/%s" % s, "%s" % pair_label(*pair)) for s, pair in zip(PAIR_SLUGS, PAIRS)]
     + [("stats", "This page &mdash; the counts")]
 )
@@ -1140,7 +1371,7 @@ __ROWS__
       <li><strong>Counted:</strong> one anonymous increment per page load, fired by a few lines of script that every page on this site carries. The counter names the <em>page</em>, and nothing else.</li>
       <li><strong>Not counted:</strong> any visitor with JavaScript switched off &mdash; and <strong>counted:</strong> any software that loads a page and runs scripts, crawlers included. These numbers are a floor, not a census; a small number is not proof that nobody looked.</li>
       <li><strong>What leaves a visitor's browser:</strong> one plain GET carrying no cookie (<code>credentials: omit</code>), no referring page (<code>referrerPolicy: no-referrer</code>) and no identifier of any kind. A counting service, like any web server, necessarily sees the requesting IP address; nothing else about a visitor is sent or stored.</li>
-      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="https://abacus.jasoncameron.dev" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>__NS__</code>. Each value is readable directly at <code>__BASE__/get/__NS__/&lt;key&gt;</code>. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero.</li>
+      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="__BASE__" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>__NS__</code>. Every row above reads its own key back the same way, and any value is a plain address you can open yourself &mdash; for example this site's landing-page counter, <a href="__BASE__/get/__NS__/__EXAMPLEKEY__"><code>__BASE__/get/__NS__/__EXAMPLEKEY__</code></a>. Every key on this page is a real counter that a page on this site fires when it loads; there is no placeholder. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero.</li>
       <li><strong>Nothing is sold, profiled or shared.</strong> There is no analytics product here, no cross-site tracking and no attempt to identify anyone. The only use made of these numbers is knowing whether this site is being read.</li>
     </ol>
   </section>
@@ -1201,6 +1432,9 @@ _stats_out = (STATS_PAGE
               .replace("__ROWS__", STATS_ROWS)
               .replace("__NS__", esc(METRIC_NS))
               .replace("__BASE__", esc(METRIC_BASE))
+              # Named, real key - the landing page's own counter - so the page explains itself with an
+              # address that actually answers instead of a <key> template that reads like a broken row.
+              .replace("__EXAMPLEKEY__", esc(metric_key(metric_segment(""))))
               .replace("__CHECKED__", esc(CHECKED)))
 write_page(os.path.join(ROOT, "stats", "index.html"), _stats_out, "stats")
 
@@ -1210,19 +1444,40 @@ write_page(os.path.join(ROOT, "stats", "index.html"), _stats_out, "stats")
 # with the key its row on /stats/ will fetch. Any mismatch, any extra or any missing page stops the
 # build - before sitemap.xml is written.
 _BEACON_RE = re.compile(r'fetch\("https://[^"]*/hit/[^/]+/([A-Za-z0-9_.-]+)"')
+_UNSUB = re.compile(r"__[A-Z_][A-Z_0-9]*__")
 for _path, _label in METRIC_PAGES:
     _file = os.path.join(ROOT, _path, "index.html")
+    _text = open(_file, encoding="utf-8").read()
     _want = [metric_key(metric_segment(_path))]
-    _got = _BEACON_RE.findall(open(_file, encoding="utf-8").read())
+    _got = _BEACON_RE.findall(_text)
     assert _got == _want, "beacon/reader mismatch in %s: beacon %r, row %r" % (_file, _got, _want)
+    # A build token left in the output is a page that says __DESC__ to a reader and to a crawler.
+    _left = sorted(set(_UNSUB.findall(_text)))
+    assert not _left, "%s still carries unsubstituted build tokens: %r" % (_file, _left)
     print("beacon ok: %s -> %s" % (os.path.relpath(_file, ROOT).replace(os.sep, "/"), _want[0]))
 _KEYS = [metric_key(metric_segment(p)) for p, _ in METRIC_PAGES]
 assert len(set(_KEYS)) == len(_KEYS), "two pages share one counter key"
 
+# The reader itself is read back too. A row is only reading a real key if the key it prints is a key some
+# page fires, and nothing on the page may be an unsubstituted template: a bare <key> on a stats page reads
+# as a broken row to anyone who looks at it, whether or not the script behind it works.
+_stats_text = open(os.path.join(ROOT, "stats", "index.html"), encoding="utf-8").read()
+for _bad in ("&lt;key&gt;", "<key>", "__BASE__", "__NS__", "__ROWS__", "__CSS__", "__CANONICAL__",
+             "__CHECKED__", "__EXAMPLEKEY__"):
+    assert _bad not in _stats_text, "unsubstituted token on /stats/: %r" % _bad
+_ROWS_READ = re.findall(r'data-metric-key="([^"]+)"', _stats_text)
+assert _ROWS_READ == _KEYS, \
+    "/stats/ reads keys no page fires (or misses one): %r" % (set(_ROWS_READ) ^ set(_KEYS),)
+print("stats reader: %d rows, every one a live beacon key, no placeholder token" % len(_ROWS_READ))
+
 # ---------------------------------------------------------------- sitemap + robots
 URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
-        + ["%s/how-far/" % SITE] + ["%s/stats/" % SITE]
+        + ["%s/how-far/" % SITE] + ["%s/guide/" % SITE] + ["%s/stats/" % SITE]
         + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
+# The sitemap and the beacon list are the same set of pages, or one of them is lying. Asserted, not assumed.
+_metric_urls = sorted(("%s/%s/" % (SITE, p)) if p else ("%s/" % SITE) for p, _l in METRIC_PAGES)
+assert sorted(URLS) == _metric_urls, \
+    "sitemap and the page list disagree: %r" % (set(URLS) ^ set(_metric_urls),)
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
            + "\n".join("  <url><loc>%s</loc><lastmod>%s</lastmod></url>" % (u, esc(CHECKED)) for u in URLS)
@@ -1276,12 +1531,12 @@ def footer(canvas, d):
     canvas.restoreState()
 
 story = []
-story.append(Paragraph("Canadian commuter e-bikes, sorted out", H1))
-story.append(Paragraph("%s bikes you can buy in Canada for %s. Every figure in this guide was read from the maker's own product page on %s - no remembered specs. Prices move, so confirm before you buy." % (N_WORD_CAP, PRICE_SPAN, CHECKED), BODY))
+story.append(Paragraph(GUIDE_TITLE, H1))
+story.append(Paragraph(GUIDE_INTRO, BODY))
 story.append(Spacer(1, 10))
-story.append(Paragraph("<b>Disclosure:</b> this guide was not paid for and carries no live affiliate links. Product names link to the makers' own pages. If paid partner links are ever added, they will be labelled as such.", SMALL))
+story.append(Paragraph("<b>Disclosure:</b> " + GUIDE_DISCLOSURE, SMALL))
 story.append(Spacer(1, 6))
-story.append(Paragraph("Which one, in one line each", H2))
+story.append(Paragraph(GUIDE_PICKS_HEAD, H2))
 for title, pid, body in PICKS:
     p = BY_ID[pid]
     block: list = [
@@ -1293,22 +1548,18 @@ for title, pid, body in PICKS:
     block.append(Paragraph(body, BODY))
     story.append(KeepTogether(block))
 
-story.append(Paragraph("The comparison", H2))
-story.append(Paragraph("Cheapest to dearest; %s. Claimed range is the maker's estimate, not a test. Weight is the maker's figure. Where a maker does not publish a figure, the cell says so." % TIE_NOTE, SMALL))
+story.append(Paragraph(GUIDE_COMPARE_HEAD, H2))
+story.append(Paragraph(GUIDE_COMPARE_NOTE, SMALL))
 story.append(Spacer(1, 8))
-hdr = ["Model", "Price\n(CAD)", "Motor", "Torque", "Battery", "Claimed\nrange", "Weight", "Brakes", "Class", "Warranty"]
-rows = [[Paragraph(x.replace("\n", "<br/>"), CELLB) for x in hdr]]
+rows = [[Paragraph(l.replace("\n", "<br/>"), CELLB) for l, _f in GUIDE_TABLE]]
 for p in ORDER:
     modelcell = "<b>%s</b><br/><font size=7 color='#5d6270'>%s</font>" % (p["model"], p["maker"])
     if p.get("availability"):
         modelcell += "<br/><font size=7 color='#a6550c'><b>%s</b></font>" % p["availability"]
-    rows.append([
-        Paragraph(modelcell, CELL),
-        Paragraph("<b>%s</b>" % p["price_display"], CELL),
-        Paragraph(p["motor"], CELL), Paragraph(p["torque"], CELL), Paragraph(p["battery"], CELL),
-        Paragraph(p["range"], CELL), Paragraph(p["weight"], CELL), Paragraph(p["brakes"], CELL),
-        Paragraph(p["eclass"], CELL), Paragraph(p["warranty"], CELL),
-    ])
+    rows.append([Paragraph(modelcell, CELL) if f is None
+                 else Paragraph("<b>%s</b>" % p[f], CELL) if f == "price_display"
+                 else Paragraph(p[f], CELL)
+                 for _l, f in GUIDE_TABLE])
 widths = [86, 56, 96, 42, 74, 86, 60, 76, 64, 60]
 tbl = Table(rows, colWidths=widths, repeatRows=1)
 tbl.setStyle(TableStyle([
@@ -1321,10 +1572,10 @@ tbl.setStyle(TableStyle([
     ("RIGHTPADDING", (0,0), (-1,-1), 5),
 ]))
 story.append(tbl)
-story.append(Paragraph("Cheapest is not the same as best value: the Soltera 2.5 costs the least but carries the smallest battery here. Match the battery to your round-trip distance, not the price tag.", NOTE))
+story.append(Paragraph(GUIDE_COMPARE_NOTE2, NOTE))
 
 story.append(Spacer(1, 14))
-story.append(Paragraph("Which one for which household", H2))
+story.append(Paragraph(GUIDE_HOUSEHOLD_HEAD, H2))
 for p in ORDER:
     story.append(KeepTogether([
         Paragraph("%s %s &nbsp;&middot;&nbsp; %s" % (p["maker"], p["model"], p["price_display"]), H3),
@@ -1334,8 +1585,8 @@ for p in ORDER:
     ]))
 
 story.append(Spacer(1, 14))
-story.append(Paragraph("Where every number comes from", H2))
-story.append(Paragraph("Each bike below links to the exact page the figures were read from, on %s." % CHECKED, BODY))
+story.append(Paragraph(GUIDE_SOURCES_HEAD, H2))
+story.append(Paragraph(GUIDE_SOURCES_NOTE, BODY))
 story.append(Spacer(1, 6))
 for p in ORDER:
     story.append(KeepTogether([
@@ -1344,7 +1595,51 @@ for p in ORDER:
         Spacer(1, 5),
     ]))
 story.append(Spacer(1, 8))
-story.append(Paragraph("Two caveats worth naming. Claimed range is the maker's figure and depends on rider weight, hills, temperature and assist level. Weight is the maker's figure too. Where a maker does not publish a figure on the page we read, this guide says so rather than guessing. This is general product information, not advice about your riding or your province's e-bike rules - check those before you buy.", NOTE))
+story.append(Paragraph(GUIDE_CAVEATS, NOTE))
 
 doc.build(story, onFirstPage=footer, onLaterPages=footer)
 print("wrote", PDF)
+
+# ---------------------------------------------------------------- the page and the PDF cannot drift
+# /guide/index.html and the PDF are two artefacts of one guide, and the whole point of generating both from
+# the same source is that neither can be edited without the other. Proven here: the PDF just written is read
+# back through its own text layer, and every string the page prints from that shared source — the figures,
+# the one-line verdicts, the headings, the notes — must be present in it. reportlab wraps lines where the
+# page does not, so both sides are compared whitespace-normalised. A figure typed onto the page and not
+# into the guide stops the build here.
+# pypdf is a build-time dependency for this check. The build refuses to run rather than skip it: an
+# assertion that can silently not run is not a guard.
+try:
+    import pypdf
+except ImportError:
+    raise SystemExit("pypdf is required: this build reads the PDF it just wrote back to prove the guide "
+                     "page and the PDF carry the same figures. Install it with: py -3.10 -m pip install pypdf")
+
+_PDF_TEXT = " ".join(" ".join((_pg.extract_text() or "").split())
+                     for _pg in pypdf.PdfReader(PDF).pages)
+assert len(_PDF_TEXT) > 5000, "the PDF's text layer came back nearly empty - the drift check would be a lie"
+
+def _norm(s):
+    return " ".join(str(s).split())
+
+_SHARED = [GUIDE_TITLE, GUIDE_INTRO, GUIDE_DISCLOSURE, GUIDE_PICKS_HEAD, GUIDE_COMPARE_HEAD,
+           GUIDE_COMPARE_NOTE, GUIDE_COMPARE_NOTE2, GUIDE_HOUSEHOLD_HEAD, GUIDE_SOURCES_HEAD,
+           GUIDE_SOURCES_NOTE, GUIDE_CAVEATS]
+_FIGURES = [p[f] for p in ORDER for _l, f in GUIDE_TABLE if f and p.get(f)]
+_VERDICTS = [x for pk in PICKS for x in (pk[0], pk[2])]
+_BESTFOR = [p["best_for"] for p in ORDER]
+
+_absent = [s for s in _SHARED + _FIGURES + _VERDICTS + _BESTFOR if _norm(s) not in _PDF_TEXT]
+assert not _absent, ("on the guide page but in neither the guide PDF nor products.json: %r"
+                     % (_absent[:4],))
+
+# And the coarser net: no NUMBER may appear anywhere in the page's own text that the PDF does not carry.
+# Figures are the thing this site can be sued over, so a stray one anywhere - a heading, a sub, a caption -
+# is caught here, not only inside the blocks the page is built from.
+_page_text = re.sub(r"(?s)<(style|script).*?</\1>", " ", GUIDE_TEXT)
+_page_text = html.unescape(re.sub(r"(?s)<[^>]+>", " ", _page_text))
+_page_nums = sorted(set(re.findall(r"\d[\d,.]*", _page_text)))
+_stray = [n for n in _page_nums if n not in _PDF_TEXT]
+assert not _stray, "number(s) on the guide page that the guide PDF does not carry: %r" % (_stray,)
+print("guide page vs PDF: %d shared strings and %d numbers, all present in the PDF's own text"
+      % (len(_SHARED) + len(_FIGURES) + len(_VERDICTS) + len(_BESTFOR), len(_page_nums)))
