@@ -135,7 +135,7 @@
       <li><strong>Counted:</strong> one anonymous increment per page load, fired by a few lines of script that every page on this site carries. The counter names the <em>page</em>, and nothing else.</li>
       <li><strong>Not counted:</strong> any visitor with JavaScript switched off &mdash; and <strong>counted:</strong> any software that loads a page and runs scripts, crawlers included. These numbers are a floor, not a census; a small number is not proof that nobody looked.</li>
       <li><strong>What leaves a visitor's browser:</strong> one plain GET carrying no cookie (<code>credentials: omit</code>), no referring page (<code>referrerPolicy: no-referrer</code>) and no identifier of any kind. A counting service, like any web server, necessarily sees the requesting IP address; nothing else about a visitor is sent or stored.</li>
-      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="https://abacus.jasoncameron.dev" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>maxhemmerich.github.io</code>. Every row above reads its own key back the same way, and any value is a plain address you can open yourself &mdash; for example this site's landing-page counter, <a href="https://abacus.jasoncameron.dev/get/maxhemmerich.github.io/canada-ebike-compare-index"><code>https://abacus.jasoncameron.dev/get/maxhemmerich.github.io/canada-ebike-compare-index</code></a>. Every key on this page is a real counter that a page on this site fires when it loads; there is no placeholder. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero.</li>
+      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="https://abacus.jasoncameron.dev" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>maxhemmerich.github.io</code>. Every row above reads its own key back the same way, and any value is a plain address you can open yourself &mdash; for example this site's landing-page counter, <a href="https://abacus.jasoncameron.dev/get/maxhemmerich.github.io/canada-ebike-compare-index"><code>https://abacus.jasoncameron.dev/get/maxhemmerich.github.io/canada-ebike-compare-index</code></a>. Every key on this page is a real counter that a page on this site fires when it loads; there is no placeholder. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero. It also allows only 30 reads per 10 seconds per address, and this page reads 15 counters &mdash; so it reads them one at a time, about 2.5 a second, and waits out a rate-limited read instead of calling the counter dead.</li>
       <li><strong>Nothing is sold, profiled or shared.</strong> There is no analytics product here, no cross-site tracking and no attempt to identify anyone. The only use made of these numbers is knowing whether this site is being read.</li>
     </ol>
   </section>
@@ -157,25 +157,45 @@
   var stamp = new Date();
   var sum = 0, read = 0, missing = 0, failed = 0;
   asof.textContent = stamp.toLocaleString();
+
+  /* The counting service allows 30 requests per 10 seconds per IP and this page reads 15 counters. Fired
+     all at once, two looks at this page inside one window made most rows read "unavailable" - measured on
+     the live page, twice, not guessed. So the reads are spaced (about 2.5 per second, under the limit even
+     with another tab open) and a rate-limited read is waited out and retried instead of being reported as a
+     dead counter. A row still reads "unavailable" only after the retries are exhausted. */
+  var GAP = 400, RETRY_AFTER = 3000, TRIES = 3;
+
+  function pause(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
   function finish(){
-    if (read + missing + failed < cells.length) return;
     total.textContent = sum.toLocaleString() + (failed ? " (partial)" : "");
     status.textContent = "Read " + read + " of " + cells.length + " counters"
       + (missing ? ", of which " + missing + " have never been hit and are shown as 0" : "")
       + (failed ? ", and " + failed + " could not be reached (shown as \"unavailable\" and excluded from the total)" : "")
       + ". Read at " + stamp.toLocaleString() + ". These are page loads that ran scripts, not people.";
   }
-  cells.forEach(function(td){
-    fetch(BASE + td.getAttribute("data-metric-key"), {cache:"no-store"})
+
+  function one(cell, tries){
+    return fetch(BASE + cell.getAttribute("data-metric-key"), {cache:"no-store"})
       .then(function(r){
-        if (r.status === 404) { missing++; td.textContent = "0"; td.title = "no hit has reached this page yet"; return; }
+        if (r.status === 404) { missing++; cell.textContent = "0"; cell.title = "no hit has reached this page yet"; return; }
+        if (r.status === 429) {
+          if (tries > 1) return pause(RETRY_AFTER).then(function(){ return one(cell, tries - 1); });
+          throw new Error("rate limited");
+        }
         if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json().then(function(j){ read++; var v = j.value|0; sum += v; td.textContent = v.toLocaleString(); });
+        return r.json().then(function(j){ read++; var v = j.value|0; sum += v; cell.textContent = v.toLocaleString(); });
       })
-      .catch(function(){ failed++; td.textContent = "unavailable"; })
-      .then(finish);
-  });
-  finish();
+      .catch(function(){ failed++; cell.textContent = "unavailable"; });
+  }
+
+  var i = 0;
+  (function next(){
+    if (i >= cells.length) { finish(); return; }
+    var cell = cells[i++];
+    status.textContent = "Reading the counters (" + i + " of " + cells.length + ")\u2026";
+    one(cell, TRIES).then(function(){ return pause(GAP).then(next); });
+  })();
 })();
 </script>
 <script>

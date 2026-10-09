@@ -99,6 +99,10 @@ every counter back and shows it.
   page with two beacons stops the build before `sitemap.xml` is written.
 - Every row on `stats/` reads its own real key: the build asserts the list of keys the page will fetch
   is exactly the list of beacons the pages fire, and that the page carries no `<key>`-style placeholder.
+- The reader fetches its counters **one at a time**, about 2.5 a second, and waits out a `429` instead of
+  reporting a dead counter. That is a repair, not a precaution: fired in parallel, a second look at the
+  page inside the service's 30-reads-per-10-seconds window made 9 to 10 of the 15 rows read "unavailable"
+  on the live page, measured twice before the change.
 
 ## Telling crawlers the pages exist
 
