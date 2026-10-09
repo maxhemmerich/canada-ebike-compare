@@ -1,6 +1,6 @@
 # Canadian Commuter E-Bike Comparison
 
-A comparison page for five commuter e-bikes you can buy in Canada, one indexable page per model,
+A comparison page for seven commuter e-bikes you can buy in Canada, one indexable page per model,
 and a free decision-guide PDF. Built as a static site (no framework, no build step at runtime) so
 it loads fast and can be linked to.
 
@@ -15,7 +15,7 @@ figure, the table says "not stated" rather than guessing.
 
 - Source of truth: `data/products.json` (each product carries its `source_url` and a note on
   what was read).
-- `build.py` renders `index.html`, the five per-model pages, the **range picker** and
+- `build.py` renders `index.html`, the per-model pages, the **range picker** and
   `guide/canada-commuter-ebike-guide.pdf` from that one file, so no two of them can disagree.
 - Nothing on a per-model page is written by hand either: its title, description, canonical URL and
   every specification row are generated from the same record. A figure a maker does not publish is
@@ -29,16 +29,22 @@ to the maker's own website, unmonetised; a row is labelled "affiliate link" only
 constant holds a real tracking link. If paid partner links are ever added, they will be
 labelled as such.
 
-Availability is carried as an `availability` field on the product (currently set only for the
-Rook, which showed out of stock on the date checked) and is rendered in the bike's comparison
-row wherever it is present — a product whose stock we did not observe gets no badge, never an
-invented "in stock".
+Two models added later (Aventon Soltera 2.5, OHM Cruise 3) deliberately have **no** constant at
+all — the program that would cover each one is named in the comment block of `config.js` and
+nowhere else, and no account has been applied for. Adding a model is a catalogue decision, not an
+affiliate one.
+
+Availability is carried as an `availability` field on the product and is rendered in the bike's
+comparison row wherever it is present — three models carry one today (the Rook, "Out of stock when
+checked"; the Soltera 2.5, "Limited stock when checked"; the Cruise 3, "In stock when checked"), each
+in the maker's own words or from the maker's own cart state. A product whose stock we did not observe
+gets no badge, never an invented "in stock".
 
 ## The range picker
 
 `how-far/` answers the query a buyer actually types — *"how big a battery do I need for a 14 km
 commute"* — instead of presenting another spec sheet. The visitor enters a round-trip distance and
-ticks a box for a hilly route or a load; the page then lists which of the five bikes claims to cover
+ticks a box for a hilly route or a load; the page then lists which of the bikes claims to cover
 it, in two buckets: those covered on the maker's **highest published figure**, and those covered only
 on that figure where the maker publishes no lower one.
 
@@ -47,8 +53,9 @@ It invents nothing. Each model has two numbers, both taken from the `range` stri
 literally in that string — a drifted figure stops the build before a single file is written. There is
 no derating factor: no maker here publishes a hills figure, so the hills box changes *which* published
 figure you are measured against (the maker's own low end, where one exists) rather than applying a
-percentage of our own making. The one conversion is named on the page (the Discover 3's 65 mi
-throttle figure). The whole table of figures, quoted verbatim, is on the page for the reader to check.
+percentage of our own making. The conversions are named on the page (the Discover 3's 65 mi throttle
+figure, and the Soltera 2.5's 46 mi range, which the maker publishes in miles only). The whole table of
+figures, quoted verbatim, is on the page for the reader to check.
 
 ## Telling crawlers the pages exist
 
@@ -78,7 +85,8 @@ Requires `reportlab` (PDF) only. The pages are plain HTML/CSS/JS.
   and canonical URL, built from the same dataset and linking back to the comparison
 - `how-far/index.html` — generated; the range picker, reading the published range figures from the
   same dataset and quoting them in full on the page
-- `sitemap.xml` — generated; the seven indexable URLs (the comparison, the five bikes and the picker)
+- `sitemap.xml` — generated; the eleven indexable URLs (the comparison, the seven bikes, the range
+  picker and the two head-to-head pages)
 - `indexnow.py` + `indexnow.key` + `<key>.txt` — the sitemap-submission script, its key, and the
   hosted key file IndexNow verifies
 - `robots.txt` — generated; note it is ignored by crawlers here, because this site sits on a
@@ -86,7 +94,7 @@ Requires `reportlab` (PDF) only. The pages are plain HTML/CSS/JS.
 - `config.js` — affiliate placeholder constants + the on-page disclosure text
 - `data/products.json` — the sourced dataset (single source of truth)
 - `build.py` — generator
-- `guide/canada-commuter-ebike-guide.pdf` — the decision guide (4 pages)
+- `guide/canada-commuter-ebike-guide.pdf` — the decision guide (5 pages)
 
 The per-model pages offer a partner button **only** when that bike's constant in `config.js` holds a
 real tracking link; while the constant is `null` the element is removed, so the page carries no link

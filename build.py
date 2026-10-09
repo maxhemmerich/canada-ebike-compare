@@ -10,12 +10,31 @@ BY_ID = {p["id"]: p for p in PRODUCTS}
 CHECKED = DATA["checked_on"]
 
 # ---------------------------------------------------------------- order
-# ONE deterministic order for every list of the five bikes, on the page and in the PDF.
+# ONE deterministic order for every list of the bikes, on the page and in the PDF.
 # The table caption promises cheapest-to-dearest, so sort by price ascending. Three models
 # tie at CA$2,699, so ties break by model name A-Z and then by id: the same data always
 # builds the identical page (no reliance on the order rows happen to sit in products.json).
 ORDER = sorted(PRODUCTS, key=lambda p: (p["price_cad"], p["model"].lower(), p["id"]))
 TIE_NOTE = "equal-price bikes A-Z"
+
+# ---------------------------------------------------------------- catalog size + price span (derived, never typed)
+# The copy names how many bikes are on the page and the price span they cover. Both are DERIVED from
+# data/products.json, so adding or removing a model cannot leave "five" or "CA$1,899 to CA$2,699"
+# stranded in the page as a false statement. A row in the data is the only edit an addition needs.
+N = len(PRODUCTS)
+_N_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six",
+            7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
+assert N in _N_WORDS, "add a word for %d models to _N_WORDS" % N
+N_WORD = _N_WORDS[N]
+N_WORD_CAP = N_WORD.capitalize()
+
+def _cad(n):
+    return "CA$%s" % format(n, ",d")
+
+_PRICE_LO = _cad(min(p["price_cad"] for p in PRODUCTS))
+_PRICE_HI = _cad(max(p["price_cad"] for p in PRODUCTS))
+PRICE_SPAN = "%s to %s" % (_PRICE_LO, _PRICE_HI)
+PRICE_SPAN_DASH = "%s-%s" % (_PRICE_LO, _PRICE_HI)
 
 # ---------------------------------------------------------------- published-range table
 # Used by the "how far will it go" picker. This is the only hand-made table in the build, so it is
@@ -46,10 +65,19 @@ RANGE_PARSE = {
         high=150, low=None, low_label=None,
         high_from='the maker\'s single published figure "up to 150 km (maker, eco mode)"',
         low_from=None),
+    "aventon-soltera-2-5": dict(
+        high=74, low=None, low_label=None,
+        high_from='the maker\'s published "Up to 46 Miles", converted to km (1 mi = 1.609344 km); their footnote names Eco mode and a 75 kg rider',
+        low_from=None),
+    "ohm-cruise-3": dict(
+        high=100, low=None, low_label=None,
+        high_from='the maker\'s own product-page summary "100 km range"; the specification table publishes no range figure',
+        low_from=None),
 }
 _RANGE_TOKENS = {"radster-road": ("104", "40"), "radkick-7speed": ("56", "24"),
                  "velotric-tempo": ("97",), "velotric-discover-3": ("129", "65"),
-                 "surface604-rook": ("150",)}
+                 "surface604-rook": ("150",), "aventon-soltera-2-5": ("74", "46"),
+                 "ohm-cruise-3": ("100",)}
 assert set(RANGE_PARSE) == {q["id"] for q in PRODUCTS} == set(_RANGE_TOKENS), \
     "the range table is out of step with data/products.json"
 for _pid, _toks in _RANGE_TOKENS.items():
@@ -115,19 +143,25 @@ PAIR_CARDS = "\n".join(pair_card(a, b) for a, b in PAIRS)
 PICKS = [
     ("Apartment, stairs, or carrying it onto transit",
      "velotric-tempo",
-     "At 39 lb the Tempo is 16 lb lighter than anything else here, and light enough to ride with the motor off. The 374 Wh battery is the trade-off."),
+     "At 39 lb the Tempo is the lightest bike here - 7 lb under the next lightest - and light enough to ride with the motor off. The 374 Wh battery is the trade-off."),
+    ("The cheapest way in, without buying a toy",
+     "aventon-soltera-2-5",
+     "At CA$1,699 the Soltera 2.5 is the lowest price here and still a real bike: Tektro hydraulic disc brakes, a torque sensor and lights front and rear, UL 2849 / UL 2271 certified. Its 345.6 Wh battery is the honest limit: short, light trips."),
     ("The longest commute on one charge",
      "surface604-rook",
-     "The Rook carries the biggest battery here (960 Wh) and claims the longest range of the five: up to 150 km in eco. It is also the only bike here that ships at Class 3."),
+     "The Rook carries the biggest battery here (960 Wh) and claims the longest range of any bike on this page: up to 150 km in eco. It is also the only bike here that ships at Class 3."),
     ("The best all-round daily commuter",
      "velotric-discover-3",
-     "750 W of motor, a 730 Wh battery and ~129 km of claimed pedal assist, with lights, fenders and a rack included. The most complete package of the five."),
-    ("The cheapest way in, without buying a toy",
+     "750 W is the highest motor rating in this set, and its 730 Wh battery is the second biggest - behind only the Rook's 960 Wh - with lights, fenders and a rack included."),
+    ("The lowest-priced Rad Power bike here",
      "radkick-7speed",
-     "At CA$1,899 the RadKick 7-Speed is the lowest price here and still has hydraulic brakes and a rear rack. Its 360 Wh battery is the honest limit: short trips only."),
+     "At CA$1,899 the RadKick 7-Speed still has hydraulic brakes and a rear rack included, and it is the lightest Rad on this page. Its 40 Nm is the least torque here and its 360 Wh battery is the honest limit: short trips only."),
     ("A bike that feels like a bike, on a long mixed commute",
      "radster-road",
-     "The Radster Road pairs a torque sensor with a 100 Nm motor, so the assist follows your pedalling instead of pushing you. It is the heaviest of the five."),
+     "The Radster Road pairs a torque sensor with a 100 Nm motor, so the assist follows your pedalling instead of pushing you. It is the heaviest bike here."),
+    ("The premium step-through commuter",
+     "ohm-cruise-3",
+     "CA$3,499 buys a Shimano E7000 system with 60 Nm, a 504 Wh in-tube battery, a 2-year warranty and 30-day returns, from a maker that has designed in North Vancouver since 2005. The dearest bike here; the maker sells it on comfort rather than speed."),
 ]
 
 # ---------------------------------------------------------------- HTML
@@ -195,7 +229,7 @@ PAGE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
 <title>Canadian Commuter E-Bike Comparison (CAD, 2026)</title>
-<meta name="description" content="Five commuter e-bikes you can buy in Canada for CA$1,899-CA$2,699, compared on price, motor, battery, range, weight and warranty, with every spec traced to the maker's own product page.">
+<meta name="description" content="__N_WORD_CAP__ commuter e-bikes you can buy in Canada for __PRICE_SPAN_DASH__, compared on price, motor, battery, range, weight and warranty, with every spec traced to the maker's own product page.">
 <style>
   :root{
     --paper:#faf8f4; --ink:#16181d; --muted:#5d6270; --line:#e3ddd1;
@@ -270,11 +304,11 @@ PAGE = r"""<!doctype html>
 
 <main class="wrap">
   <section class="hero" style="border-top:none">
-    <h1>Five commuter e-bikes you can buy in Canada, sorted out</h1>
-    <p class="deck">CA$1,899 to CA$2,699. Real specs from each maker's own product page, so you can tell which bike fits a real commute instead of a spec sheet.</p>
+    <h1>__N_WORD_CAP__ commuter e-bikes you can buy in Canada, sorted out</h1>
+    <p class="deck">__PRICE_SPAN__. Real specs from each maker's own product page, so you can tell which bike fits a real commute instead of a spec sheet.</p>
     <div class="cta">
       <a class="btn" href="guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
-      <a class="btn ghost" href="#compare">Compare the five</a>
+      <a class="btn ghost" href="#compare">Compare the __N_WORD__</a>
       <a class="btn ghost" href="how-far/">How far will it go?</a>
     </div>
     <p class="disclosure" role="note">__DISCLOSURE__</p>
@@ -356,6 +390,10 @@ __ROWS__
 out = (PAGE
        .replace("__CHECKED__", esc(CHECKED))
        .replace("__TIE_NOTE__", esc(TIE_NOTE))
+       .replace("__N_WORD_CAP__", esc(N_WORD_CAP))
+       .replace("__N_WORD__", esc(N_WORD))
+       .replace("__PRICE_SPAN_DASH__", esc(PRICE_SPAN_DASH))
+       .replace("__PRICE_SPAN__", esc(PRICE_SPAN))
        .replace("__DISCLOSURE__", esc(json.load(open(os.path.join(ROOT,"data","products.json"), encoding="utf-8"))["currency_note"]) + " " + "<strong>Disclosure:</strong> no live affiliate links yet; every product link goes to the maker's own site.")
        .replace("__PICKS__", PICKS_HTML)
        .replace("__ROWS__", ROWS)
@@ -440,7 +478,7 @@ BIKE_PAGE = """<!doctype html>
 
 <main class="wrap">
   <section class="bikehero" style="border-top:none">
-    <p class="crumb"><a href="../../">All five commuter e-bikes, compared</a> &rsaquo; __MAKER__</p>
+    <p class="crumb"><a href="../../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; __MAKER__</p>
     <h1>__MAKER__ __MODEL__ in Canada</h1>
     <p class="pricebig">__PRICE____STOCK__</p>
     <p class="buyrow"><a class="buyaff" data-aff="__ID__" hidden></a></p>
@@ -464,7 +502,7 @@ BIKE_PAGE = """<!doctype html>
     <h2>The other bikes</h2>
     <ul class="otherbikes">__OTHERS__</ul>
     <p class="cta" style="margin-top:20px">
-      <a class="btn" href="../../#compare">Compare all five side by side</a>
+      <a class="btn" href="../../#compare">Compare all __N_WORD__ side by side</a>
       <a class="btn ghost" href="../../guide/canada-commuter-ebike-guide.pdf" download>Download the free PDF guide</a>
     </p>
   </section>
@@ -522,6 +560,7 @@ def bike_html(p):
             % (p["price_display"], p["maker"], stock_word, p["maker"]))
     return (BIKE_PAGE
             .replace("__CSS__", CSS)
+            .replace("__N_WORD__", esc(N_WORD))
             .replace("__TITLE__", esc(title))
             .replace("__DESC__", esc(desc))
             .replace("__CANONICAL__", "%s/bikes/%s/" % (SITE, p["id"]))
@@ -548,7 +587,7 @@ for p in ORDER:
 
 # ================================================================ "how far will it go" range picker
 # The one page here that answers a question instead of listing a spec sheet: a buyer types a round-trip
-# distance and sees which of the five bikes claims to cover it, from the sourced figures already in
+# distance and sees which of the bikes claims to cover it, from the sourced figures already in
 # data/products.json. Generated here so a rebuild cannot drop it, and linked from sitemap.xml.
 # RANGE_PARSE (defined and guarded at the top of this file, before anything is written) supplies the
 # two figures per model.
@@ -589,7 +628,7 @@ PICKER_PAGE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="impact-site-verification" value="12512726-8e95-419c-8747-523f99ebd94b">
 <title>How far will an e-bike go? Range vs. your commute (Canada)</title>
-<meta name="description" content="How big a battery do you need for a 14 km commute? Enter your round-trip distance and see which of five Canadian commuter e-bikes claims to cover it, using each maker's own published range figure.">
+<meta name="description" content="How big a battery do you need for a 14 km commute? Enter your round-trip distance and see which of __N_WORD__ Canadian commuter e-bikes claims to cover it, using each maker's own published range figure.">
 <link rel="canonical" href="__CANONICAL__">
 <style>__CSS__
   .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
@@ -637,7 +676,7 @@ PICKER_PAGE = r"""<!doctype html>
 
 <main class="wrap">
   <section class="hero" style="border-top:none">
-    <p class="crumb"><a href="../">All five commuter e-bikes, compared</a> &rsaquo; Range picker</p>
+    <p class="crumb"><a href="../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; Range picker</p>
     <h1>How far will it actually go?</h1>
     <p class="deck">"How big a battery do I need for a 14 km commute?" Put your round-trip distance in below. This page compares it with the range figure each maker publishes on its own product page &mdash; not a test we ran, and not a number we bent to fit.</p>
     <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today; every link goes to a maker's own page or to another page on this site.</p>
@@ -690,7 +729,8 @@ __FIGROWS__
       <li><strong>It only ever quotes the maker.</strong> Each top figure and each lowest published figure above is a number the maker itself published, quoted in full in the table, with a link to the page it was read from.</li>
       <li><strong>Hills are not modelled.</strong> No maker here publishes a hills figure, so this page will not invent a percentage for you. The hills box changes which published figure you are measured against &mdash; the maker's own low end, where one exists.</li>
       <li><strong>A caveat on the Rook.</strong> Surface 604 describes its published figure as eco mode, so that top figure is the maker's best case, not a worst case.</li>
-      <li><strong>One conversion, named.</strong> The Discover 3's lowest figure is published in miles (65 mi) and is shown here converted to kilometres.</li>
+      <li><strong>Conversions, named.</strong> The Discover 3's lowest figure is published in miles (65 mi) and the Soltera 2.5's range is published in miles only (46 mi); both are shown here converted to kilometres at 1 mi = 1.609344 km.</li>
+      <li><strong>Where two of these figures come from.</strong> The Soltera 2.5's figure carries Aventon's own footnote &mdash; Eco mode, a 75 kg rider, flat paved road &mdash; so it is a best case as well. The Cruise 3's 100 km is stated in OHM's own product-page summary rather than in its specification table, and no assist level is named with it.</li>
       <li><strong>Battery size is the whole story only sometimes.</strong> The Wh figure above is the maker's published capacity; two bikes can post the same miles from different Wh once weight and assist level are counted in.</li>
     </ol>
   </section>
@@ -698,7 +738,7 @@ __FIGROWS__
   <section id="next">
     <h2>Read the rest</h2>
     <ul class="otherbikes">
-      <li><a href="../">All five commuter e-bikes, compared side by side</a></li>
+      <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
       __BIKELINKS__
       <li><a href="../guide/canada-commuter-ebike-guide.pdf" download>The free decision-guide PDF</a></li>
     </ul>
@@ -778,11 +818,11 @@ __FIGROWS__
                   + group("Does not reach", short);
     if (!hilly) {
       sum.textContent = (short.length === 0)
-        ? "All five bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes."
-        : cover.length + " of the 5 bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes; "
+        ? "All " + DATA.length + " bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes."
+        : cover.length + " of the " + DATA.length + " bikes claim to cover a " + dShow + " km round trip on the highest figure their maker publishes; "
           + short.length + (short.length === 1 ? " does not." : " do not.");
     } else {
-      sum.textContent = "Hills on: " + cover.length + " of the 5 claim to cover a " + dShow
+      sum.textContent = "Hills on: " + cover.length + " of the " + DATA.length + " claim to cover a " + dShow
         + " km round trip even against the lowest figure their maker publishes; " + partial.length
         + " only on the maker\u2019s best case; " + short.length + " do not reach it.";
     }
@@ -796,6 +836,7 @@ __FIGROWS__
 
 _picker_out = (PICKER_PAGE
                .replace("__CSS__", CSS)
+               .replace("__N_WORD__", esc(N_WORD))
                .replace("__CANONICAL__", "%s/how-far/" % SITE)
                .replace("__CHECKED__", esc(CHECKED))
                .replace("__FIGROWS__", FIG_ROWS)
@@ -866,7 +907,7 @@ VS_PAGE = r"""<!doctype html>
 
 <main class="wrap">
   <section class="vshero" style="border-top:none">
-    <p class="crumb"><a href="../../">All five commuter e-bikes, compared</a> &rsaquo; Head to head</p>
+    <p class="crumb"><a href="../../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; Head to head</p>
     <h1>__H1__</h1>
     <p class="deck">__DECK__</p>
     <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links. Nothing here is paid for and no purchase through this page earns anyone a commission today; every link goes to a maker's own page or to another page on this site.</p>
@@ -938,7 +979,7 @@ def vs_page(a, b):
         % (esc(q["maker"]), esc(q["model"]), esc(q["price_display"]), esc(q["id"]),
            esc(q["maker"]), esc(q["model"]), esc(q["best_for"]))
         for q in (pa, pb))
-    links = ['<li><a href="../../">All five commuter e-bikes, compared side by side</a></li>']
+    links = ['<li><a href="../../">All %s commuter e-bikes, compared side by side</a></li>' % esc(N_WORD)]
     for q in (pa, pb):
         links.append('<li><a href="../../bikes/%s/">%s %s &mdash; %s, full specifications</a></li>'
                      % (esc(q["id"]), esc(q["maker"]), esc(q["model"]), esc(q["price_display"])))
@@ -949,6 +990,7 @@ def vs_page(a, b):
             links.append('<li><a href="../%s/">%s</a></li>' % (esc(pair_slug(c, d)), esc(pair_label(c, d))))
     out = (VS_PAGE
            .replace("__CSS__", CSS)
+           .replace("__N_WORD__", esc(N_WORD))
            .replace("__TITLE__", esc(title))
            .replace("__DESC__", esc(desc))
            .replace("__CANONICAL__", "%s/vs/%s/" % (SITE, slug))
@@ -1026,7 +1068,7 @@ def footer(canvas, d):
 
 story = []
 story.append(Paragraph("Canadian commuter e-bikes, sorted out", H1))
-story.append(Paragraph("Five bikes you can buy in Canada for CA$1,899 to CA$2,699. Every figure in this guide was read from the maker's own product page on %s - no remembered specs. Prices move, so confirm before you buy." % CHECKED, BODY))
+story.append(Paragraph("%s bikes you can buy in Canada for %s. Every figure in this guide was read from the maker's own product page on %s - no remembered specs. Prices move, so confirm before you buy." % (N_WORD_CAP, PRICE_SPAN, CHECKED), BODY))
 story.append(Spacer(1, 10))
 story.append(Paragraph("<b>Disclosure:</b> this guide was not paid for and carries no live affiliate links. Product names link to the makers' own pages. If paid partner links are ever added, they will be labelled as such.", SMALL))
 story.append(Spacer(1, 6))
@@ -1042,7 +1084,6 @@ for title, pid, body in PICKS:
     block.append(Paragraph(body, BODY))
     story.append(KeepTogether(block))
 
-story.append(PageBreak())
 story.append(Paragraph("The comparison", H2))
 story.append(Paragraph("Cheapest to dearest; %s. Claimed range is the maker's estimate, not a test. Weight is the maker's figure. Where a maker does not publish a figure, the cell says so." % TIE_NOTE, SMALL))
 story.append(Spacer(1, 8))
@@ -1071,9 +1112,9 @@ tbl.setStyle(TableStyle([
     ("RIGHTPADDING", (0,0), (-1,-1), 5),
 ]))
 story.append(tbl)
-story.append(Paragraph("Cheapest is not the same as best value: the RadKick costs the least but carries the smallest battery. Match the battery to your round-trip distance, not the price tag.", NOTE))
+story.append(Paragraph("Cheapest is not the same as best value: the Soltera 2.5 costs the least but carries the smallest battery here. Match the battery to your round-trip distance, not the price tag.", NOTE))
 
-story.append(PageBreak())
+story.append(Spacer(1, 14))
 story.append(Paragraph("Which one for which household", H2))
 for p in ORDER:
     story.append(KeepTogether([
@@ -1083,7 +1124,7 @@ for p in ORDER:
         Spacer(1, 6),
     ]))
 
-story.append(PageBreak())
+story.append(Spacer(1, 14))
 story.append(Paragraph("Where every number comes from", H2))
 story.append(Paragraph("Each bike below links to the exact page the figures were read from, on %s." % CHECKED, BODY))
 story.append(Spacer(1, 6))

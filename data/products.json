@@ -1,6 +1,6 @@
 {
   "title": "Canadian Commuter E-Bike Comparison",
-  "subtitle": "Five commuter e-bikes you can buy in Canada for CAD $1,899-$2,699, with specs taken from each maker's own product page.",
+  "subtitle": "Seven commuter e-bikes you can buy in Canada for CAD $1,699-$3,499, with specs taken from each maker's own product page.",
   "checked_on": "2026-10-08",
   "currency_note": "Every price below was read from the maker's Canadian storefront in Canadian dollars (CAD). Specs were read from the maker's own product/spec pages on the date above.",
   "products": [
@@ -109,6 +109,48 @@
       "best_for": "The long-haul, high-speed pick: the biggest battery here (960 Wh) and the only bike in this set that ships at Class 3, with a 45 km/h claimed top speed. Vancouver-designed, with a 5-year frame warranty. It was Out of Stock when checked.",
       "source_url": "https://www.surface604bikes.com/electric-bikes/rook",
       "source_note": "Product page and its Specifications tab (motor, torque, battery, class, brakes, weight, weight capacity, warranty). Price shown as CA$2,699.00 (page JSON-LD: priceCurrency CAD). This model showed Out of Stock on the date checked. Re-read 2026-10-08: the Specifications tab now publishes 500 W (peaks at 750 W) Bafang geared hub, 65 Nm, net weight 27.75 kg / 61 lb, and weight capacity 300 lb (136 kg)."
+    },
+    {
+      "id": "aventon-soltera-2-5",
+      "maker": "Aventon",
+      "model": "Soltera 2.5",
+      "price_cad": 1699,
+      "price_display": "CA$1,699",
+      "type": "Lightweight city (step-over)",
+      "motor": "Rear hub, 350 W sustained (540 W peak)",
+      "torque": "45 Nm",
+      "battery": "345.6 Wh (9.6 Ah, LG cells)",
+      "range": "up to 46 mi / 74 km (maker, Eco mode)",
+      "weight": "46 lb",
+      "brakes": "Tektro HD-T280 hydraulic disc, 180 mm rotors front and rear",
+      "eclass": "Class 2",
+      "sensor": "Torque sensor, double-sided (bottom bracket)",
+      "warranty": "2 years",
+      "payload": "300 lb total weight limit",
+      "availability": "Limited stock when checked",
+      "best_for": "A flat-city commuter on the lowest budget here: at 46 lb it is light, and it still carries hydraulic disc brakes, a torque sensor and front and rear lights. The 345.6 Wh battery and the maker's own Eco-mode range figure suit short, light trips rather than long ones.",
+      "source_url": "https://www.aventon.com/en-ca/products/soltera-2-5-ebike",
+      "source_note": "Technical Specifications panel and the feature strip on Aventon's Canadian (en-ca) product page, read 2026-10-08: Speed Class 2, 36 V 350 W sustained / 540 W peak brushless hub motor, Motor Torque 45 Nm, battery 36 V 9.6 Ah (345.6 Wh) with LG cells, Sensors 'Double Sided Bottom Bracket Torque Sensor', Weight 46 lbs, Total Weight Limit 300 lbs, front and rear brake Tektro HD-T280 hydraulic disc with 180 mm rotors, Pedal Assist 4 levels, Front and rear lights integrated, UL 2849 / UL 2271 certified, and the page's own '2 Year Warranty' badge. Range is published as 'Up to 46 Miles' with the page's own footnote: 'Max range is estimated based on a rider weighing 165 lbs (75 kg) on a paved, flat road, in Eco Mode, with Ride Tune set to the default settings.' The miles figure is converted at 1 mi = 1.609344 km and shown as both. Price is the CA$1,699.00 shown on the en-ca page (variants at 169900). Stock wording seen on the page: 'Limited stock available. Order today.'"
+    },
+    {
+      "id": "ohm-cruise-3",
+      "maker": "OHM",
+      "model": "Cruise 3",
+      "price_cad": 3499,
+      "price_display": "CA$3,499",
+      "type": "Step-through commuter",
+      "motor": "Shimano E7000, 250 W continuous / 500 W peak",
+      "torque": "60 Nm",
+      "battery": "504 Wh (in-tube)",
+      "range": "100 km (maker's page summary)",
+      "weight": "22.2 kg (49 lb)",
+      "brakes": "Shimano MT-420 quad-piston hydraulic disc (180 mm front / 160 mm rear)",
+      "eclass": "32 km/h speed assist (Canada); no class number published",
+      "warranty": "2 years",
+      "availability": "In stock when checked",
+      "best_for": "The comfort-first step-through: an upright position, a Shimano E7000 system with 60 Nm, and a maker that has designed in North Vancouver since 2005 and states a 10-year parts guarantee. It is also the dearest bike on this page.",
+      "source_url": "https://www.ohmcycles.com/products/cruise-3",
+      "source_note": "Technical Specifications accordion and the Bike Details tab on OHM's own product page, read 2026-10-08: Motor 'Shimano E7000, 250W continuous / 500W peak, 60Nm', Battery '504Wh, Li-ion, In-tube, State of Charge Display', Speed Assist '32 km/h (Canada)*' with the page's own footnote ('Motor is rated at 250W continuous output - the legally relevant figure under Canada's federal PAB regulations (500W max). Peak power rating reflects momentary output under load. Speed assist is firmware-configured to 32 km/h for Canadian compliance (28 mph available for US Class 3 regions)'), Brakes 'Shimano MT-420, Quad Piston, Hydraulic Disc' with 180 mm front / 160 mm rear rotors, Frame 'Premium Hydroformed Aluminium, Step-Through', and the page's own '2-Year Warranty' badge. Bike Details: Weight 22.2 kg (49 lb), MSRP $3,499 CAD. The 100 km figure is published in the product page's own summary text ('Shimano E7000, 60 Nm torque, 100 km range'); the specification table itself publishes no range figure and names no assist level, so the figure is labelled as coming from the page summary. The same page's FAQ answers 'Is it heavy?' with 52 lbs while the Bike Details tab says 22.2 kg (49 lb); the tab figure is the one used here. Price CA$3,499.00 CAD (Shopify product data; storefront currency CAD), 'Add to cart' enabled and no variant flagged sold out. The product page's own name is 'Cruise'; its URL, the maker's comparison page and its city collection call it Cruise 3."
     }
   ]
 }
