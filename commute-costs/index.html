@@ -24,6 +24,11 @@
   body{margin:0;background:var(--paper);color:var(--ink);
     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   a{color:var(--accent-ink)}
+  /* A long unbreakable token (a source URL, a counter key) must never stretch the LAYOUT past the
+     phone. Before this rule /rules/ and /stats/ each forced a 390px phone to pan horizontally
+     (layout scrollWidth 734 and 514) because a source URL would not wrap inside its <li>. Break it
+     inside its own box: `anywhere` shrinks the min-content width, which `break-word` does not. */
+  a,code,kbd,samp{overflow-wrap:anywhere}
   a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
   .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
   header.top{border-bottom:1px solid var(--line);background:var(--paper)}

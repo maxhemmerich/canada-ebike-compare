@@ -233,7 +233,7 @@ def model_cell(p):
             f'<a class="mname" href="bikes/{esc(p["id"])}/">{esc(p["model"])}</a>'
             f'<span class="mmaker">{esc(p["maker"])}</span>'
             + stock_badge(p) +
-            f'<a class="spec-link" href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">maker specs \u2197</a>'
+            f'<a class="spec-link" data-aff="{esc(p["id"])}" href="{esc(p["source_url"])}" target="_blank" rel="noopener nofollow">maker specs ↗</a>'
             '</th>')
 
 def row_html(p):
@@ -298,6 +298,11 @@ PAGE = r"""<!doctype html>
   body{margin:0;background:var(--paper);color:var(--ink);
     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   a{color:var(--accent-ink)}
+  /* A long unbreakable token (a source URL, a counter key) must never stretch the LAYOUT past the
+     phone. Before this rule /rules/ and /stats/ each forced a 390px phone to pan horizontally
+     (layout scrollWidth 734 and 514) because a source URL would not wrap inside its <li>. Break it
+     inside its own box: `anywhere` shrinks the min-content width, which `break-word` does not. */
+  a,code,kbd,samp{overflow-wrap:anywhere}
   a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
   .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
   header.top{border-bottom:1px solid var(--line);background:var(--paper)}
@@ -437,13 +442,24 @@ __ROWS__
     "velotric-tempo":"AFFILIATE_VELOTRIC_TEMPO","velotric-discover-3":"AFFILIATE_VELOTRIC_DISCOVER_3",
     "surface604-rook":"AFFILIATE_SURFACE604_ROOK"
   };
-  document.querySelectorAll(".aff").forEach(function(el){
+  document.querySelectorAll("[data-aff]").forEach(function(el){
     var id = el.getAttribute("data-aff");
+    var live = cfg[affMap[id]];
     // A row says "affiliate link" only when a real tracking link is configured for it.
     // While the constant is null the row says nothing: the disclosure above the fold
     // already covers the absence, and no claim is made about any application's status.
-    var live = cfg[affMap[id]];
-    el.textContent = live ? "affiliate link" : "";
+    if (el.tagName === "A") {
+      // This row's own outbound product link IS the money link. While the constant is null it
+      // stays the maker's plain URL and carries NO tracking attribute; the moment a tracking URL
+      // is set it becomes that URL and is marked sponsored. One paste in config.js, nothing else.
+      if (live) {
+        el.href = live;
+        el.setAttribute("rel", "sponsored nofollow noopener");
+        el.setAttribute("data-aff-live", "1");
+      }
+    } else {
+      el.textContent = live ? "affiliate link" : "";
+    }
   });
 })();
 </script>

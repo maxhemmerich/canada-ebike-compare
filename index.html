@@ -17,6 +17,11 @@
   body{margin:0;background:var(--paper);color:var(--ink);
     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   a{color:var(--accent-ink)}
+  /* A long unbreakable token (a source URL, a counter key) must never stretch the LAYOUT past the
+     phone. Before this rule /rules/ and /stats/ each forced a 390px phone to pan horizontally
+     (layout scrollWidth 734 and 514) because a source URL would not wrap inside its <li>. Break it
+     inside its own box: `anywhere` shrinks the min-content width, which `break-word` does not. */
+  a,code,kbd,samp{overflow-wrap:anywhere}
   a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
   .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
   header.top{border-bottom:1px solid var(--line);background:var(--paper)}
@@ -131,13 +136,13 @@
           <th scope="col">Weight</th><th scope="col">Brakes</th><th scope="col">Class</th><th scope="col">Warranty</th>
         </tr></thead>
         <tbody>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/aventon-soltera-2-5/">Soltera 2.5</a><span class="mmaker">Aventon</span><span class="stock">Limited stock when checked</span><a class="spec-link" href="https://www.aventon.com/en-ca/products/soltera-2-5-ebike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$1,699<span class="aff" data-aff="aventon-soltera-2-5"></span></td><td>Rear hub, 350 W sustained (540 W peak)</td><td>45 Nm</td><td>345.6 Wh (9.6 Ah, LG cells)</td><td>up to 46 mi / 74 km (maker, Eco mode)</td><td>46 lb</td><td>Tektro HD-T280 hydraulic disc, 180 mm rotors front and rear</td><td>Class 2</td><td>2 years</td></tr>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/radkick-7speed/">RadKick 7-Speed</a><span class="mmaker">Rad Power Bikes</span><a class="spec-link" href="https://radpowerbikes.ca/products/radkick-7-speed-electric-lightweight-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$1,899<span class="aff" data-aff="radkick-7speed"></span></td><td>Rear hub, 500 W rated</td><td>40 Nm</td><td>360 Wh (10 Ah)</td><td>24-56 km (maker estimate)</td><td>55 lb / 25.2 kg</td><td>Hydraulic disc (Gemma GA-950)</td><td>Class 2</td><td>2 years frame, components and battery; 1 year some items (Rad warranty page)</td></tr>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/velotric-tempo/">Tempo</a><span class="mmaker">Velotric</span><a class="spec-link" href="https://www.velotric.ca/products/velotric-tempo-ebike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,099<span class="aff" data-aff="velotric-tempo"></span></td><td>Rear hub, 350 W (650 W peak)</td><td>45 Nm</td><td>374 Wh (removable)</td><td>up to 97 km (maker estimate)</td><td>39 lb / 17.7 kg</td><td>Shimano hydraulic disc, 180 mm rotors</td><td>Class 1/2/3 (32 km/h default, adjustable 19-45)</td><td>2 years</td></tr>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/velotric-discover-3/">Discover 3</a><span class="mmaker">Velotric</span><a class="spec-link" href="https://www.velotric.ca/products/discover-3" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="velotric-discover-3"></span></td><td>Rear hub, 750 W (1,100 W peak)</td><td>75 Nm</td><td>730 Wh (15.2 Ah), Samsung/LG 21700</td><td>129 km PAS / 105 km throttle (maker)</td><td>62 lb / 28 kg</td><td>Tektro hydraulic disc, 180 mm rotors</td><td>Class 1/2/3 (20 mph default, adjustable to 28)</td><td>2 years (covers electrical)</td></tr>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/radster-road/">Radster Road</a><span class="mmaker">Rad Power Bikes</span><a class="spec-link" href="https://radpowerbikes.ca/products/radster-road-electric-commuter-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="radster-road"></span></td><td>Rear hub, 500 W rated</td><td>100 Nm</td><td>720 Wh (15 Ah)</td><td>40-104 km (maker estimate)</td><td>74.5 lb / 33.8 kg</td><td>Hydraulic disc</td><td>Class 1/2 (ships Class 2)</td><td>2 years frame, components and battery; 1 year some items (Rad warranty page)</td></tr>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/surface604-rook/">Rook</a><span class="mmaker">Surface 604</span><span class="stock">Out of stock when checked</span><a class="spec-link" href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="surface604-rook"></span></td><td>500 W Bafang geared hub (750 W peak)</td><td>65 Nm</td><td>960 Wh (20 Ah)</td><td>up to 150 km (maker, eco mode)</td><td>61 lb / 27.75 kg</td><td>Tektro Auriga hydraulic disc</td><td>Class 3 (45 km/h)</td><td>5 years frame / 2 years components</td></tr>
-<tr><th scope="row" class="model"><a class="mname" href="bikes/ohm-cruise-3/">Cruise 3</a><span class="mmaker">OHM</span><span class="stock">In stock when checked</span><a class="spec-link" href="https://www.ohmcycles.com/products/cruise-3" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$3,499<span class="aff" data-aff="ohm-cruise-3"></span></td><td>Shimano E7000, 250 W continuous / 500 W peak</td><td>60 Nm</td><td>504 Wh (in-tube)</td><td>150 km (maker&#x27;s product-page tile)</td><td>22.2 kg (49 lb)</td><td>Shimano MT-420 quad-piston hydraulic disc (180 mm front / 160 mm rear)</td><td>32 km/h speed assist (Canada); no class number published</td><td>2 years</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/aventon-soltera-2-5/">Soltera 2.5</a><span class="mmaker">Aventon</span><span class="stock">Limited stock when checked</span><a class="spec-link" data-aff="aventon-soltera-2-5" href="https://www.aventon.com/en-ca/products/soltera-2-5-ebike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$1,699<span class="aff" data-aff="aventon-soltera-2-5"></span></td><td>Rear hub, 350 W sustained (540 W peak)</td><td>45 Nm</td><td>345.6 Wh (9.6 Ah, LG cells)</td><td>up to 46 mi / 74 km (maker, Eco mode)</td><td>46 lb</td><td>Tektro HD-T280 hydraulic disc, 180 mm rotors front and rear</td><td>Class 2</td><td>2 years</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/radkick-7speed/">RadKick 7-Speed</a><span class="mmaker">Rad Power Bikes</span><a class="spec-link" data-aff="radkick-7speed" href="https://radpowerbikes.ca/products/radkick-7-speed-electric-lightweight-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$1,899<span class="aff" data-aff="radkick-7speed"></span></td><td>Rear hub, 500 W rated</td><td>40 Nm</td><td>360 Wh (10 Ah)</td><td>24-56 km (maker estimate)</td><td>55 lb / 25.2 kg</td><td>Hydraulic disc (Gemma GA-950)</td><td>Class 2</td><td>2 years frame, components and battery; 1 year some items (Rad warranty page)</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/velotric-tempo/">Tempo</a><span class="mmaker">Velotric</span><a class="spec-link" data-aff="velotric-tempo" href="https://www.velotric.ca/products/velotric-tempo-ebike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,099<span class="aff" data-aff="velotric-tempo"></span></td><td>Rear hub, 350 W (650 W peak)</td><td>45 Nm</td><td>374 Wh (removable)</td><td>up to 97 km (maker estimate)</td><td>39 lb / 17.7 kg</td><td>Shimano hydraulic disc, 180 mm rotors</td><td>Class 1/2/3 (32 km/h default, adjustable 19-45)</td><td>2 years</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/velotric-discover-3/">Discover 3</a><span class="mmaker">Velotric</span><a class="spec-link" data-aff="velotric-discover-3" href="https://www.velotric.ca/products/discover-3" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="velotric-discover-3"></span></td><td>Rear hub, 750 W (1,100 W peak)</td><td>75 Nm</td><td>730 Wh (15.2 Ah), Samsung/LG 21700</td><td>129 km PAS / 105 km throttle (maker)</td><td>62 lb / 28 kg</td><td>Tektro hydraulic disc, 180 mm rotors</td><td>Class 1/2/3 (20 mph default, adjustable to 28)</td><td>2 years (covers electrical)</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/radster-road/">Radster Road</a><span class="mmaker">Rad Power Bikes</span><a class="spec-link" data-aff="radster-road" href="https://radpowerbikes.ca/products/radster-road-electric-commuter-bike" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="radster-road"></span></td><td>Rear hub, 500 W rated</td><td>100 Nm</td><td>720 Wh (15 Ah)</td><td>40-104 km (maker estimate)</td><td>74.5 lb / 33.8 kg</td><td>Hydraulic disc</td><td>Class 1/2 (ships Class 2)</td><td>2 years frame, components and battery; 1 year some items (Rad warranty page)</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/surface604-rook/">Rook</a><span class="mmaker">Surface 604</span><span class="stock">Out of stock when checked</span><a class="spec-link" data-aff="surface604-rook" href="https://www.surface604bikes.com/electric-bikes/rook" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$2,699<span class="aff" data-aff="surface604-rook"></span></td><td>500 W Bafang geared hub (750 W peak)</td><td>65 Nm</td><td>960 Wh (20 Ah)</td><td>up to 150 km (maker, eco mode)</td><td>61 lb / 27.75 kg</td><td>Tektro Auriga hydraulic disc</td><td>Class 3 (45 km/h)</td><td>5 years frame / 2 years components</td></tr>
+<tr><th scope="row" class="model"><a class="mname" href="bikes/ohm-cruise-3/">Cruise 3</a><span class="mmaker">OHM</span><span class="stock">In stock when checked</span><a class="spec-link" data-aff="ohm-cruise-3" href="https://www.ohmcycles.com/products/cruise-3" target="_blank" rel="noopener nofollow">maker specs ↗</a></th><td class="price">CA$3,499<span class="aff" data-aff="ohm-cruise-3"></span></td><td>Shimano E7000, 250 W continuous / 500 W peak</td><td>60 Nm</td><td>504 Wh (in-tube)</td><td>150 km (maker&#x27;s product-page tile)</td><td>22.2 kg (49 lb)</td><td>Shimano MT-420 quad-piston hydraulic disc (180 mm front / 160 mm rear)</td><td>32 km/h speed assist (Canada); no class number published</td><td>2 years</td></tr>
         </tbody>
       </table>
     </div>
@@ -194,13 +199,24 @@
     "velotric-tempo":"AFFILIATE_VELOTRIC_TEMPO","velotric-discover-3":"AFFILIATE_VELOTRIC_DISCOVER_3",
     "surface604-rook":"AFFILIATE_SURFACE604_ROOK"
   };
-  document.querySelectorAll(".aff").forEach(function(el){
+  document.querySelectorAll("[data-aff]").forEach(function(el){
     var id = el.getAttribute("data-aff");
+    var live = cfg[affMap[id]];
     // A row says "affiliate link" only when a real tracking link is configured for it.
     // While the constant is null the row says nothing: the disclosure above the fold
     // already covers the absence, and no claim is made about any application's status.
-    var live = cfg[affMap[id]];
-    el.textContent = live ? "affiliate link" : "";
+    if (el.tagName === "A") {
+      // This row's own outbound product link IS the money link. While the constant is null it
+      // stays the maker's plain URL and carries NO tracking attribute; the moment a tracking URL
+      // is set it becomes that URL and is marked sponsored. One paste in config.js, nothing else.
+      if (live) {
+        el.href = live;
+        el.setAttribute("rel", "sponsored nofollow noopener");
+        el.setAttribute("data-aff-live", "1");
+      }
+    } else {
+      el.textContent = live ? "affiliate link" : "";
+    }
   });
 })();
 </script>
