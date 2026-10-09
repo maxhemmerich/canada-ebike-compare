@@ -2185,117 +2185,235 @@ RULES_PROVINCES = [
     dict(name="British Columbia",
          law=u"Motor Assisted Cycle (E-Bike) Regulation, B.C. Reg. 64/2024 (in force 5 April 2024)",
          motor=u"500 W or less (standard) / 250 W or less (light)", speed=u"32 km/h (standard) / 25 km/h (light)",
-         age=u"16 (standard) / 14 (light)", helmet=u"Required \u2014 a bicycle safety helmet, all ages",
+         age=u"16 (standard) / 14 (light)", helmet=u"Required — a bicycle safety helmet, all ages",
          papers=u"None: no licence, no registration, no insurance",
-         where=u"Public roads where cycles are permitted; some municipalities set their own rules, and a " 
+         where=u"Public roads where cycles are permitted; some municipalities set their own rules, and a "
                u"Class 1 machine is the only one allowed on Parks Canada trails.",
          url="https://www2.gov.bc.ca/gov/content/transportation/driving-and-cycling/cycling/"
              "cycling-regulations-restrictions-rules/e-bikes",
-         src=u"Province of British Columbia, \u201cE-bike requirements\u201d",
+         src=u"Province of British Columbia, “E-bike requirements”",
          date=u"page last updated 4 November 2025",
          quote=(u"| Minimum rider age | 16 | 14 | Maximum motor-assisted speed | 32 km/h | 25 km/h | "
                 u"Maximum continuous power output* | 500W | 250W | Throttle assist | Yes | No | "
-                u"\"Wearing a bicycle safety helmet is required when operating an e-bike.\"")),
+                u"“Wearing a bicycle safety helmet is required when operating an e-bike.”")),
     dict(name="Alberta",
          law=u"Traffic Safety Act; Use of Highway and Rules of the Road Regulation, Alta. Reg. 304/2002",
          motor=u"500 W or less, all motors combined", speed=u"32 km/h on level ground",
-         age=u"12", helmet=u"Required \u2014 all ages: an approved motorcycle helmet, or a bicycle helmet",
+         age=u"12", helmet=u"Required — all ages: an approved motorcycle helmet, or a bicycle helmet",
          papers=u"None: no licence, no registration, no insurance",
          where=u"Highways and roads, riding as far to the right as is practicable. A rider under the age of "
                u"16 may not carry a passenger.",
          url="https://www.transportation.alberta.ca/Content/docType41/Production/small_vehicle_booklet_final.pdf",
-         src=u"Alberta Transportation, \u201cRules & Regulations Applying to Small Vehicles\u201d",
+         src=u"Alberta Transportation, “Rules & Regulations Applying to Small Vehicles”",
          date=u"booklet updated November 2018, read 2026-10-09",
-         quote=(u"\"it has a total continuous power output rating, measured at the shaft of each motor, of "
+         quote=(u"“it has a total continuous power output rating, measured at the shaft of each motor, of "
                 u"500 W or less [...] it is incapable of providing further assistance when the bicycle "
                 u"attains a speed of 32 km/h on level ground [...] Minimum driving age: The minimum driving "
-                u"age to operate a power bicycle is 12 years.\"")),
+                u"age to operate a power bicycle is 12 years.”")),
     dict(name="Saskatchewan",
          law=u"The Traffic Safety Act, s. 247.1",
          motor=u"500 W or less", speed=u"32 km/h",
-         age=u"14", helmet=u"Required \u2014 all ages: an approved bicycle or motorcycle helmet",
+         age=u"14", helmet=u"Required — all ages: an approved bicycle or motorcycle helmet",
          papers=u"None: no licence, no registration, no insurance",
          where=u"Under the rules of the road for a bicycle, and not in any area restricted by a municipal "
                u"bylaw.",
          url="https://sgi.sk.ca/motorcycle/-/knowledge_base/motorcycle-handbook/power-assisted-bicycles1",
-         src=u"SGI, \u201cE-bikes (power-assisted bicycles)\u201d",
+         src=u"SGI, “E-bikes (power-assisted bicycles)”",
          date=u"read 2026-10-09",
-         quote=(u"\"is equipped with an electric assist motor that is no larger than 500 watts [...] cannot "
+         quote=(u"“is equipped with an electric assist motor that is no larger than 500 watts [...] cannot "
                 u"be operated at a speed of greater than 32 km/h (20 mph) on any level service [...] Age "
                 u"restriction: 14 years of age or older [...] Operator requires an approved bicycle or "
-                u"motorcycle helmet\"")),
+                u"motorcycle helmet”")),
     dict(name="Manitoba",
          law=u"The Highway Traffic Act, C.C.S.M. c. H60, ss. 1(1), 145",
          motor=u"500 W or less, measured at the shaft", speed=u"32 km/h",
-         age=u"14", helmet=u"Required \u2014 all ages: a properly fitted and fastened protective helmet",
+         age=u"14", helmet=u"Required — all ages: a properly fitted and fastened protective helmet",
          papers=u"None: no licence, no registration, no insurance",
          where=u"Highways and bicycle facilities, with the rights and duties of a driver of a motor "
                u"vehicle, except that a power-assisted bicycle may not be driven on a sidewalk.",
-         url="https://www.gov.mb.ca/sd/parks/_resources/en/pdf/power-assisted-bicycles.pdf",
-         src=u"Manitoba Parks, \u201cThe Use of Power-Assisted Bicycles in Provincial Parks\u201d, quoting "
-             u"The Highway Traffic Act",
-         date=u"read 2026-10-09",
-         quote=(u"\"the motor has a continuous power output rating, measured at its shaft, of 500 W or less "
+         url="https://web2.gov.mb.ca/laws/statutes/ccsm/h060.php",
+         src=u"Manitoba, The Highway Traffic Act, C.C.S.M. c. H60 (s. 1(1) definition; s. 145)",
+         date=u"Act read 2026-10-09",
+         quote=(u"“the motor has a continuous power output rating, measured at its shaft, of 500 W or less "
                 u"[...] the motor cannot provide the vehicle with motive power when it is travelling at more "
-                u"than 32 km/h\" / s. 145: \"No person shall operate a power-assisted bicycle [...] unless he "
-                u"or she is 14 years of age or older\" and \"unless he or she is wearing a properly fitted "
-                u"and fastened protective helmet\"")),
+                u"than 32 km/h” / s. 145(2): “No person shall operate a power-assisted bicycle on a highway "
+                u"or bicycle facility unless they are 14 years of age or older” / s. 145(4): “No person shall "
+                u"ride on or operate a power-assisted bicycle on a highway or bicycle facility unless they "
+                u"are wearing a properly fitted and fastened protective helmet”")),
     dict(name="Ontario",
          law=u"Highway Traffic Act, R.S.O. 1990, c. H.8, and O. Reg. 369/09",
          motor=u"500 W or less", speed=u"32 km/h",
-         age=u"16", helmet=u"Required \u2014 all ages: an approved bicycle or motorcycle helmet",
+         age=u"16", helmet=u"Required — all ages: an approved bicycle or motorcycle helmet",
          papers=u"None: no licence, no registration, no insurance",
          where=u"Most roads and highways where conventional bicycles are permitted. Not on the 400-series "
                u"and other controlled-access highways, and not where a municipal bylaw bans e-bikes.",
          url="https://www.ontario.ca/page/riding-e-bike",
-         src=u"Government of Ontario, \u201cRiding an e-bike\u201d",
+         src=u"Government of Ontario, “Riding an e-bike”",
          date=u"page updated 19 July 2024, read 2026-10-09",
-         quote=(u"\"a maximum assisted speed of 32 km/h [...] a maximum weight of 120 kg [...] an electric "
+         quote=(u"“a maximum assisted speed of 32 km/h [...] a maximum weight of 120 kg [...] an electric "
                 u"motor not exceeding 500 watts [...] you must [...] be 16 or older [...] wear an approved "
-                u"bicycle or motorcycle helmet\"")),
+                u"bicycle or motorcycle helmet”")),
     dict(name="Quebec",
          law=u"Highway Safety Code, and the Protective Helmets Regulation",
          motor=u"500 W or less", speed=u"32 km/h",
-         age=u"18", helmet=u"Required \u2014 all ages: a helmet meeting a listed standard",
+         age=u"18", helmet=u"Required — all ages: a helmet meeting a listed standard",
          papers=u"None at 18 or over; a moped licence (Class 6D) at ages 14 to 17",
          where=u"All public roadways except highways and their access and exit ramps. An electric bike "
                u"cannot be registered, and a combustion engine on a bicycle is prohibited.",
          url="https://saaq.gouv.qc.ca/en/road-safety/modes-transportation/electric-bike",
-         src=u"SAAQ, \u201cRiding an Electric Bike\u201d",
+         src=u"SAAQ, “Riding an Electric Bike”",
          date=u"last updated 25 May 2026",
-         quote=(u"\"the bike's electric motor must have a maximum power rating of no more than 500 watts and "
-                u"must cease to generate power once the bicycle reaches a speed of no more than 32 km/h\" / "
-                u"\"You must be aged 18 or older to ride an electric bike. However, people aged 14 to 17 who "
-                u"hold a Class 6D (moped or scooter) licence are also authorized\"")),
+         quote=(u"“the bike's electric motor must have a maximum power rating of no more than 500 watts and "
+                u"must cease to generate power once the bicycle reaches a speed of no more than 32 km/h” / "
+                u"“You must be aged 18 or older to ride an electric bike. However, people aged 14 to 17 who "
+                u"hold a Class 6D (moped or scooter) licence are also authorized”")),
     dict(name="New Brunswick",
          law=u"Motor Vehicle Act (read through Service New Brunswick's registration page)",
          motor=u"500 W or less", speed=u"32 km/h",
-         age=u"Not set on the page read", helmet=u"Required \u2014 all ages (the province's general bicycle rule)",
+         age=u"Not set on the page read", helmet=u"Required — all ages (the province's general bicycle rule)",
          papers=u"None for a compliant machine; over the limit it cannot be registered unless certified",
          where=u"Treated as a bicycle, so the requirements placed on cyclists apply.",
          url="https://www.gnb.ca/en/topic/driving-transportation/registration-inspection/motor-vehicle-registration.html",
-         src=u"Government of New Brunswick, \u201cMotor vehicle registration\u201d",
-         date=u"read 2026-10-09",
-         quote=(u"\"If the vehicle can be powered by human force and has a motor equal to or less than 500W, "
+         src=u"Government of New Brunswick, “Motor vehicle registration”",
+         date=u"page read 2026-10-09",
+         quote=(u"“If the vehicle can be powered by human force and has a motor equal to or less than 500W, "
                 u"and the motor is not capable of assisting when the vehicle is travelling at a speed "
                 u"greater than 32km/h then it can be considered a bicycle and all the requirements placed on "
-                u"bicyclists are applicable.\"")),
+                u"bicyclists are applicable.”")),
+    dict(name="Nova Scotia",
+         law=u"Motor Vehicle Act, R.S.N.S. 1989, c. 293, s. 2(c)(ii), as amended by Bill 111 (2002) — "
+              u"being replaced by the Traffic Safety Act, S.N.S. 2025, c. 20",
+         motor=u"500 W or less (or a 50 cc piston displacement)",
+         speed=u"Thirty kilometres per hour — the Act writes the figure out in words",
+         age=u"Not set in the Act",
+         helmet=u"Required — all ages (a bicycle helmet, under the Act's Helmet Regulations)",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Roads and highways under the rules of the road for a bicycle; a compliant machine cannot "
+               u"be registered as a motor vehicle.",
+         url="https://nslegislature.ca/legc/bills/58th_2nd/3rd_read/b111.htm",
+         src=u"Nova Scotia House of Assembly, Motor Vehicle Act, Bill 111 (2002), s. 2(c)(ii)",
+         date=u"Bill 111 assented 30 May 2002; read 2026-10-09, with the successor regulation due 19 October 2026",
+         quote=(u"“a vehicle propelled by human and mechanical power that is fitted with pedals that are "
+                u"operable at all times to propel the bicycle [...] and that has an attached motor driven by "
+                u"electricity not producing more than 500 watts or with a piston displacement of not more "
+                u"than 50 cubic centimetres and is incapable of providing further assistance when the "
+                u"vehicle attains a speed of thirty kilometres per hour on level ground”")),
+    dict(name="Prince Edward Island",
+         law=u"Highway Traffic Act, R.S.P.E.I. 1988, c. H-5 — Power-Assisted Bicycles Regulations "
+              u"(P.E.I. Reg. EC557/21)",
+         motor=u"500 W or less, in total, measured at the shaft of each motor", speed=u"32 km/h",
+         age=u"16", helmet=u"Required — all ages: a properly fitted and fastened bicycle safety helmet",
+         papers=u"None: a power-assisted bicycle is deemed not to be a motor vehicle",
+         where=u"Roadways and shoulders, and bicycle lanes where they are provided — not on a sidewalk or "
+               u"walkway, and on a trail only from 1 April to 30 November.",
+         url="https://www.princeedwardisland.ca/sites/default/files/legislation/"
+             "h05-24-1-highway_traffic_act_power-assisted_regulations.pdf",
+         src=u"Government of Prince Edward Island, Power-Assisted Bicycles Regulations",
+         date=u"consolidation current to 23 September 2023, read 2026-10-09",
+         quote=(u"“a total continuous power output rating, measured at the shaft of each motor, of 500 watts "
+                u"or less [...] power assistance ceases when the bicycle attains a speed of 32 kilometres "
+                u"per hour on level ground” / s. 13(2): “No person under the age of 16 years shall operate a "
+                u"power-assisted bicycle.” / s. 13(8): “No person shall ride on or operate a power-assisted "
+                u"bicycle unless the person is wearing a properly fitted and fastened bicycle safety "
+                u"helmet.”")),
+    dict(name="Newfoundland and Labrador",
+         law=u"Highway Traffic Act, R.S.N.L. 1990, c. H-3 — no e-bike class in the Act; the province "
+              u"applies the federal standard",
+         motor=u"500 W or less", speed=u"32 km/h",
+         age=u"Not set in the Act",
+         helmet=u"Required — all ages (fine up to $180)",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"The rules of the road for a bicycle: a rider “has the same rights and duties as a driver "
+               u"of a motor vehicle”. Not on a sidewalk.",
+         url="https://rcmp.ca/en/nl/news/2025/09/"
+             "rcmp-newfoundland-and-labrador-encourages-e-bike-and-bicycle-users-put-safety-first",
+         src=u"Royal Canadian Mounted Police, Newfoundland and Labrador",
+         date=u"release dated 12 September 2025, read 2026-10-09",
+         quote=(u"“In Newfoundland and Labrador, e-bike owners must follow all federal legislation. The "
+                u"e-bike motors cannot be more powerful than 500 watts, with a top speed of 32 km/h. They "
+                u"also must have fully operable pedals [...]” / “Anyone riding an e-bike or bicycle in this "
+                u"province, regardless of age, is required to wear an approved helmet [...] you may be fined "
+                u"up to a maximum of $180.”")),
+    dict(name="Yukon",
+         law=u"Motor Vehicles Act, R.S.Y. 2002, c. 153, s. 1 — “electric power-assisted cycle”",
+         motor=u"500 W or less in total", speed=u"32 km/h",
+         age=u"Not set in the Act",
+         helmet=u"Not set in the Act",
+         papers=u"None: an electric power-assisted cycle is an excluded motor vehicle",
+         where=u"Where cycles may ride; Whitehorse's own E-Bike Regulation Bylaw sorts Class 1, 2 and 3 by "
+               u"trail.",
+         url="https://laws.yukon.ca/cms/images/LEGISLATION/PRINCIPAL/2002/2002-0153/2002-0153.pdf",
+         src=u"Government of Yukon, Motor Vehicles Act, s. 1",
+         date=u"consolidation read 2026-10-09",
+         quote=(u"“electric power-assisted cycle” means a vehicle that (a) has steering handlebars and is "
+                u"equipped with pedals; [...] (d) has one or more motors that are electric only and have, "
+                u"singly or in combination, the following characteristics (i) a continuous power output "
+                u"rating, measured at the shaft of each motor, of 500 W or less in total for the motor or "
+                u"combination of motors, [...] and (iv) the motor or combination of motors is incapable of "
+                u"providing further assistance when the vehicle attains a speed of 32 km/h on level ground")),
+    dict(name="Northwest Territories",
+         law=u"Motor Vehicles Act, R.S.N.W.T. 1988, c. M-16 — no e-bike class; the Department of "
+              u"Infrastructure publishes the power-bicycle rule",
+         motor=u"500 W maximum", speed=u"32 km/h",
+         age=u"None set — the department suggests 12 and over",
+         helmet=u"Not required — an approved motorcycle helmet is recommended",
+         papers=u"None: no licence, no registration, no insurance",
+         where=u"Public roads under the rules of the road; community by-laws may add their own.",
+         url="https://www.idmv.inf.gov.nt.ca/media/81148926-42bf-4d53-9b8f-b5b2fadf6bc3/-KKDZQ/Documents/"
+             "Motorcycle%20Manual.pdf",
+         src=u"Government of the Northwest Territories, Department of Infrastructure, “Motorcycle "
+             u"Operator's Licence Information”",
+         date=u"manual revised March 2020, read 2026-10-09",
+         quote=(u"“A power bicycle is a pedal bicycle with an electric motor (maximum power of 500 watts), a "
+                u"top-speed of 32 km/h, and no prescribed weight, nor allowance to be engine driven. [...] a "
+                u"Driver's Licence is not required to operate.” / “Minimum Driving Age: There is currently no "
+                u"age restriction placed on the operation of power bicycles. However, the Department of "
+                u"Infrastructure strongly recommends that only those 12 years of age or older operate a "
+                u"power bicycle.” / “Helmet: The Department of Infrastructure does not require operators of "
+                u"or passengers on power bicycles to wear a helmet.”")),
+    dict(name="Nunavut",
+         law=u"Traffic Safety Act, R.S.N.W.T. 1988, c. M-16 (as renamed), s. 1, read with the All-terrain "
+              u"Vehicles Act, R.S.N.W.T. 1988, c. A-3, s. 1(1)",
+         motor=u"Not defined in the Act", speed=u"Not defined in the Act",
+         age=u"Not set in the Act",
+         helmet=u"Not set in the Act",
+         papers=u"Not set in the Act",
+         where=u"A motorized pedal bicycle is not a “bicycle” under the Act, and no e-bike class is written "
+               u"into it; the All-terrain Vehicles Act counts “a pedal bicycle with motor attachment” as an "
+               u"all-terrain vehicle, and community by-laws govern use.",
+         url="https://www.nunavutlegislation.ca/sites/default/files/consolidated-law-current/"
+             "consRSNWT1988cM-16.pdf",
+         src=u"Government of Nunavut, Traffic Safety Act, s. 1",
+         date=u"consolidation current to 6 December 2019, read 2026-10-09",
+         quote=(u"“bicycle” means a device having any number of wheels upon which a person sits astride and "
+                u"which is propelled by human muscular power through the use of pedals; (bicyclette)")),
 ]
-RULES_PROV_HEAD = u"Province by province: what each one writes into law"
-RULES_PROV_SUB = (u"One row per province, each read from that province's own government page on the date "
-                  u"shown. Every figure below is in the verbatim quote in the sources at the foot of this "
-                  u"page - the build checks that before it writes the file.")
-RULES_PROV_NOTE = (u"Read the motor column as the one hard line. Every province here caps a power-assisted "
-                   u"bicycle at a 500 W continuous rating, and every one stops motor assistance at a "
-                   u"published speed - so a motor rated above 500 W, or assistance that continues past the "
-                   u"cut-off, is what turns a bicycle into a motor vehicle that needs a licence and "
-                   u"insurance. Two provinces leave a rider rule open: Alberta sets a minimum age without a "
-                   u"licence requirement, and New Brunswick's registration page sets no minimum age at all. "
-                   u"Where a rule is not published, this page says so instead of filling the gap.")
-RULES_PROV_MISSING = (u"Not on this page: Nova Scotia, Prince Edward Island, Newfoundland and Labrador, "
-                      u"Yukon, the Northwest Territories and Nunavut. This page only states what it read on "
-                      u"a government page, and those jurisdictions' own pages have not been read yet - so "
-                      u"they are named here rather than guessed at.")
+
+RULES_PROV_HEAD = u"Province and territory, one by one: what each writes into law"
+RULES_PROV_SUB = (u"One row per province and territory, each read from that jurisdiction's own "
+                  u"government page on the date shown. Every figure below is in the verbatim quote in "
+                  u"the sources at the foot of this page - the build checks that before it writes the "
+                  u"file.")
+RULES_PROV_NOTE = (u"Read the motor column as the one hard line. Every province that writes the rule "
+                   u"caps a power-assisted bicycle at a 500 W continuous rating, and every one of "
+                   u"them stops motor assistance at a published speed - so a motor rated above "
+                   u"500 W, or assistance that continues past the cut-off, is what turns a bicycle "
+                   u"into a motor vehicle that needs a licence and insurance. Three jurisdictions "
+                   u"leave a rider rule open: Alberta sets a minimum age without a licence "
+                   u"requirement, New Brunswick's registration page sets no minimum age at all, and "
+                   u"the territories set none. Where a rule is not published, this page says so "
+                   u"instead of filling the gap.")
+RULES_PROV_MISSING = (u"Where a cell above reads “not set” or “not defined”, the page is reporting "
+                      u"a gap in the law rather than filling one in. Nova Scotia still rides on its Motor "
+                      u"Vehicle Act, which writes its cut-off out in words; the province is replacing "
+                      u"that Act, and the successor regulation - the Traffic Safety Act Interpretation "
+                      u"Regulations, N.S. Reg. 221/2026, published at novascotia.ca/just/regulations - "
+                      u"takes effect 19 October 2026 and sets the figure at 32 km/h. Newfoundland and "
+                      u"Labrador writes no e-bike class into its Highway Traffic Act at all, and applies "
+                      u"the federal standard its RCMP restate; the Northwest Territories and Nunavut "
+                      u"likewise write none, so the rule is published by the territory's own department "
+                      u"(NWT) or left to the municipal by-law (Nunavut). Every one of them is named here "
+                      u"rather than guessed at.")
 
 
 def _rules_prov_row(p):
@@ -2370,17 +2488,17 @@ RULES_SOURCES = "\n        ".join(
                                     u"with tailored operator, vehicle and safety requirements.")))]
     + [_rules_src_block(p) for p in RULES_PROVINCES])
 
-RULES_TITLE = (u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and what each province requires "
+RULES_TITLE = (u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and what each province and territory requires "
                u"| Commuter E-Bikes CA")
 RULES_OGTITLE = u"E-bike classes in Canada: what Class 1, 2 and 3 mean, and where the provinces differ"
-RULES_DESC = (u"What Class 1, 2 and 3 e-bikes mean in Canada, what speed and power each province allows, "
+RULES_DESC = (u"What Class 1, 2 and 3 e-bikes mean in Canada, what speed and power each province and territory allows, "
               u"which helmet is required and where you may ride - every rule quoted from a government page "
               u"and dated, with no affiliate link.")
 RULES_INTRO = (u"Before the price, the motor or the battery: is the machine legal where you ride it? "
                u"Canadian e-bike law is written in watts and kilometres per hour, province by province - "
                u"not as Class 1, 2 or 3. This page sets out what the three classes are (in the words of a "
                u"federal agency that uses them), what Ottawa repealed and when, where a provincial law "
-               u"really does define classes, and what each province requires: motor limit, assist speed, "
+               u"really does define classes, and what each province and territory requires: motor limit, assist speed, "
                u"minimum age, helmet and paperwork. Every figure is quoted from a named government page and "
                u"dated; where a province has not published a rule, the page says so.")
 RULES_DISCLOSURE = (u"this page has no affiliate link and nothing to buy. It carries no partner link, no "
@@ -2485,7 +2603,7 @@ RULES_PAGE = r"""<!doctype html>
     <p class="sub">__PROV_SUB__</p>
     <div class="tablewrap">
       <table class="rules">
-        <caption>One row per province: motor limit, assist cut-off, minimum age, helmet and paperwork, each from that province's own government page.</caption>
+        <caption>One row per province or territory: motor limit, assist cut-off, minimum age, helmet and paperwork, each from that jurisdiction's own government page.</caption>
         <thead><tr>
           <th scope="col">Province</th><th scope="col">Motor limit</th>
           <th scope="col">Assist cut-off</th><th scope="col" class="num">Min. age</th>
@@ -2541,7 +2659,7 @@ RULES_PAGE = r"""<!doctype html>
 <footer><div class="wrap">
   <p><strong>Disclosure:</strong> __DISC__</p>
   <p>This is general information about published e-bike rules, not legal advice, and not advice about your particular riding, health or local by-laws. Rules change; read your province's own page before you buy or ride.</p>
-  <p>Built __CHECKED__ by the GAMMA project. Sources: Transport Canada, Parks Canada, Recreation Sites and Trails BC, and each province's own page &mdash; all named above. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a>.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Sources: Transport Canada, Parks Canada, Recreation Sites and Trails BC, and each province's or territory's own page &mdash; all named above. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a>.</p>
 </div></footer>
 </body>
 </html>
@@ -2611,7 +2729,8 @@ for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="
 
 # 3. no product link: every absolute link on the page is a GOVERNMENT page, never a shop or a maker.
 _RULES_GOV = ("canada.ca", "gov.bc.ca", "alberta.ca", "sgi.sk.ca", "gov.mb.ca", "ontario.ca",
-              "saaq.gouv.qc.ca", "gnb.ca")
+              "saaq.gouv.qc.ca", "gnb.ca", "nslegislature.ca", "novascotia.ca", "princeedwardisland.ca",
+              "rcmp.ca", "yukon.ca", "gov.nt.ca", "nunavutlegislation.ca")
 _rhrefs = re.findall(r'href="([^"]+)"', RULES_TEXT)
 _rext = sorted(h for h in _rhrefs if h.startswith("http") and not h.startswith(SITE))
 _rbad = [h for h in _rext if not h.split("//", 1)[1].split("/", 1)[0].endswith(_RULES_GOV)]
