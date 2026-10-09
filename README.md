@@ -57,6 +57,26 @@ percentage of our own making. The conversions are named on the page (the Discove
 figure, and the Soltera 2.5's 46 mi range, which the maker publishes in miles only). The whole table of
 figures, quoted verbatim, is on the page for the reader to check.
 
+## Measuring whether anyone is reading it
+
+This site counts its own page views, anonymously, with **no account and no analytics product**. Every
+generated page carries a few lines of script that fire one increment per page load, and `stats/` reads
+every counter back and shows it.
+
+- Counter service: [Abacus](https://abacus.jasoncameron.dev) — free, no signup, no key, CORS-enabled.
+  `GET /hit/<namespace>/<key>` increments and answers `{"value": N}`; `GET /get/<namespace>/<key>` reads
+  without incrementing. Namespace `maxhemmerich.github.io`, one key per page
+  (`canada-ebike-compare-<page>`).
+- **Nothing visitor-identifying is sent**: no cookie (`credentials: omit`), no referring page
+  (`referrerPolicy: no-referrer`), no identifier of any kind. The counter names the page. As with any
+  HTTP request the service necessarily sees the requesting IP address; nothing else leaves the page.
+- What it counts is **page loads that ran JavaScript**. A visitor with scripting off is not counted, and
+  a crawler that renders pages is. The number is a floor, not a census, and `stats/` says so.
+- `build.py` owns all of it: every page is written through one `write_page()` call that inserts the
+  beacon, and the build then reads each generated page back off disk and asserts its beacon key matches
+  the key its row on `stats/` will fetch. A drifted key, a missing page or a page with two beacons
+  stops the build before `sitemap.xml` is written.
+
 ## Telling crawlers the pages exist
 
 `indexnow.py` posts every URL in the generated `sitemap.xml` to `https://api.indexnow.org/indexnow`,
@@ -88,8 +108,10 @@ Requires `reportlab` (PDF) only. The pages are plain HTML/CSS/JS.
 - `vs/<a>-vs-<b>/index.html` — generated; one head-to-head page per pair in `build.py`'s `PAIRS` list,
   two columns drawn from the same dataset, linked from the comparison page and from both models' own
   pages, and carrying no affiliate element of any kind
-- `sitemap.xml` — generated; the thirteen indexable URLs (the comparison, the seven bikes, the range
-  picker and the four head-to-head pages)
+- `stats/index.html` — generated; reads every page counter back from the counting service and shows
+  the counts, with its own title, description and canonical URL. Linked from the comparison page footer
+- `sitemap.xml` — generated; the fourteen indexable URLs (the comparison, the seven bikes, the range
+  picker, the four head-to-head pages and `stats/`)
 - `indexnow.py` + `indexnow.key` + `<key>.txt` — the sitemap-submission script, its key, and the
   hosted key file IndexNow verifies
 - `robots.txt` — generated; note it is ignored by crawlers here, because this site sits on a

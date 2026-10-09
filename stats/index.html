@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page views on this site | Commuter E-Bikes CA</title>
+<meta name="description" content="How many page views each page of this Canadian commuter e-bike comparison has been counted for, read live. Counted anonymously: no cookie, no referring page, no identifier.">
+<link rel="canonical" href="https://maxhemmerich.github.io/canada-ebike-compare/stats/">
+<style>
+  :root{
+    --paper:#faf8f4; --ink:#16181d; --muted:#5d6270; --line:#e3ddd1;
+    --accent:#0e6b53; --accent-ink:#0a5340; --amber:#a6550c; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent-ink)}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  header.top{border-bottom:1px solid var(--line);background:var(--paper)}
+  .top .wrap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:14px;padding-bottom:14px}
+  .brand{font:700 15px/1 -apple-system,"Segoe UI",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  .stamp{font-size:13px;color:var(--muted)}
+  h1,h2,h3{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:700;letter-spacing:-.01em}
+  .hero{padding:44px 0 8px}
+  .hero h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:0 0 14px;max-width:20ch}
+  .deck{font-size:19px;color:#333842;max-width:62ch;margin:0 0 22px}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 26px}
+  .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+    font-weight:600;padding:13px 20px;border-radius:8px}
+  .btn:hover{background:var(--accent-ink)}
+  .btn.ghost{background:transparent;color:var(--accent-ink);border:1px solid var(--accent)}
+  .disclosure{background:#fff;border:1px solid var(--line);border-left:4px solid var(--amber);
+    padding:14px 16px;border-radius:6px;font-size:15px;color:#3a3f49;max-width:70ch}
+  .disclosure strong{color:var(--ink)}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  section h2{font-size:clamp(22px,3vw,30px);margin:0 0 6px}
+  .sub{color:var(--muted);margin:0 0 24px;max-width:66ch}
+  .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px 28px}
+  .pick h3{font-size:17px;margin:0 0 4px;font-family:-apple-system,"Segoe UI",sans-serif;font-weight:700}
+  .pick .pickwho{margin:0 0 8px;font-size:14px;color:var(--accent-ink);font-weight:600}
+  .pick p{margin:0;color:#333842;font-size:15px}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+  table{border-collapse:collapse;width:100%;min-width:880px;font-size:13.4px}
+  caption{text-align:left;padding:14px 16px;color:var(--muted);font-size:13px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{position:sticky;top:0;background:#f3efe7;font-size:12px;letter-spacing:.05em;
+    text-transform:uppercase;color:#4a4f59;white-space:nowrap;z-index:1}
+  tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+  th.model{white-space:normal;min-width:150px}
+  .mname{display:block;font-weight:700;font-size:15px}
+  .mmaker{display:block;color:var(--muted);font-size:13px;margin:2px 0 6px}
+  .spec-link{font-size:12.5px;text-decoration:none;border-bottom:1px solid var(--accent)}
+  a.mname{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  a.mname:hover{border-bottom-color:var(--accent)}
+  td.price{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  .aff{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
+  .stock{display:inline-block;margin:1px 0 2px;font-size:11px;font-weight:700;color:#fff;
+    background:var(--amber);padding:1px 6px;border-radius:4px;letter-spacing:.02em}
+  .pickstock{margin:0 0 6px;font-size:12.5px;font-weight:700;color:var(--amber)}
+  .details{display:grid;gap:20px}
+  .detail{border-left:3px solid var(--accent);padding:2px 0 2px 16px}
+  .detail h3{margin:0 0 6px;font-size:18px}
+  .detail .dprice{color:var(--muted);font-family:-apple-system,sans-serif;font-size:15px;font-weight:600}
+  .detail p{margin:0 0 8px;color:#333842;max-width:72ch}
+  .src,.fn{font-size:13px;color:var(--muted)}
+  ul.sources{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+  ul.sources li{border-bottom:1px dashed var(--line);padding-bottom:12px;max-width:78ch}
+  .note{font-size:14px;color:var(--muted);max-width:72ch}
+  footer{border-top:1px solid var(--line);padding:28px 0 50px;color:var(--muted);font-size:13.5px}
+  footer p{margin:0 0 8px;max-width:78ch}
+
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .stathero{padding:30px 0 8px}
+  .stathero h1{font-size:clamp(26px,4.4vw,40px);line-height:1.12;margin:0 0 10px;max-width:24ch}
+  .statwrap{border:1px solid var(--line);border-radius:10px;background:var(--card);overflow-x:auto}
+  table.stats{min-width:560px}
+  table.stats td.num,table.stats th.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  table.stats td.pkey{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all}
+  table.stats tr.total th,table.stats tr.total td{border-top:2px solid var(--line);font-weight:700}
+  #status{font-size:14px;color:var(--muted);max-width:78ch;margin:0 0 18px}
+  ol.method{margin:0;padding-left:22px}
+  ol.method li{margin:0 0 9px;max-width:76ch;color:#333842}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="brand">Commuter E-Bikes CA</span>
+  <span class="stamp">Counts read <strong id="asof">&hellip;</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="stathero" style="border-top:none">
+    <p class="crumb"><a href="../">&larr; The comparison</a></p>
+    <h1>Page views on this site</h1>
+    <p class="deck">This site counts its own page views, anonymously, and shows the number here. The reason is blunt: a comparison site nobody finds earns nothing, and until this page existed there was no way to tell whether anyone was finding this one.</p>
+    <p id="status">Reading the counters&hellip;</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links and nothing to buy. It carries no analytics product, no cookie and no third-party script beyond the count described below.</p>
+  </section>
+
+  <section id="counts">
+    <h2>The counts</h2>
+    <p class="sub">One row per page on this site, read live from the counting service when this page loaded. Reload to refresh.</p>
+    <div class="statwrap">
+      <table class="stats">
+        <caption>Every count below is fetched directly from your browser to the counting service, so this page serves the same bytes to everyone &mdash; no number is baked into the file.</caption>
+        <thead><tr><th scope="col">Page</th><th scope="col">Counter key</th><th scope="col" class="num">Views</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><a href="../">The comparison &mdash; the landing page</a></th><td class="pkey">canada-ebike-compare-index</td><td class="num" data-metric-key="canada-ebike-compare-index">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/aventon-soltera-2-5/">Aventon Soltera 2.5 — CA$1,699</a></th><td class="pkey">canada-ebike-compare-bikes-aventon-soltera-2-5</td><td class="num" data-metric-key="canada-ebike-compare-bikes-aventon-soltera-2-5">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/radkick-7speed/">Rad Power Bikes RadKick 7-Speed — CA$1,899</a></th><td class="pkey">canada-ebike-compare-bikes-radkick-7speed</td><td class="num" data-metric-key="canada-ebike-compare-bikes-radkick-7speed">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/velotric-tempo/">Velotric Tempo — CA$2,099</a></th><td class="pkey">canada-ebike-compare-bikes-velotric-tempo</td><td class="num" data-metric-key="canada-ebike-compare-bikes-velotric-tempo">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/velotric-discover-3/">Velotric Discover 3 — CA$2,699</a></th><td class="pkey">canada-ebike-compare-bikes-velotric-discover-3</td><td class="num" data-metric-key="canada-ebike-compare-bikes-velotric-discover-3">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/radster-road/">Rad Power Bikes Radster Road — CA$2,699</a></th><td class="pkey">canada-ebike-compare-bikes-radster-road</td><td class="num" data-metric-key="canada-ebike-compare-bikes-radster-road">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/surface604-rook/">Surface 604 Rook — CA$2,699</a></th><td class="pkey">canada-ebike-compare-bikes-surface604-rook</td><td class="num" data-metric-key="canada-ebike-compare-bikes-surface604-rook">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../bikes/ohm-cruise-3/">OHM Cruise 3 — CA$3,499</a></th><td class="pkey">canada-ebike-compare-bikes-ohm-cruise-3</td><td class="num" data-metric-key="canada-ebike-compare-bikes-ohm-cruise-3">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../how-far/">How far will it go? &mdash; the range picker</a></th><td class="pkey">canada-ebike-compare-how-far</td><td class="num" data-metric-key="canada-ebike-compare-how-far">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../vs/discover-3-vs-rook/">Velotric Discover 3 vs Surface 604 Rook</a></th><td class="pkey">canada-ebike-compare-vs-discover-3-vs-rook</td><td class="num" data-metric-key="canada-ebike-compare-vs-discover-3-vs-rook">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../vs/tempo-vs-radkick-7-speed/">Velotric Tempo vs Rad Power Bikes RadKick 7-Speed</a></th><td class="pkey">canada-ebike-compare-vs-tempo-vs-radkick-7-speed</td><td class="num" data-metric-key="canada-ebike-compare-vs-tempo-vs-radkick-7-speed">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../vs/soltera-2-5-vs-tempo/">Aventon Soltera 2.5 vs Velotric Tempo</a></th><td class="pkey">canada-ebike-compare-vs-soltera-2-5-vs-tempo</td><td class="num" data-metric-key="canada-ebike-compare-vs-soltera-2-5-vs-tempo">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../vs/cruise-3-vs-discover-3/">OHM Cruise 3 vs Velotric Discover 3</a></th><td class="pkey">canada-ebike-compare-vs-cruise-3-vs-discover-3</td><td class="num" data-metric-key="canada-ebike-compare-vs-cruise-3-vs-discover-3">&hellip;</td></tr>
+          <tr><th scope="row"><a href="../stats/">This page &mdash; the counts</a></th><td class="pkey">canada-ebike-compare-stats</td><td class="num" data-metric-key="canada-ebike-compare-stats">&hellip;</td></tr>
+          <tr class="total"><th scope="row" colspan="2">All pages</th><td class="num" id="total">&hellip;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>What is counted, and what is not</h2>
+    <ol class="method">
+      <li><strong>Counted:</strong> one anonymous increment per page load, fired by a few lines of script that every page on this site carries. The counter names the <em>page</em>, and nothing else.</li>
+      <li><strong>Not counted:</strong> any visitor with JavaScript switched off &mdash; and <strong>counted:</strong> any software that loads a page and runs scripts, crawlers included. These numbers are a floor, not a census; a small number is not proof that nobody looked.</li>
+      <li><strong>What leaves a visitor's browser:</strong> one plain GET carrying no cookie (<code>credentials: omit</code>), no referring page (<code>referrerPolicy: no-referrer</code>) and no identifier of any kind. A counting service, like any web server, necessarily sees the requesting IP address; nothing else about a visitor is sent or stored.</li>
+      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="https://abacus.jasoncameron.dev" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>maxhemmerich.github.io</code>. Each value is readable directly at <code>https://abacus.jasoncameron.dev/get/maxhemmerich.github.io/&lt;key&gt;</code>. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero.</li>
+      <li><strong>Nothing is sold, profiled or shared.</strong> There is no analytics product here, no cross-site tracking and no attempt to identify anyone. The only use made of these numbers is knowing whether this site is being read.</li>
+    </ol>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this site carries no live affiliate links. No purchase through this page earns anyone a commission today, and nothing on this page is paid for.</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws.</p>
+  <p>Built 2026-10-08 by the GAMMA project. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="../how-far/">the range picker</a>.</p>
+</div></footer>
+
+<script>
+(function(){
+  var BASE = "https://abacus.jasoncameron.dev/get/maxhemmerich.github.io/";
+  var cells = Array.prototype.slice.call(document.querySelectorAll("[data-metric-key]"));
+  var status = document.getElementById("status");
+  var total = document.getElementById("total");
+  var asof = document.getElementById("asof");
+  var stamp = new Date();
+  var sum = 0, read = 0, missing = 0, failed = 0;
+  asof.textContent = stamp.toLocaleString();
+  function finish(){
+    if (read + missing + failed < cells.length) return;
+    total.textContent = sum.toLocaleString() + (failed ? " (partial)" : "");
+    status.textContent = "Read " + read + " of " + cells.length + " counters"
+      + (missing ? ", of which " + missing + " have never been hit and are shown as 0" : "")
+      + (failed ? ", and " + failed + " could not be reached (shown as \"unavailable\" and excluded from the total)" : "")
+      + ". Read at " + stamp.toLocaleString() + ". These are page loads that ran scripts, not people.";
+  }
+  cells.forEach(function(td){
+    fetch(BASE + td.getAttribute("data-metric-key"), {cache:"no-store"})
+      .then(function(r){
+        if (r.status === 404) { missing++; td.textContent = "0"; td.title = "no hit has reached this page yet"; return; }
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json().then(function(j){ read++; var v = j.value|0; sum += v; td.textContent = v.toLocaleString(); });
+      })
+      .catch(function(){ failed++; td.textContent = "unavailable"; })
+      .then(finish);
+  });
+  finish();
+})();
+</script>
+<script>
+/* Page-view count. One anonymous increment, read back on the stats page. */
+(function(){
+  try{
+    fetch("https://abacus.jasoncameron.dev/hit/maxhemmerich.github.io/canada-ebike-compare-stats", {mode:"no-cors", cache:"no-store", credentials:"omit",
+      referrerPolicy:"no-referrer", keepalive:true});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

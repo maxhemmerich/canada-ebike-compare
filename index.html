@@ -164,7 +164,7 @@
 <footer><div class="wrap">
   <p><strong>Disclosure (repeated):</strong> this site carries no live affiliate links. Links marked "maker specs" go to the manufacturer's own page, unmonetised. If paid partner links are added later, they will be labelled as such here and on the button itself.</p>
   <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
-  <p>Built 2026-10-08 by the GAMMA project. Data: <a href="data/products.json">products.json</a>.</p>
+  <p>Built 2026-10-08 by the GAMMA project. Data: <a href="data/products.json">products.json</a> &middot; page views: <a href="stats/">the counts</a>.</p>
 </div></footer>
 
 <script src="config.js"></script>
@@ -184,6 +184,15 @@
     var live = cfg[affMap[id]];
     el.textContent = live ? "affiliate link" : "";
   });
+})();
+</script>
+<script>
+/* Page-view count. One anonymous increment, read back on the stats page. */
+(function(){
+  try{
+    fetch("https://abacus.jasoncameron.dev/hit/maxhemmerich.github.io/canada-ebike-compare-index", {mode:"no-cors", cache:"no-store", credentials:"omit",
+      referrerPolicy:"no-referrer", keepalive:true});
+  }catch(e){}
 })();
 </script>
 </body>

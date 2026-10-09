@@ -9,6 +9,61 @@ PRODUCTS = DATA["products"]
 BY_ID = {p["id"]: p for p in PRODUCTS}
 CHECKED = DATA["checked_on"]
 
+# ---------------------------------------------------------------- counting (no account, no vendor SDK, no cookie)
+# This lane lives on organic search traffic and had no way to tell whether it gets any. It is measured
+# with one free counter that needs no account, no signup and no API key — Abacus
+# (https://abacus.jasoncameron.dev, "Integer as a Service"; every response is CORS-enabled):
+#   GET /hit/<namespace>/<key>  -> increment by one, answer {"value": N} (creates the key on first hit)
+#   GET /get/<namespace>/<key>  -> read only, never increments; 404 {"error":"Key not found"} if absent
+# Measured live before this was wired (2026-10-08): 404 -> hit x3 -> {1,2,3} -> get {3} -> get {3}
+# (a read does not move the number) -> hit -> {4}; /info said is_genuine true, TTL 4031h59m59s.
+# Rejected on measurement, not assumption: counterapi.dev v1 -> 410 Gone, its v2 -> 404 "Workspace not
+# found" (it wants a registered workspace), countapi.xyz -> no response at all, visitorbadge -> 403.
+#
+# What is sent: one anonymous GET per page load, naming the PAGE. No cookie (credentials: omit), no
+# referring page (referrerPolicy: no-referrer), no visitor id, no fingerprint — nothing that identifies
+# a person. As with any HTTP request, the counter service necessarily sees the requesting IP address.
+# What is counted: page loads that ran JavaScript. A load with scripting off is not counted; software
+# that renders pages and runs scripts — including a crawler that does — is. So the number is a floor,
+# never a census, and /stats/ says so in those words.
+# Keys expire after 6 months of no access; the /stats/ page reads every key, which resets that clock.
+METRIC_HOST = "abacus.jasoncameron.dev"
+METRIC_BASE = "https://" + METRIC_HOST
+METRIC_NS = "maxhemmerich.github.io"    # the service's own advice: use the site's domain as namespace
+METRIC_PREFIX = "canada-ebike-compare"  # this repo's slug, so no other site on this host can collide
+
+def metric_key(segment):
+    """One counter key per generated page. The service allows ^[A-Za-z0-9_-.]{3,64}$; asserted here."""
+    key = "%s-%s" % (METRIC_PREFIX, segment)
+    assert re.match(r"^[A-Za-z0-9_.-]{3,64}$", key), "counter key outside the service's charset: %r" % key
+    return key
+
+def track_js(segment):
+    """The beacon, as one string. Invisible by construction: no element, no class, no styles — nothing
+    that can appear in the page's layout or disturb its one theme. One fire-and-forget GET per load."""
+    return (
+        '<script>\n'
+        '/* Page-view count. One anonymous increment, read back on the stats page. */\n'
+        '(function(){\n'
+        '  try{\n'
+        '    fetch("%s/hit/%s/%s", {mode:"no-cors", cache:"no-store", credentials:"omit",\n'
+        '      referrerPolicy:"no-referrer", keepalive:true});\n'
+        '  }catch(e){}\n'
+        '})();\n'
+        '</script>\n' % (METRIC_BASE, METRIC_NS, metric_key(segment)))
+
+def write_page(path, html_text, segment):
+    """THE one write path for every generated HTML page. A page cannot be written without its beacon,
+    and a page with no </body> cannot be written either: both are asserted before the file is touched."""
+    assert html_text.count("</body>") == 1, "%s: not exactly one </body> (found %d)" % (
+        path, html_text.count("</body>"))
+    out = html_text.replace("</body>", track_js(segment) + "</body>")
+    beacon = "%s/hit/%s/%s" % (METRIC_BASE, METRIC_NS, metric_key(segment))
+    assert out.count(beacon) == 1, "%s: beacon not inserted exactly once" % path
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    open(path, "w", encoding="utf-8").write(out)
+    print("wrote %s" % os.path.relpath(path, ROOT).replace(os.sep, "/"))
+
 # ---------------------------------------------------------------- order
 # ONE deterministic order for every list of the bikes, on the page and in the PDF.
 # The table caption promises cheapest-to-dearest, so sort by price ascending. Three models
@@ -363,7 +418,7 @@ __ROWS__
 <footer><div class="wrap">
   <p><strong>Disclosure (repeated):</strong> this site carries no live affiliate links. Links marked "maker specs" go to the manufacturer's own page, unmonetised. If paid partner links are added later, they will be labelled as such here and on the button itself.</p>
   <p>This is general product information, not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying. Prices and stock change daily.</p>
-  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="data/products.json">products.json</a>.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="data/products.json">products.json</a> &middot; page views: <a href="stats/">the counts</a>.</p>
 </div></footer>
 
 <script src="config.js"></script>
@@ -402,8 +457,7 @@ out = (PAGE
        .replace("__DETAILS__", DETAILS_HTML)
        .replace("__PAIRS__", PAIR_CARDS)
        .replace("__SOURCES__", SOURCES_HTML))
-open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8").write(out)
-print("wrote index.html")
+write_page(os.path.join(ROOT, "index.html"), out, "index")
 
 # ================================================================ per-bike pages, sitemap, robots.txt
 # One indexable URL per model, generated from the same dataset as the comparison page so a rebuild
@@ -582,10 +636,7 @@ def bike_html(p):
             .replace("__AFFJS__", BIKE_AFF_JS))
 
 for p in ORDER:
-    d = os.path.join(ROOT, "bikes", p["id"])
-    os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(bike_html(p))
-    print("wrote bikes/%s/index.html" % p["id"])
+    write_page(os.path.join(ROOT, "bikes", p["id"], "index.html"), bike_html(p), "bikes-%s" % p["id"])
 
 # ================================================================ "how far will it go" range picker
 # The one page here that answers a question instead of listing a spec sheet: a buyer types a round-trip
@@ -844,9 +895,7 @@ _picker_out = (PICKER_PAGE
                .replace("__FIGROWS__", FIG_ROWS)
                .replace("__BIKELINKS__", BIKE_LINKS)
                .replace("__PICKERDATA__", PICKER_DATA))
-os.makedirs(os.path.join(ROOT, "how-far"), exist_ok=True)
-open(os.path.join(ROOT, "how-far", "index.html"), "w", encoding="utf-8").write(_picker_out)
-print("wrote how-far/index.html")
+write_page(os.path.join(ROOT, "how-far", "index.html"), _picker_out, "how-far")
 
 # ================================================================ head-to-head "vs" pages
 # One page per pair in the PAIRS list at the top of this file: two columns, every cell a field already
@@ -1005,17 +1054,175 @@ def vs_page(a, b):
            .replace("__WHO__", who)
            .replace("__NEXT__", "\n      ".join(links))
            .replace("__SOURCES__", "\n      ".join(source_html(q) for q in (pa, pb))))
-    d = os.path.join(ROOT, "vs", slug)
-    os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(out)
-    print("wrote vs/%s/index.html" % slug)
+    write_page(os.path.join(ROOT, "vs", slug, "index.html"), out, "vs-%s" % slug)
 
 for _pa, _pb in PAIRS:
     vs_page(_pa, _pb)
 
+# ================================================================ the reader: /stats/
+# A count nobody can read is not a measurement. This page reads every key back through the service's
+# /get endpoint and shows what it finds, so "how much traffic does this lane get" has an answer that
+# can be checked rather than asserted. Generated here like every other page: its own title, its own
+# meta description, its own canonical, listed in sitemap.xml, and linked from the landing page footer.
+SITE_PATH = "/canada-ebike-compare"
+assert SITE.endswith(SITE_PATH), "SITE_PATH has drifted from SITE"
+
+def metric_segment(path):
+    """The beacon's segment for a page, derived from the page's own path so the two cannot drift."""
+    return "index" if not path else path.replace("/", "-")
+
+# Every page this build generates, in page order: (site-relative path, the name shown on /stats/).
+METRIC_PAGES = (
+    [("", "The comparison &mdash; the landing page")]
+    + [("bikes/%s" % p["id"], "%s %s \u2014 %s" % (p["maker"], p["model"], p["price_display"]))
+       for p in ORDER]
+    + [("how-far", "How far will it go? &mdash; the range picker")]
+    + [("vs/%s" % s, "%s" % pair_label(*pair)) for s, pair in zip(PAIR_SLUGS, PAIRS)]
+    + [("stats", "This page &mdash; the counts")]
+)
+
+STATS_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page views on this site | Commuter E-Bikes CA</title>
+<meta name="description" content="How many page views each page of this Canadian commuter e-bike comparison has been counted for, read live. Counted anonymously: no cookie, no referring page, no identifier.">
+<link rel="canonical" href="__CANONICAL__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .stathero{padding:30px 0 8px}
+  .stathero h1{font-size:clamp(26px,4.4vw,40px);line-height:1.12;margin:0 0 10px;max-width:24ch}
+  .statwrap{border:1px solid var(--line);border-radius:10px;background:var(--card);overflow-x:auto}
+  table.stats{min-width:560px}
+  table.stats td.num,table.stats th.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  table.stats td.pkey{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);word-break:break-all}
+  table.stats tr.total th,table.stats tr.total td{border-top:2px solid var(--line);font-weight:700}
+  #status{font-size:14px;color:var(--muted);max-width:78ch;margin:0 0 18px}
+  ol.method{margin:0;padding-left:22px}
+  ol.method li{margin:0 0 9px;max-width:76ch;color:#333842}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="brand">Commuter E-Bikes CA</span>
+  <span class="stamp">Counts read <strong id="asof">&hellip;</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="stathero" style="border-top:none">
+    <p class="crumb"><a href="../">&larr; The comparison</a></p>
+    <h1>Page views on this site</h1>
+    <p class="deck">This site counts its own page views, anonymously, and shows the number here. The reason is blunt: a comparison site nobody finds earns nothing, and until this page existed there was no way to tell whether anyone was finding this one.</p>
+    <p id="status">Reading the counters&hellip;</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links and nothing to buy. It carries no analytics product, no cookie and no third-party script beyond the count described below.</p>
+  </section>
+
+  <section id="counts">
+    <h2>The counts</h2>
+    <p class="sub">One row per page on this site, read live from the counting service when this page loaded. Reload to refresh.</p>
+    <div class="statwrap">
+      <table class="stats">
+        <caption>Every count below is fetched directly from your browser to the counting service, so this page serves the same bytes to everyone &mdash; no number is baked into the file.</caption>
+        <thead><tr><th scope="col">Page</th><th scope="col">Counter key</th><th scope="col" class="num">Views</th></tr></thead>
+        <tbody>
+__ROWS__
+          <tr class="total"><th scope="row" colspan="2">All pages</th><td class="num" id="total">&hellip;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>What is counted, and what is not</h2>
+    <ol class="method">
+      <li><strong>Counted:</strong> one anonymous increment per page load, fired by a few lines of script that every page on this site carries. The counter names the <em>page</em>, and nothing else.</li>
+      <li><strong>Not counted:</strong> any visitor with JavaScript switched off &mdash; and <strong>counted:</strong> any software that loads a page and runs scripts, crawlers included. These numbers are a floor, not a census; a small number is not proof that nobody looked.</li>
+      <li><strong>What leaves a visitor's browser:</strong> one plain GET carrying no cookie (<code>credentials: omit</code>), no referring page (<code>referrerPolicy: no-referrer</code>) and no identifier of any kind. A counting service, like any web server, necessarily sees the requesting IP address; nothing else about a visitor is sent or stored.</li>
+      <li><strong>Where the numbers live:</strong> the counters are kept by <a href="https://abacus.jasoncameron.dev" target="_blank" rel="noopener">Abacus</a>, a free counting API that needs no account, no signup and no key, under the namespace <code>__NS__</code>. Each value is readable directly at <code>__BASE__/get/__NS__/&lt;key&gt;</code>. It is a third party with no uptime promise: where it cannot be reached, the rows above say so rather than showing a zero.</li>
+      <li><strong>Nothing is sold, profiled or shared.</strong> There is no analytics product here, no cross-site tracking and no attempt to identify anyone. The only use made of these numbers is knowing whether this site is being read.</li>
+    </ol>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this site carries no live affiliate links. No purchase through this page earns anyone a commission today, and nothing on this page is paid for.</p>
+  <p>This is general product information, not advice about your particular riding, health or local by-laws.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a> &middot; <a href="../how-far/">the range picker</a>.</p>
+</div></footer>
+
+<script>
+(function(){
+  var BASE = "__BASE__/get/__NS__/";
+  var cells = Array.prototype.slice.call(document.querySelectorAll("[data-metric-key]"));
+  var status = document.getElementById("status");
+  var total = document.getElementById("total");
+  var asof = document.getElementById("asof");
+  var stamp = new Date();
+  var sum = 0, read = 0, missing = 0, failed = 0;
+  asof.textContent = stamp.toLocaleString();
+  function finish(){
+    if (read + missing + failed < cells.length) return;
+    total.textContent = sum.toLocaleString() + (failed ? " (partial)" : "");
+    status.textContent = "Read " + read + " of " + cells.length + " counters"
+      + (missing ? ", of which " + missing + " have never been hit and are shown as 0" : "")
+      + (failed ? ", and " + failed + " could not be reached (shown as \"unavailable\" and excluded from the total)" : "")
+      + ". Read at " + stamp.toLocaleString() + ". These are page loads that ran scripts, not people.";
+  }
+  cells.forEach(function(td){
+    fetch(BASE + td.getAttribute("data-metric-key"), {cache:"no-store"})
+      .then(function(r){
+        if (r.status === 404) { missing++; td.textContent = "0"; td.title = "no hit has reached this page yet"; return; }
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json().then(function(j){ read++; var v = j.value|0; sum += v; td.textContent = v.toLocaleString(); });
+      })
+      .catch(function(){ failed++; td.textContent = "unavailable"; })
+      .then(finish);
+  });
+  finish();
+})();
+</script>
+</body>
+</html>
+"""
+
+STATS_ROWS = "\n".join(
+    '          <tr><th scope="row"><a href="../%s">%s</a></th>'
+    '<td class="pkey">%s</td>'
+    '<td class="num" data-metric-key="%s">&hellip;</td></tr>'
+    % (esc(path + "/" if path else ""), label, esc(metric_key(metric_segment(path))),
+       esc(metric_key(metric_segment(path))))
+    for path, label in METRIC_PAGES)
+
+_stats_out = (STATS_PAGE
+              .replace("__CSS__", CSS)
+              .replace("__CANONICAL__", "%s/stats/" % SITE)
+              .replace("__ROWS__", STATS_ROWS)
+              .replace("__NS__", esc(METRIC_NS))
+              .replace("__BASE__", esc(METRIC_BASE))
+              .replace("__CHECKED__", esc(CHECKED)))
+write_page(os.path.join(ROOT, "stats", "index.html"), _stats_out, "stats")
+
+# ---------------------------------------------------------------- the beacon and the reader must agree
+# A statistics page that reads a key no page writes is fiction, and a page whose beacon drifted from
+# its row is a blind spot. So every generated page is read back off disk and its beacon key compared
+# with the key its row on /stats/ will fetch. Any mismatch, any extra or any missing page stops the
+# build - before sitemap.xml is written.
+_BEACON_RE = re.compile(r'fetch\("https://[^"]*/hit/[^/]+/([A-Za-z0-9_.-]+)"')
+for _path, _label in METRIC_PAGES:
+    _file = os.path.join(ROOT, _path, "index.html")
+    _want = [metric_key(metric_segment(_path))]
+    _got = _BEACON_RE.findall(open(_file, encoding="utf-8").read())
+    assert _got == _want, "beacon/reader mismatch in %s: beacon %r, row %r" % (_file, _got, _want)
+    print("beacon ok: %s -> %s" % (os.path.relpath(_file, ROOT).replace(os.sep, "/"), _want[0]))
+_KEYS = [metric_key(metric_segment(p)) for p, _ in METRIC_PAGES]
+assert len(set(_KEYS)) == len(_KEYS), "two pages share one counter key"
+
 # ---------------------------------------------------------------- sitemap + robots
 URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
-        + ["%s/how-far/" % SITE] + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
+        + ["%s/how-far/" % SITE] + ["%s/stats/" % SITE]
+        + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
            + "\n".join("  <url><loc>%s</loc><lastmod>%s</lastmod></url>" % (u, esc(CHECKED)) for u in URLS)
