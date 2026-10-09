@@ -3855,6 +3855,57 @@ def _og_title_of(html_text):
     return re.sub(r"\s*\|\s*Commuter E-Bikes CA\s*$", "", t)
 
 
+# ---------------------------------------------------------------- structured data: one block per money page
+# A comparison page and a model page are the two page kinds here a search engine can turn into a richer
+# result, and until this wake neither carried a single machine-readable fact - while every shop-owned page
+# ranking above this one (Shopify stores emit Product JSON-LD by default) carries one. So each gets exactly
+# one JSON-LD block: the comparison an ItemList of the seven models in the published order, each model page
+# a Product carrying the maker's own price. Every value is lifted from data/products.json, the same
+# catalogue the page renders, so the block cannot assert anything the page does not; the build reads every
+# one of them back below.
+AVAIL_SCHEMA = {"Out of stock": "https://schema.org/OutOfStock",
+                "Limited stock": "https://schema.org/LimitedAvailability",
+                "In stock": "https://schema.org/InStock"}
+
+
+def _schema_availability(text):
+    """The schema.org availability for the maker's own stock string, or the build stops.
+
+    This is the one hand-written mapping in the block, so it is exact and it refuses an unknown string
+    rather than guessing one - a new stock wording cannot quietly become 'InStock'.
+    """
+    for key, val in AVAIL_SCHEMA.items():
+        if key.lower() in text.lower():
+            return val
+    raise AssertionError("no schema.org availability for the maker's own stock string %r" % text)
+
+
+def _ldjson_for(path, title):
+    """The one structured-data block a page carries, or None if this page is not a money page."""
+    title = html.unescape(title)
+    if path == "":
+        return {"@context": "https://schema.org", "@type": "ItemList", "name": title,
+                "numberOfItems": N, "itemListOrder": "https://schema.org/ItemListOrderAscending",
+                "itemListElement": [
+                    {"@type": "ListItem", "position": i, "name": "%s %s" % (p["maker"], p["model"]),
+                     "url": "%s/bikes/%s/" % (SITE, p["id"])} for i, p in enumerate(ORDER, 1)]}
+    if path.startswith("bikes/"):
+        p = BY_ID.get(path.split("/", 1)[1])
+        if p is None:
+            return None
+        offer = {"@type": "Offer", "price": p["price_cad"], "priceCurrency": "CAD",
+                 "url": p["source_url"]}
+        if p.get("availability"):
+            offer["availability"] = _schema_availability(p["availability"])
+        return {"@context": "https://schema.org", "@type": "Product",
+                "name": "%s %s" % (p["maker"], p["model"]),
+                "brand": {"@type": "Brand", "name": p["maker"]},
+                "url": "%s/bikes/%s/" % (SITE, p["id"]),
+                "image": "%s/og/%s.png" % (SITE, metric_segment(path)),
+                "offers": offer}
+    return None
+
+
 os.makedirs(OG_DIR, exist_ok=True)
 OG_BY_PAGE = {}
 for _path, _label in METRIC_PAGES:
@@ -3898,6 +3949,13 @@ for _path, _label in METRIC_PAGES:
     else:
         _text = _text.replace('<meta name="twitter:card" content="summary">',
                               '<meta name="twitter:card" content="summary_large_image">', 1)
+    # The structured-data block. json.dumps with no spaces keeps it one deterministic line, and because it
+    # is a <script> every "no tracking attribute" sweep that strips scripts is blind to it by design - the
+    # link gate resolves its url values instead.
+    _ld = _ldjson_for(_path, _title)
+    if _ld is not None:
+        _add.append('<script type="application/ld+json">%s</script>'
+                    % json.dumps(_ld, ensure_ascii=False, separators=(",", ":")))
     assert "</head>" in _text, "%s has no </head> to place a social card in" % _file
     _text = _text.replace("</head>", "%s\n</head>" % "\n".join(_add), 1)
     open(_file, "w", encoding="utf-8").write(_text)
@@ -3931,60 +3989,60 @@ for _path, _label in METRIC_PAGES:
 print("share cards: %d pages, one %dx%d PNG each in og/, every page naming its own card and no other"
       % (len(METRIC_PAGES), OG_W, OG_H))
 
-# ================================================================ every internal link resolves, or the build stops
-# Found by hand on the live site 2026-10-09, not by this build: the range picker's result cards are built in
-# JavaScript from the "url" fields of its own JSON block, and those fields were written as site-root paths
-# ("bikes/<id>/"). Served from /how-far/, the browser resolved each one to /how-far/bikes/<id>/ - both links on
-# every result card a 404 - and nothing caught it, because no part of the build had ever read its own links
-# back. So it does now, from the files on disk after everything is written. Two checks:
-#   1. every literal relative href/src on every generated page resolves to a file that exists in the tree
-#      (fragment-only refs, mailto:/tel:, and absolute URLs are not this check's business);
-#   2. every URL inside a page's own <script type="application/json"> data block resolves from THAT page's
-#      directory - the JavaScript-built link the literal sweep cannot see.
-import posixpath
-
-def _tree_target(page_dir, ref):
-    """Where one relative reference lands inside the built tree, as a posix path ('' == the root)."""
-    t = posixpath.normpath(posixpath.join(page_dir, ref))
-    return "" if t in (".", "/") else t
-
-def _exists(target):
-    full = os.path.join(ROOT, *[x for x in target.split("/") if x])
-    if os.path.isdir(full):
-        full = os.path.join(full, "index.html")
-    return os.path.isfile(full)
-
-_LINK_RE = re.compile(r'(?<![\w-])(?:href|src)="([^"]*)"')
-_JSON_RE = re.compile(r'<script type="application/json"[^>]*>(.*?)</script>', re.S)
-# A script body is code, not markup: an inline template like '<a href="' + m.url + '">' would otherwise be read
-# as a link of its own. Strip every script element before the literal sweep; the JSON check below covers the
-# one data block whose values ARE links.
-_SCRIPT_RE = re.compile(r"<script\b[^>]*>.*?</script>", re.S)
-_SKIP = ("#", "//", "http:", "https:", "mailto:", "tel:", "data:", "javascript:")
-_links = 0
+# 4. the structured data, read back the same way: the pages that should carry a block do and no page carries
+#    a second; the comparison's list is the whole catalogue in the published order; and every model block's
+#    price and source URL equal the catalogue's, so the block cannot drift from the page it sits on.
+_ld_seen = {}
 for _path, _label in METRIC_PAGES:
     _text = open(os.path.join(ROOT, _path, "index.html"), encoding="utf-8").read()
-    for _ref in _LINK_RE.findall(_SCRIPT_RE.sub("", _text)):
-        if not _ref or _ref.startswith(_SKIP):
-            continue
-        _ref = _ref.split("#", 1)[0]
-        if not _ref:
-            continue
-        _t = _tree_target(_path, _ref)
-        assert _exists(_t), "%s: %r points at %r, which is not in the tree" % (_path or "index.html", _ref, _t)
-        _links += 1
-    for _block in _JSON_RE.findall(_text):
-        try:
-            _data = json.loads(_block)
-        except ValueError:
-            continue
-        for _item in (_data if isinstance(_data, list) else []):
-            if not (isinstance(_item, dict) and "url" in _item):
-                continue
-            _ref = str(_item["url"]).split("#", 1)[0]
-            _t = _tree_target(_path, _ref)
-            assert _exists(_t), \
-                "%s: a data url %r points at %r, which is not in the tree" % (_path, _ref, _t)
-            _links += 1
-print("internal links: %d relative references over %d pages, every one resolving inside the tree"
-      % (_links, len(METRIC_PAGES)))
+    _blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', _text, re.S)
+    assert len(_blocks) <= 1, "%s carries more than one JSON-LD block" % (_path or "index.html")
+    _ld_seen[_path] = json.loads(_blocks[0]) if _blocks else None
+_ld_root = _ld_seen[""]
+assert _ld_root is not None and _ld_root["@type"] == "ItemList", "the comparison carries no ItemList"
+assert len(_ld_root["itemListElement"]) == N and _ld_root["numberOfItems"] == N, \
+    "the comparison's structured list is not the whole catalogue"
+assert [_i["url"] for _i in _ld_root["itemListElement"]] == \
+    ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER], \
+    "the comparison's structured list is not in the published order"
+_ld_models = 0
+for _path, _label in METRIC_PAGES:
+    _want = (_path == "") or _path.startswith("bikes/")
+    if _want:
+        assert _ld_seen[_path], "%s should carry a JSON-LD block and does not" % (_path or "index.html")
+    else:
+        assert _ld_seen[_path] is None, "%s carries a JSON-LD block it should not" % _path
+for _p in ORDER:
+    _d = _ld_seen["bikes/%s" % _p["id"]]
+    _o = _d["offers"]
+    assert _d["@type"] == "Product" and _o["priceCurrency"] == "CAD", \
+        "%s: structured data is not a CAD Product" % _p["id"]
+    assert _o["price"] == _p["price_cad"] and _o["url"] == _p["source_url"], \
+        "%s: structured price/source does not match data/products.json" % _p["id"]
+    if _p.get("availability"):
+        assert _o.get("availability") == _schema_availability(_p["availability"]), \
+            "%s: structured availability does not match the maker's own %r" % (_p["id"], _p["availability"])
+    else:
+        assert "availability" not in _o, \
+            "%s: structured data claims an availability the catalogue does not carry" % _p["id"]
+    _ld_models += 1
+print("structured data: 1 ItemList + %d Product blocks, every value lifted from data/products.json"
+      % _ld_models)
+
+# ================================================================ every link any page carries resolves, or the build stops
+# The first version of this gate (2026-10-09) saw only literal href/src, plus the range picker's own JSON
+# data block - the block whose site-root paths had shipped 14 dead links. It could not see the links that
+# never appear as href/src in the stripped HTML: the og:image / twitter:image share cards, <link
+# rel="canonical">, a srcset, or a JSON-LD url/@id. A page whose only bad link is in its share card is
+# still a page that shares a 404. So the sweep now covers all of them, and it additionally refuses a
+# canonical that does not name the page it sits on - a canonical that was asserted on only six of the
+# twenty pages before this wake, leaving the landing page, the seven model pages, /how-far/ and /stats/
+# carrying an unchecked one.
+# The whole sweep lives in linkgate.check() so it is one definition, and so it can be run on its own
+# against any tree - including a deliberately corrupted copy, which is how it is shown to be able to fail:
+#     py -3.10 linkgate.py <root> <site-url>
+import linkgate
+_links_checked, _pages_checked = linkgate.check(ROOT, [p for p, _l in METRIC_PAGES], SITE)
+print("internal links: %d references over %d pages - href/src, srcset, share cards, canonical and JSON-LD - "
+      "every one landing inside the tree, every canonical naming its own page"
+      % (_links_checked, _pages_checked))
