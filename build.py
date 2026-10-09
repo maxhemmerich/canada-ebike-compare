@@ -368,6 +368,7 @@ PAGE = r"""<!doctype html>
       <a class="btn ghost" href="guide/">Read the guide as a page</a>
       <a class="btn ghost" href="#compare">Compare the __N_WORD__</a>
       <a class="btn ghost" href="how-far/">How far will it go?</a>
+      <a class="btn ghost" href="commute-costs/">What a commute costs</a>
     </div>
     <p class="disclosure" role="note">__DISCLOSURE__</p>
   </section>
@@ -1057,6 +1058,7 @@ __ROWS__
     <h2>Read the rest</h2>
     <ul class="otherbikes">
       <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
+      <li><a href="../commute-costs/">What a commute costs: e-bike vs car vs transit, per year</a></li>
       <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
       <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
     </ul>
@@ -1289,6 +1291,488 @@ def vs_page(a, b):
 for _pa, _pb in PAIRS:
     vs_page(_pa, _pb)
 
+# ================================================================ "what a commute costs" (the linkable asset)
+# The one page on this site a third party would cite: what it actually costs, per year, to move a
+# Canadian commuter by e-bike, by car and by transit. Built ONLY from published, dated figures, every
+# one named in the sources block below - the CAA Driving Costs Calculator (per province: fuel cost per
+# year, fuel price, electricity price), the Canada Revenue Agency (its 2026 reasonable per-kilometre
+# rate), each city's own transit agency, and this site's own published battery and range figures. No
+# config.js and no affiliate element is emitted here at all; every field comes from the data blocks.
+COST_DISTANCE_KM = 12500
+COST_HEADLINE_MODEL = "velotric-discover-3"
+COST_READ = "2026-10-09"
+CAA_VEHICLE = "2025 Nissan Sentra (mainstream gas passenger car)"
+_CAA_BASE = "https://carcosts.caa.ca/results/%s/passenger_mainstream/ice"
+CRA_URL = ("https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/"
+           "benefits-allowances/automobile/automobile-motor-vehicle-allowances/"
+           "reasonable-kilometre-allowance.html")
+CRA_YEAR = "2026"
+CRA_FIRST_5000, CRA_AFTER = 0.73, 0.67
+
+# CAA Driving Costs Calculator, passenger_mainstream/ice, read 2026-10-09. Every province carries the
+# SAME vehicle (the 2025 Nissan Sentra, its best-in-class mainstream gas car) at 12,500 km/year, 55%
+# city / 45% highway, so the provinces differ only by fuel price, electricity price and registration.
+# fuel = fuel cost per year (CA$); litre = fuel price (cents/L); kwh = electricity price (cents/kWh);
+# reg = licence and registration (CA$). Depreciation and maintenance are national in CAA's figures.
+CAA_PROVINCES = {
+    "Ontario":          dict(slug="ontario",          fuel=1506.11, litre=181.87, kwh=20.2, reg=0.00),
+    "Quebec":           dict(slug="quebec",           fuel=1635.88, litre=197.54, kwh=14.1, reg=186.97),
+    "British Columbia": dict(slug="british-columbia", fuel=1746.10, litre=210.85, kwh=16.8, reg=94.00),
+    "Alberta":          dict(slug="alberta",          fuel=1242.52, litre=150.04, kwh=26.3, reg=200.00),
+    "Manitoba":         dict(slug="manitoba",         fuel=1276.14, litre=154.10, kwh=16.5, reg=129.00),
+}
+CAA_DEPRECIATION, CAA_MAINTENANCE = 2747.00, 296.50
+CAA_FUEL_ECONOMY = 6.55
+COST_PROVINCE_ORDER = ["Ontario", "Quebec", "British Columbia", "Alberta", "Manitoba"]
+
+# Each city's own transit agency, read 2026-10-09. pass_price = the adult monthly (or month-equivalent)
+# figure the agency publishes; single = the adult single fare it publishes.
+COST_CITIES = [
+    dict(city="Toronto", province="Ontario", agency="TTC",
+         single=3.30, single_label="adult single fare, PRESTO",
+         pass_price=143.00, pass_label="adult 12-month pass",
+         source="https://www.ttc.ca/Fares-and-passes",
+         note="The TTC discontinued its adult monthly pass on 31 August 2026; pay-as-you-go fares are now capped after 47 paid trips in a calendar month, and the adult 12-month pass is CA$143.00 a month."),
+    dict(city="Ottawa", province="Ontario", agency="OC Transpo",
+         single=4.10, single_label="adult fare, Presto",
+         pass_price=138.50, pass_label="adult monthly pass",
+         source="https://www.octranspo.com/en/fares/",
+         note="OC Transpo caps a month of fares at the price of an adult monthly pass, CA$138.50."),
+    dict(city="Montreal", province="Quebec", agency="STM",
+         single=3.75, single_label="1 trip, All modes A",
+         pass_price=110.00, pass_label="Monthly, All Modes A",
+         source="https://stm.info/en/info/fares/transit-fares/monthly-all-modes",
+         note="The STM's Monthly, All Modes A pass is CA$110.00; a single All modes A trip is CA$3.75."),
+    dict(city="Calgary", province="Alberta", agency="Calgary Transit",
+         single=4.00, single_label="adult cash fare",
+         pass_price=126.00, pass_label="adult monthly pass",
+         source="https://www.calgarytransit.com/fares---passes.html",
+         note="Calgary Transit's 2026 adult fares: CA$4.00 single, CA$126.00 adult monthly pass."),
+    dict(city="Edmonton", province="Alberta", agency="ETS",
+         single=3.00, single_label="adult Arc, 90-minute",
+         pass_price=102.00, pass_label="adult Arc monthly fare cap",
+         source="https://www.edmonton.ca/ets/fares-passes",
+         note="Edmonton's ETS charges CA$3.00 for a 90-minute adult Arc trip and caps a month of adult Arc fares at CA$102."),
+    dict(city="Vancouver", province="British Columbia", agency="TransLink",
+         single=2.85, single_label="adult stored-value, 1 zone",
+         pass_price=117.20, pass_label="adult 1-zone monthly pass",
+         source="https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+         note="TransLink's adult 1-zone monthly pass is CA$117.20; a 1-zone stored-value single fare is CA$2.85."),
+    dict(city="Winnipeg", province="Manitoba", agency="Winnipeg Transit",
+         single=3.10, single_label="full fare, e-cash",
+         pass_price=119.35, pass_label="monthly e-pass",
+         source="https://winnipegtransit.com/fares",
+         note="Winnipeg Transit's 2026 fares: CA$3.10 full fare on e-cash, CA$119.35 monthly e-pass."),
+]
+
+# Battery capacity per model, in Wh, taken from the maker's own published battery string in
+# data/products.json (guarded below). The maker's claimed range in km is RANGE_PARSE[...]["high"],
+# already read from the maker's product page and used by the range picker. Wh/km is this page's own
+# arithmetic on those two published inputs.
+BATTERY_WH = {"radster-road": 720.0, "radkick-7speed": 360.0, "velotric-tempo": 374.0,
+              "velotric-discover-3": 730.0, "surface604-rook": 960.0,
+              "aventon-soltera-2-5": 345.6, "ohm-cruise-3": 504.0}
+assert set(BATTERY_WH) == {q["id"] for q in PRODUCTS}, "BATTERY_WH is out of step with products.json"
+for _pid, _wh in BATTERY_WH.items():
+    assert ("%g" % _wh) in BY_ID[_pid]["battery"], \
+        "battery %g is not in the published battery string for %s: %r" % (_wh, _pid, BY_ID[_pid]["battery"])
+assert COST_HEADLINE_MODEL in BATTERY_WH, "the headline model is not in the catalogue"
+
+
+def _wh_per_km(pid):
+    return BATTERY_WH[pid] / RANGE_PARSE[pid]["high"]
+
+
+def _kwh_per_year(pid):
+    return _wh_per_km(pid) * COST_DISTANCE_KM / 1000.0
+
+
+def _ca(x):
+    return "CA$%s" % format(x, ",.2f")
+
+
+CRA_ANNUAL = CRA_FIRST_5000 * 5000 + CRA_AFTER * (COST_DISTANCE_KM - 5000)
+
+# ---- the rows, every cell derived here from the data above (nothing typed by hand)
+def _cost_city_row(c):
+    p = CAA_PROVINCES[c["province"]]
+    charge = _kwh_per_year(COST_HEADLINE_MODEL) * (p["kwh"] / 100.0)
+    return ('<tr><th scope="row" class="model">%s<span class="prov">%s</span></th>'
+            '<td class="prov">%s</td>'
+            '<td class="num">%s</td><td class="num">%s</td><td class="num">%s</td></tr>'
+            % (esc(c["city"]), esc(c["agency"]), esc(c["province"]),
+               _ca(charge), _ca(p["fuel"]), _ca(c["pass_price"] * 12)))
+
+
+COST_BILL_ROWS = "\n        ".join(_cost_city_row(c) for c in COST_CITIES)
+
+
+def _cost_ebike_row(q):
+    return ('<tr><th scope="row" class="model"><a class="mname" href="../bikes/%s/">%s</a>'
+            '<span class="mmaker">%s</span></th>'
+            '<td>%s</td><td class="num">%s km</td><td class="num">%s</td><td class="num">%s</td></tr>'
+            % (esc(q["id"]), esc(q["model"]), esc(q["maker"]), esc(q["battery"]),
+               format(RANGE_PARSE[q["id"]]["high"], ",d"), format(_wh_per_km(q["id"]), ",.2f"),
+               format(_kwh_per_year(q["id"]), ",.2f")))
+
+
+COST_EBIKE_ROWS = "\n        ".join(_cost_ebike_row(q) for q in ORDER)
+
+
+def _cost_car_row(pname):
+    p = CAA_PROVINCES[pname]
+    allin = p["fuel"] + CAA_DEPRECIATION + CAA_MAINTENANCE + p["reg"]
+    return ('<tr><th scope="row" class="model">%s</th>'
+            '<td class="num">%s</td><td class="num">%s</td><td class="num">%s</td>'
+            '<td class="num">%s</td><td class="num">%s</td></tr>'
+            % (esc(pname), "$%.2f" % (p["litre"] / 100.0), "$%.3f" % (p["kwh"] / 100.0),
+               _ca(p["fuel"]), _ca(p["reg"]), _ca(allin)))
+
+
+COST_CAR_ROWS = "\n        ".join(_cost_car_row(p) for p in COST_PROVINCE_ORDER)
+
+# ---- prose and the sources block (all text with figures lives here, never in the template)
+COST_TITLE = "What a Canadian commuter actually pays: e-bike vs car vs transit, per year | Commuter E-Bikes CA"
+COST_DESC = ("A commuter's yearly bill for the same distance, three ways - charging an e-bike, fuelling a "
+             "small car, or a transit pass - in seven Canadian cities. Every figure from a named, dated "
+             "source; nothing from memory.")
+COST_INTRO = ("A commuter's yearly bill for the same distance, three ways: charging an e-bike, fuelling a "
+              "small car, or buying a transit pass. Every figure below is published and dated - the CAA "
+              "Driving Costs Calculator, the Canada Revenue Agency, and each city's own transit agency - "
+              "and every one is named at the bottom of this page. Nothing here is remembered or guessed; "
+              "where a figure does not exist, the page says so instead of filling the gap.")
+COST_DISCLOSURE = ("this page has no live affiliate links and nothing to buy. It carries no partner link "
+                   "and no commission, and every source is a public one, named in full below.")
+COST_BILL_SUB = ("Seven cities, one commuter each. The car figures are the province's, because that is how "
+                 "the CAA publishes them; the transit figure is the city's own pass. Electricity and fuel "
+                 "prices come from the same CAA province records.")
+COST_BILL_NOTE = ("E-bike, to charge: the Velotric Discover 3 - this site's all-round pick - using the "
+                  "maker's claimed range and the province's published electricity price, for %s km a year. "
+                  "Car, fuel only: CAA's yearly fuel cost for a %s at the same distance. Transit, pass: "
+                  "the city's adult monthly (or month-equivalent) pass, times twelve - a pass is unlimited "
+                  "travel, so transit is compared as an annual bill, not per kilometre."
+                  % (format(COST_DISTANCE_KM, ",d"), CAA_VEHICLE))
+COST_BILL_CAVEAT = ("This is the running bill, not the whole cost of ownership: it leaves out insurance, "
+                    "the price of the vehicle itself, and any transit trips beyond the commute. What each "
+                    "figure can and cannot tell you is set out under \u201cWhat is not in these numbers\u201d.")
+COST_CRA_SUB = ("Canada's tax system publishes its own idea of what it costs to run a car, per kilometre: "
+                "the CRA reasonable per-kilometre rate that an employer may reimburse tax-free. For %s it "
+                "is $%.2f for the first %s km and $%.2f for every kilometre after (provinces; the "
+                "territories add four cents)." % (CRA_YEAR, CRA_FIRST_5000, format(5000, ",d"), CRA_AFTER))
+COST_CRA_ANNUAL = _ca(CRA_ANNUAL)
+COST_CRA_LINE = ("$%.2f \u00d7 %s km, plus $%.2f \u00d7 %s km, at %s km a year = %s. One federal, "
+                 "per-province number that already folds in fuel, maintenance, depreciation, insurance "
+                 "and finance - the closest thing Canada has to an official cost of driving."
+                 % (CRA_FIRST_5000, format(5000, ",d"), CRA_AFTER, format(COST_DISTANCE_KM - 5000, ",d"),
+                    format(COST_DISTANCE_KM, ",d"), _ca(CRA_ANNUAL)))
+COST_CRA_NOTE = ("The rate is set for business use of a personal vehicle and is identical in every "
+                 "province; only the territories add four cents. It is not a consumer price list, but it "
+                 "is the government's own published per-kilometre cost - and at %s km it comes to %s a year."
+                 % (format(COST_DISTANCE_KM, ",d"), _ca(CRA_ANNUAL)))
+COST_EBIKE_SUB = ("Energy per kilometre is this page's own arithmetic: each model's published battery "
+                  "capacity divided by the maker's own claimed range. Both inputs come from the maker's "
+                  "product page (read %s); the ratio is derived here and stated nowhere else." % COST_READ)
+COST_EBIKE_NOTE = ("Battery and range are the maker's published figures, the same ones on this site's "
+                   "model pages; Wh/km and the yearly kWh are derived from them. A lower Wh/km is a more "
+                   "efficient bike - but only against each maker's own claim.")
+COST_EBIKE_CAVEAT = ("Two honest limits. The maker's claimed range is a best case, so these Wh/km figures "
+                     "are a floor - a real rider uses more energy per kilometre. And a charger is not "
+                     "lossless: the battery stores the watt-hours shown, while the wall draws somewhat "
+                     "more, and no maker here publishes charger efficiency, so it is not modelled.")
+COST_CAR_SUB = ("The same CAA province record the e-bike price comes from, for a %s at %s km a year (55%% "
+                "city, 45%% highway). All-in is fuel plus registration plus CAA's depreciation and "
+                "maintenance; it leaves out insurance, which CAA asks the driver to enter."
+                % (CAA_VEHICLE, format(COST_DISTANCE_KM, ",d")))
+COST_CAR_NOTE = ("CAA publishes a province's fuel price and electricity price with the same vehicle, so "
+                 "the provinces differ only by price and by registration. Depreciation (%s) and "
+                 "maintenance (%s) are national figures; the fuel price is not."
+                 % (_ca(CAA_DEPRECIATION), _ca(CAA_MAINTENANCE)))
+COST_CAR_CAVEAT = ("All-in is not a sticker price: depreciation is CAA's average for the category, and "
+                   "insurance is left out because CAA does not publish it. The fuel column is the one "
+                   "figure that does not depend on how the car was bought.")
+COST_SOURCES_SUB = ("Every number on this page traces to one of these, each read on the date shown. Where "
+                    "a figure does not exist, it is admitted above rather than filled in. Read %s." % COST_READ)
+COST_CAVEATS = ("Claimed range is the maker's own estimate. Transit fares are set by each agency and change "
+                "most years; the CRA rate is set annually and may differ after the year shown. Prices were "
+                "read on the dates above and may since have moved. This page is general cost information, "
+                "not financial or tax advice.")
+
+COST_MISSING = "\n      ".join(
+    "<li>%s</li>" % t for t in [
+        "<strong>Insurance.</strong> Not published by the sources used here. The CAA calculator asks the "
+        "driver to enter their own premium, and the CRA per-kilometre rate folds insurance in - so no "
+        "insurance number appears anywhere on this page rather than a guess.",
+        "<strong>The price of the vehicle.</strong> An e-bike, a car and a transit pass are bought very "
+        "differently. This page compares what it costs to keep moving, not what it costs to acquire.",
+        "<strong>Charger losses and battery wear.</strong> No maker here publishes charger efficiency or a "
+        "battery-degradation curve, so neither is modelled.",
+        "<strong>The maker's claimed range is optimistic.</strong> The e-bike energy figures use it, which "
+        "makes them the lowest honest estimate - a floor, not a measured result.",
+        "<strong>Transit is not distance-matched.</strong> A pass is unlimited travel, so it is compared as "
+        "an annual bill rather than per kilometre. Each city's single fare is in the sources below.",
+        "<strong>One rate, two tiers.</strong> The CRA figure uses the first-5,000-km rate and the rate "
+        "after it; a longer year averages lower, a shorter one higher.",
+    ])
+
+
+def _cost_src(text):
+    return "<li>%s</li>" % text
+
+
+COST_SOURCES = "\n        ".join(
+    [_cost_src("<strong>CAA Driving Costs Calculator</strong> \u2014 carcosts.caa.ca, the per-province "
+               "results for the %s at %s km a year (55%% city, 45%% highway). Gives the fuel cost per "
+               "year, the fuel price ($/L) and the electricity price ($/kWh) for each province. Read %s. "
+               "Source pages: %s"
+               % (esc(CAA_VEHICLE), format(COST_DISTANCE_KM, ",d"), esc(COST_READ),
+                  " \u00b7 ".join('<a href="%s" target="_blank" rel="noopener nofollow">%s</a>'
+                                  % (esc(_CAA_BASE % CAA_PROVINCES[p]["slug"]), esc(p))
+                                  for p in COST_PROVINCE_ORDER))),
+     _cost_src("<strong>Canada Revenue Agency</strong>, \u201cMotor vehicle provided by the employer\u201d "
+               "\u2014 the %s reasonable per-kilometre rate: $%.2f for the first %s km and $%.2f after "
+               "(provinces; the territories add four cents). Read %s. "
+               "<a href=\"%s\" target=\"_blank\" rel=\"noopener nofollow\">canada.ca</a>"
+               % (esc(CRA_YEAR), CRA_FIRST_5000, format(5000, ",d"), CRA_AFTER, esc(COST_READ), esc(CRA_URL))),
+     _cost_src("<strong>E-bike energy</strong> \u2014 this site's own "
+               "<a href=\"../data/products.json\">data/products.json</a>: each model's published battery "
+               "capacity (Wh) and the maker's own claimed range, both read from the maker's product page "
+               "(checked %s). Wh/km and the yearly kWh are this page's arithmetic on those two figures."
+               % esc(CHECKED))]
+    + [_cost_src("<strong>%s</strong> \u2014 %s, %s. %s Read %s. "
+                 "<a href=\"%s\" target=\"_blank\" rel=\"noopener nofollow\">%s fares</a>"
+                 % (esc(c["city"]), esc(c["agency"]), esc(c["province"]), esc(c["note"]), esc(COST_READ),
+                    esc(c["source"]), esc(c["agency"])))
+       for c in COST_CITIES])
+
+COST_PAGE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<link rel="canonical" href="__CANONICAL__">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Commuter E-Bikes CA">
+<meta property="og:title" content="__OGTITLE__">
+<meta property="og:description" content="__DESC__">
+<meta property="og:url" content="__CANONICAL__">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="__OGTITLE__">
+<meta name="twitter:description" content="__DESC__">
+<style>__CSS__
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .costhero{padding:34px 0 8px}
+  .costhero h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;margin:0 0 12px;max-width:28ch}
+  table.cost td.num,table.cost th.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  table.cost .model{font-weight:700}
+  table.cost .prov{display:block;color:var(--muted);font-size:12.5px;font-weight:400;margin-top:2px}
+  table.cost td.prov{font-weight:400;color:var(--muted);white-space:nowrap}
+  .big{font-size:clamp(30px,6vw,54px);font-weight:700;font-family:Georgia,"Iowan Old Style","Times New Roman",serif;line-height:1;margin:0 0 8px}
+  .callout{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:18px 20px;margin:18px 0;max-width:74ch}
+  ol.method{margin:0;padding-left:22px}
+  ol.method li{margin:0 0 10px;max-width:78ch;color:#333842}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  p.mta{margin-top:14px}
+  p.mtb{margin-top:18px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Figures checked <strong>__CHECKED__</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="costhero" style="border-top:none">
+    <p class="crumb"><a href="../">All __N_WORD__ commuter e-bikes, compared</a> &rsaquo; What a commute costs</p>
+    <h1>What a Canadian commuter actually pays: e-bike vs car vs transit</h1>
+    <p class="deck">__INTRO__</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> __DISC__</p>
+  </section>
+
+  <section id="bill">
+    <h2>The bill, per year, in seven cities</h2>
+    <p class="sub">__BILL_SUB__</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <caption>__BILL_NOTE__</caption>
+        <thead><tr>
+          <th scope="col">City</th><th scope="col">Province</th>
+          <th scope="col" class="num">E-bike, to charge</th>
+          <th scope="col" class="num">Car, fuel only</th>
+          <th scope="col" class="num">Transit, pass</th>
+        </tr></thead>
+        <tbody>
+        __BILL_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note mta">__BILL_CAVEAT__</p>
+  </section>
+
+  <section id="cra">
+    <h2>The tax system's own number for a car</h2>
+    <p class="sub">__CRA_SUB__</p>
+    <div class="callout">
+      <p class="big">__CRA_ANNUAL__</p>
+      <p>__CRA_LINE__</p>
+    </div>
+    <p class="note">__CRA_NOTE__</p>
+  </section>
+
+  <section id="ebike">
+    <h2>The e-bike's own energy, model by model</h2>
+    <p class="sub">__EBIKE_SUB__</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <caption>__EBIKE_NOTE__</caption>
+        <thead><tr>
+          <th scope="col">Model</th><th scope="col">Battery</th>
+          <th scope="col" class="num">Maker range</th>
+          <th scope="col" class="num">Wh/km</th>
+          <th scope="col" class="num">kWh / year</th>
+        </tr></thead>
+        <tbody>
+        __EBIKE_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note mta">__EBIKE_CAVEAT__</p>
+  </section>
+
+  <section id="car">
+    <h2>The car, province by province</h2>
+    <p class="sub">__CAR_SUB__</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <caption>__CAR_NOTE__</caption>
+        <thead><tr>
+          <th scope="col">Province</th>
+          <th scope="col" class="num">Fuel $/L</th>
+          <th scope="col" class="num">Electricity $/kWh</th>
+          <th scope="col" class="num">Fuel $/yr</th>
+          <th scope="col" class="num">Registration $/yr</th>
+          <th scope="col" class="num">All-in $/yr</th>
+        </tr></thead>
+        <tbody>
+        __CAR_ROWS__
+        </tbody>
+      </table>
+    </div>
+    <p class="note mta">__CAR_CAVEAT__</p>
+  </section>
+
+  <section id="missing">
+    <h2>What is not in these numbers</h2>
+    <ol class="method">
+      __MISSING__
+    </ol>
+  </section>
+
+  <section id="sources">
+    <h2>Every figure and where it comes from</h2>
+    <p class="sub">__SOURCES_SUB__</p>
+    <ul class="sources">__SOURCES__</ul>
+    <p class="note mtb">__CAVEATS__</p>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All __N_WORD__ commuter e-bikes, compared side by side</a></li>
+      <li><a href="../guide/">The free decision guide</a></li>
+      <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
+      <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> __DISC__</p>
+  <p>This is general cost information, not financial or tax advice, and not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying.</p>
+  <p>Built __CHECKED__ by the GAMMA project. Sources: the CAA Driving Costs Calculator, the Canada Revenue Agency, and each city's own transit agency &mdash; all named above. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a>.</p>
+</div></footer>
+</body>
+</html>
+"""
+
+# The template may carry no figure of its own: every digit in the output must come from a substitution,
+# or a hand-typed number could go live on a page whose whole point is that nothing is typed by hand.
+# Style, script and tags are dropped first - h1/h2 tag names carry digits of their own, which are not
+# page content - leaving only visible copy, where any digit must be a substituted figure.
+_tmpl_probe = re.sub(r"(?s)<(style|script).*?</\1>", " ", COST_PAGE)
+_tmpl_probe = re.sub(r"(?s)<[^>]+>", " ", _tmpl_probe)
+_tmpl_probe = re.sub(r"__[A-Z_0-9]*__", "", _tmpl_probe)
+assert not re.search(r"\d", _tmpl_probe), \
+    "a figure is typed into the commute-costs template instead of being substituted"
+
+_COST_SUBST = {
+    "__CSS__": CSS,
+    "__N_WORD__": esc(N_WORD),
+    "__CHECKED__": esc(CHECKED),
+    "__TITLE__": esc(COST_TITLE),
+    "__OGTITLE__": esc(COST_TITLE),
+    "__DESC__": esc(COST_DESC),
+    "__CANONICAL__": "%s/commute-costs/" % SITE,
+    "__INTRO__": esc(COST_INTRO),
+    "__DISC__": esc(COST_DISCLOSURE),
+    "__BILL_SUB__": esc(COST_BILL_SUB),
+    "__BILL_NOTE__": esc(COST_BILL_NOTE),
+    "__BILL_ROWS__": COST_BILL_ROWS,
+    "__BILL_CAVEAT__": esc(COST_BILL_CAVEAT),
+    "__CRA_SUB__": esc(COST_CRA_SUB),
+    "__CRA_ANNUAL__": esc(COST_CRA_ANNUAL),
+    "__CRA_LINE__": esc(COST_CRA_LINE),
+    "__CRA_NOTE__": esc(COST_CRA_NOTE),
+    "__EBIKE_SUB__": esc(COST_EBIKE_SUB),
+    "__EBIKE_NOTE__": esc(COST_EBIKE_NOTE),
+    "__EBIKE_ROWS__": COST_EBIKE_ROWS,
+    "__EBIKE_CAVEAT__": esc(COST_EBIKE_CAVEAT),
+    "__CAR_SUB__": esc(COST_CAR_SUB),
+    "__CAR_NOTE__": esc(COST_CAR_NOTE),
+    "__CAR_ROWS__": COST_CAR_ROWS,
+    "__CAR_CAVEAT__": esc(COST_CAR_CAVEAT),
+    "__MISSING__": COST_MISSING,
+    "__SOURCES_SUB__": esc(COST_SOURCES_SUB),
+    "__SOURCES__": COST_SOURCES,
+    "__CAVEATS__": esc(COST_CAVEATS),
+}
+_cost_out = COST_PAGE
+for _k, _v in _COST_SUBST.items():
+    _cost_out = _cost_out.replace(_k, _v)
+write_page(os.path.join(ROOT, "commute-costs", "index.html"), _cost_out, "commute-costs")
+
+# ---- the page is read back and checked before the sitemap is written
+COST_FILE = os.path.join(ROOT, "commute-costs", "index.html")
+COST_TEXT = open(COST_FILE, encoding="utf-8").read()
+
+# 1. nothing here can pay, and it says nothing about the status of any program.
+for _bad in ("config.js", "AFFILIATE_", 'data-aff=', 'class="buyaff"'):
+    assert _bad not in COST_TEXT, "affiliate element on the commute-costs page: %r" % _bad
+
+# 2. its own head: title, description, canonical and the social card.
+assert "<link rel=\"canonical\" href=\"%s/commute-costs/\">" % SITE in COST_TEXT
+for _head in ('<title>', 'name="description"', 'property="og:type"', 'property="og:site_name"',
+              'property="og:title"', 'property="og:description"', 'property="og:url"',
+              'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"'):
+    assert _head in COST_TEXT, "commute-costs page is missing %s" % _head
+
+# 3. every number that reached the page must come from a substitution, precomputed above - the guard a
+#    hand-typed figure would trip.
+_allowed_nums = set()
+for _v in _COST_SUBST.values():
+    _allowed_nums |= set(re.findall(r"\d[\d,.]*", str(_v)))
+_body_text = re.sub(r"(?s)<(style|script).*?</\1>", " ", COST_TEXT.split("<body>", 1)[1])
+_body_text = html.unescape(re.sub(r"(?s)<[^>]+>", " ", _body_text))
+_page_nums = set(re.findall(r"\d[\d,.]*", _body_text))
+assert _page_nums <= _allowed_nums, \
+    "number on the commute-costs page with no published source: %r" % sorted(_page_nums - _allowed_nums)
+print("commute-costs page: %d bytes, %d figures, every one substituted from a named source, no affiliate element"
+      % (len(COST_TEXT), len(_page_nums)))
+
 # ================================================================ the reader: /stats/
 # A count nobody can read is not a measurement. This page reads every key back through the service's
 # /get endpoint and shows what it finds, so "how much traffic does this lane get" has an answer that
@@ -1308,6 +1792,7 @@ METRIC_PAGES = (
        for p in ORDER]
     + [("how-far", "How far will it go? &mdash; the range picker")]
     + [("guide", "The decision guide &mdash; the free front-door page")]
+    + [("commute-costs", "What a commute costs &mdash; e-bike vs car vs transit, per year")]
     + [("vs/%s" % s, "%s" % pair_label(*pair)) for s, pair in zip(PAIR_SLUGS, PAIRS)]
     + [("stats", "This page &mdash; the counts")]
 )
@@ -1492,7 +1977,8 @@ print("stats reader: %d rows, every one a live beacon key, no placeholder token"
 
 # ---------------------------------------------------------------- sitemap + robots
 URLS = (["%s/" % SITE] + ["%s/bikes/%s/" % (SITE, p["id"]) for p in ORDER]
-        + ["%s/how-far/" % SITE] + ["%s/guide/" % SITE] + ["%s/stats/" % SITE]
+        + ["%s/how-far/" % SITE] + ["%s/guide/" % SITE] + ["%s/commute-costs/" % SITE]
+        + ["%s/stats/" % SITE]
         + ["%s/vs/%s/" % (SITE, s) for s in PAIR_SLUGS])
 # The sitemap and the beacon list are the same set of pages, or one of them is lying. Asserted, not assumed.
 _metric_urls = sorted(("%s/%s/" % (SITE, p)) if p else ("%s/" % SITE) for p, _l in METRIC_PAGES)

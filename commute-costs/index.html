@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a Canadian commuter actually pays: e-bike vs car vs transit, per year | Commuter E-Bikes CA</title>
+<meta name="description" content="A commuter&#x27;s yearly bill for the same distance, three ways - charging an e-bike, fuelling a small car, or a transit pass - in seven Canadian cities. Every figure from a named, dated source; nothing from memory.">
+<link rel="canonical" href="https://maxhemmerich.github.io/canada-ebike-compare/commute-costs/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Commuter E-Bikes CA">
+<meta property="og:title" content="What a Canadian commuter actually pays: e-bike vs car vs transit, per year | Commuter E-Bikes CA">
+<meta property="og:description" content="A commuter&#x27;s yearly bill for the same distance, three ways - charging an e-bike, fuelling a small car, or a transit pass - in seven Canadian cities. Every figure from a named, dated source; nothing from memory.">
+<meta property="og:url" content="https://maxhemmerich.github.io/canada-ebike-compare/commute-costs/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="What a Canadian commuter actually pays: e-bike vs car vs transit, per year | Commuter E-Bikes CA">
+<meta name="twitter:description" content="A commuter&#x27;s yearly bill for the same distance, three ways - charging an e-bike, fuelling a small car, or a transit pass - in seven Canadian cities. Every figure from a named, dated source; nothing from memory.">
+<style>
+  :root{
+    --paper:#faf8f4; --ink:#16181d; --muted:#5d6270; --line:#e3ddd1;
+    --accent:#0e6b53; --accent-ink:#0a5340; --amber:#a6550c; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent-ink)}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  header.top{border-bottom:1px solid var(--line);background:var(--paper)}
+  .top .wrap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:14px;padding-bottom:14px}
+  .brand{font:700 15px/1 -apple-system,"Segoe UI",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  .stamp{font-size:13px;color:var(--muted)}
+  h1,h2,h3{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:700;letter-spacing:-.01em}
+  .hero{padding:44px 0 8px}
+  .hero h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:0 0 14px;max-width:20ch}
+  .deck{font-size:19px;color:#333842;max-width:62ch;margin:0 0 22px}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 26px}
+  .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+    font-weight:600;padding:13px 20px;border-radius:8px}
+  .btn:hover{background:var(--accent-ink)}
+  .btn.ghost{background:transparent;color:var(--accent-ink);border:1px solid var(--accent)}
+  .disclosure{background:#fff;border:1px solid var(--line);border-left:4px solid var(--amber);
+    padding:14px 16px;border-radius:6px;font-size:15px;color:#3a3f49;max-width:70ch}
+  .disclosure strong{color:var(--ink)}
+  section{padding:40px 0;border-top:1px solid var(--line)}
+  section h2{font-size:clamp(22px,3vw,30px);margin:0 0 6px}
+  .sub{color:var(--muted);margin:0 0 24px;max-width:66ch}
+  .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px 28px}
+  .pick h3{font-size:17px;margin:0 0 4px;font-family:-apple-system,"Segoe UI",sans-serif;font-weight:700}
+  .pick .pickwho{margin:0 0 8px;font-size:14px;color:var(--accent-ink);font-weight:600}
+  .pick p{margin:0;color:#333842;font-size:15px}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+  table{border-collapse:collapse;width:100%;min-width:880px;font-size:13.4px}
+  caption{text-align:left;padding:14px 16px;color:var(--muted);font-size:13px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{position:sticky;top:0;background:#f3efe7;font-size:12px;letter-spacing:.05em;
+    text-transform:uppercase;color:#4a4f59;white-space:nowrap;z-index:1}
+  tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+  th.model{white-space:normal;min-width:150px}
+  .mname{display:block;font-weight:700;font-size:15px}
+  .mmaker{display:block;color:var(--muted);font-size:13px;margin:2px 0 6px}
+  .spec-link{font-size:12.5px;text-decoration:none;border-bottom:1px solid var(--accent)}
+  a.mname{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  a.mname:hover{border-bottom-color:var(--accent)}
+  td.price{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  .aff{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-weight:400}
+  .stock{display:inline-block;margin:1px 0 2px;font-size:11px;font-weight:700;color:#fff;
+    background:var(--amber);padding:1px 6px;border-radius:4px;letter-spacing:.02em}
+  .pickstock{margin:0 0 6px;font-size:12.5px;font-weight:700;color:var(--amber)}
+  .details{display:grid;gap:20px}
+  .detail{border-left:3px solid var(--accent);padding:2px 0 2px 16px}
+  .detail h3{margin:0 0 6px;font-size:18px}
+  .detail .dprice{color:var(--muted);font-family:-apple-system,sans-serif;font-size:15px;font-weight:600}
+  .detail p{margin:0 0 8px;color:#333842;max-width:72ch}
+  .src,.fn{font-size:13px;color:var(--muted)}
+  ul.sources{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+  ul.sources li{border-bottom:1px dashed var(--line);padding-bottom:12px;max-width:78ch}
+  .note{font-size:14px;color:var(--muted);max-width:72ch}
+  footer{border-top:1px solid var(--line);padding:28px 0 50px;color:var(--muted);font-size:13.5px}
+  footer p{margin:0 0 8px;max-width:78ch}
+
+  .crumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .costhero{padding:34px 0 8px}
+  .costhero h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;margin:0 0 12px;max-width:28ch}
+  table.cost td.num,table.cost th.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  table.cost .model{font-weight:700}
+  table.cost .prov{display:block;color:var(--muted);font-size:12.5px;font-weight:400;margin-top:2px}
+  table.cost td.prov{font-weight:400;color:var(--muted);white-space:nowrap}
+  .big{font-size:clamp(30px,6vw,54px);font-weight:700;font-family:Georgia,"Iowan Old Style","Times New Roman",serif;line-height:1;margin:0 0 8px}
+  .callout{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:18px 20px;margin:18px 0;max-width:74ch}
+  ol.method{margin:0;padding-left:22px}
+  ol.method li{margin:0 0 10px;max-width:78ch;color:#333842}
+  ul.otherbikes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  ul.otherbikes a{font-size:14.5px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  p.mta{margin-top:14px}
+  p.mtb{margin-top:18px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../" style="color:inherit;text-decoration:none">Commuter E-Bikes CA</a>
+  <span class="stamp">Figures checked <strong>2026-10-08</strong></span>
+</div></header>
+
+<main class="wrap">
+  <section class="costhero" style="border-top:none">
+    <p class="crumb"><a href="../">All seven commuter e-bikes, compared</a> &rsaquo; What a commute costs</p>
+    <h1>What a Canadian commuter actually pays: e-bike vs car vs transit</h1>
+    <p class="deck">A commuter&#x27;s yearly bill for the same distance, three ways: charging an e-bike, fuelling a small car, or buying a transit pass. Every figure below is published and dated - the CAA Driving Costs Calculator, the Canada Revenue Agency, and each city&#x27;s own transit agency - and every one is named at the bottom of this page. Nothing here is remembered or guessed; where a figure does not exist, the page says so instead of filling the gap.</p>
+    <p class="disclosure" role="note"><strong>Disclosure:</strong> this page has no live affiliate links and nothing to buy. It carries no partner link and no commission, and every source is a public one, named in full below.</p>
+  </section>
+
+  <section id="bill">
+    <h2>The bill, per year, in seven cities</h2>
+    <p class="sub">Seven cities, one commuter each. The car figures are the province&#x27;s, because that is how the CAA publishes them; the transit figure is the city&#x27;s own pass. Electricity and fuel prices come from the same CAA province records.</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <caption>E-bike, to charge: the Velotric Discover 3 - this site&#x27;s all-round pick - using the maker&#x27;s claimed range and the province&#x27;s published electricity price, for 12,500 km a year. Car, fuel only: CAA&#x27;s yearly fuel cost for a 2025 Nissan Sentra (mainstream gas passenger car) at the same distance. Transit, pass: the city&#x27;s adult monthly (or month-equivalent) pass, times twelve - a pass is unlimited travel, so transit is compared as an annual bill, not per kilometre.</caption>
+        <thead><tr>
+          <th scope="col">City</th><th scope="col">Province</th>
+          <th scope="col" class="num">E-bike, to charge</th>
+          <th scope="col" class="num">Car, fuel only</th>
+          <th scope="col" class="num">Transit, pass</th>
+        </tr></thead>
+        <tbody>
+        <tr><th scope="row" class="model">Toronto<span class="prov">TTC</span></th><td class="prov">Ontario</td><td class="num">CA$14.29</td><td class="num">CA$1,506.11</td><td class="num">CA$1,716.00</td></tr>
+        <tr><th scope="row" class="model">Ottawa<span class="prov">OC Transpo</span></th><td class="prov">Ontario</td><td class="num">CA$14.29</td><td class="num">CA$1,506.11</td><td class="num">CA$1,662.00</td></tr>
+        <tr><th scope="row" class="model">Montreal<span class="prov">STM</span></th><td class="prov">Quebec</td><td class="num">CA$9.97</td><td class="num">CA$1,635.88</td><td class="num">CA$1,320.00</td></tr>
+        <tr><th scope="row" class="model">Calgary<span class="prov">Calgary Transit</span></th><td class="prov">Alberta</td><td class="num">CA$18.60</td><td class="num">CA$1,242.52</td><td class="num">CA$1,512.00</td></tr>
+        <tr><th scope="row" class="model">Edmonton<span class="prov">ETS</span></th><td class="prov">Alberta</td><td class="num">CA$18.60</td><td class="num">CA$1,242.52</td><td class="num">CA$1,224.00</td></tr>
+        <tr><th scope="row" class="model">Vancouver<span class="prov">TransLink</span></th><td class="prov">British Columbia</td><td class="num">CA$11.88</td><td class="num">CA$1,746.10</td><td class="num">CA$1,406.40</td></tr>
+        <tr><th scope="row" class="model">Winnipeg<span class="prov">Winnipeg Transit</span></th><td class="prov">Manitoba</td><td class="num">CA$11.67</td><td class="num">CA$1,276.14</td><td class="num">CA$1,432.20</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note mta">This is the running bill, not the whole cost of ownership: it leaves out insurance, the price of the vehicle itself, and any transit trips beyond the commute. What each figure can and cannot tell you is set out under “What is not in these numbers”.</p>
+  </section>
+
+  <section id="cra">
+    <h2>The tax system's own number for a car</h2>
+    <p class="sub">Canada&#x27;s tax system publishes its own idea of what it costs to run a car, per kilometre: the CRA reasonable per-kilometre rate that an employer may reimburse tax-free. For 2026 it is $0.73 for the first 5,000 km and $0.67 for every kilometre after (provinces; the territories add four cents).</p>
+    <div class="callout">
+      <p class="big">CA$8,675.00</p>
+      <p>$0.73 × 5,000 km, plus $0.67 × 7,500 km, at 12,500 km a year = CA$8,675.00. One federal, per-province number that already folds in fuel, maintenance, depreciation, insurance and finance - the closest thing Canada has to an official cost of driving.</p>
+    </div>
+    <p class="note">The rate is set for business use of a personal vehicle and is identical in every province; only the territories add four cents. It is not a consumer price list, but it is the government&#x27;s own published per-kilometre cost - and at 12,500 km it comes to CA$8,675.00 a year.</p>
+  </section>
+
+  <section id="ebike">
+    <h2>The e-bike's own energy, model by model</h2>
+    <p class="sub">Energy per kilometre is this page&#x27;s own arithmetic: each model&#x27;s published battery capacity divided by the maker&#x27;s own claimed range. Both inputs come from the maker&#x27;s product page (read 2026-10-09); the ratio is derived here and stated nowhere else.</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <caption>Battery and range are the maker&#x27;s published figures, the same ones on this site&#x27;s model pages; Wh/km and the yearly kWh are derived from them. A lower Wh/km is a more efficient bike - but only against each maker&#x27;s own claim.</caption>
+        <thead><tr>
+          <th scope="col">Model</th><th scope="col">Battery</th>
+          <th scope="col" class="num">Maker range</th>
+          <th scope="col" class="num">Wh/km</th>
+          <th scope="col" class="num">kWh / year</th>
+        </tr></thead>
+        <tbody>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/aventon-soltera-2-5/">Soltera 2.5</a><span class="mmaker">Aventon</span></th><td>345.6 Wh (9.6 Ah, LG cells)</td><td class="num">74 km</td><td class="num">4.67</td><td class="num">58.38</td></tr>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/radkick-7speed/">RadKick 7-Speed</a><span class="mmaker">Rad Power Bikes</span></th><td>360 Wh (10 Ah)</td><td class="num">56 km</td><td class="num">6.43</td><td class="num">80.36</td></tr>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/velotric-tempo/">Tempo</a><span class="mmaker">Velotric</span></th><td>374 Wh (removable)</td><td class="num">97 km</td><td class="num">3.86</td><td class="num">48.20</td></tr>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/velotric-discover-3/">Discover 3</a><span class="mmaker">Velotric</span></th><td>730 Wh (15.2 Ah), Samsung/LG 21700</td><td class="num">129 km</td><td class="num">5.66</td><td class="num">70.74</td></tr>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/radster-road/">Radster Road</a><span class="mmaker">Rad Power Bikes</span></th><td>720 Wh (15 Ah)</td><td class="num">104 km</td><td class="num">6.92</td><td class="num">86.54</td></tr>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/surface604-rook/">Rook</a><span class="mmaker">Surface 604</span></th><td>960 Wh (20 Ah)</td><td class="num">150 km</td><td class="num">6.40</td><td class="num">80.00</td></tr>
+        <tr><th scope="row" class="model"><a class="mname" href="../bikes/ohm-cruise-3/">Cruise 3</a><span class="mmaker">OHM</span></th><td>504 Wh (in-tube)</td><td class="num">100 km</td><td class="num">5.04</td><td class="num">63.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note mta">Two honest limits. The maker&#x27;s claimed range is a best case, so these Wh/km figures are a floor - a real rider uses more energy per kilometre. And a charger is not lossless: the battery stores the watt-hours shown, while the wall draws somewhat more, and no maker here publishes charger efficiency, so it is not modelled.</p>
+  </section>
+
+  <section id="car">
+    <h2>The car, province by province</h2>
+    <p class="sub">The same CAA province record the e-bike price comes from, for a 2025 Nissan Sentra (mainstream gas passenger car) at 12,500 km a year (55% city, 45% highway). All-in is fuel plus registration plus CAA&#x27;s depreciation and maintenance; it leaves out insurance, which CAA asks the driver to enter.</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <caption>CAA publishes a province&#x27;s fuel price and electricity price with the same vehicle, so the provinces differ only by price and by registration. Depreciation (CA$2,747.00) and maintenance (CA$296.50) are national figures; the fuel price is not.</caption>
+        <thead><tr>
+          <th scope="col">Province</th>
+          <th scope="col" class="num">Fuel $/L</th>
+          <th scope="col" class="num">Electricity $/kWh</th>
+          <th scope="col" class="num">Fuel $/yr</th>
+          <th scope="col" class="num">Registration $/yr</th>
+          <th scope="col" class="num">All-in $/yr</th>
+        </tr></thead>
+        <tbody>
+        <tr><th scope="row" class="model">Ontario</th><td class="num">$1.82</td><td class="num">$0.202</td><td class="num">CA$1,506.11</td><td class="num">CA$0.00</td><td class="num">CA$4,549.61</td></tr>
+        <tr><th scope="row" class="model">Quebec</th><td class="num">$1.98</td><td class="num">$0.141</td><td class="num">CA$1,635.88</td><td class="num">CA$186.97</td><td class="num">CA$4,866.35</td></tr>
+        <tr><th scope="row" class="model">British Columbia</th><td class="num">$2.11</td><td class="num">$0.168</td><td class="num">CA$1,746.10</td><td class="num">CA$94.00</td><td class="num">CA$4,883.60</td></tr>
+        <tr><th scope="row" class="model">Alberta</th><td class="num">$1.50</td><td class="num">$0.263</td><td class="num">CA$1,242.52</td><td class="num">CA$200.00</td><td class="num">CA$4,486.02</td></tr>
+        <tr><th scope="row" class="model">Manitoba</th><td class="num">$1.54</td><td class="num">$0.165</td><td class="num">CA$1,276.14</td><td class="num">CA$129.00</td><td class="num">CA$4,448.64</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note mta">All-in is not a sticker price: depreciation is CAA&#x27;s average for the category, and insurance is left out because CAA does not publish it. The fuel column is the one figure that does not depend on how the car was bought.</p>
+  </section>
+
+  <section id="missing">
+    <h2>What is not in these numbers</h2>
+    <ol class="method">
+      <li><strong>Insurance.</strong> Not published by the sources used here. The CAA calculator asks the driver to enter their own premium, and the CRA per-kilometre rate folds insurance in - so no insurance number appears anywhere on this page rather than a guess.</li>
+      <li><strong>The price of the vehicle.</strong> An e-bike, a car and a transit pass are bought very differently. This page compares what it costs to keep moving, not what it costs to acquire.</li>
+      <li><strong>Charger losses and battery wear.</strong> No maker here publishes charger efficiency or a battery-degradation curve, so neither is modelled.</li>
+      <li><strong>The maker's claimed range is optimistic.</strong> The e-bike energy figures use it, which makes them the lowest honest estimate - a floor, not a measured result.</li>
+      <li><strong>Transit is not distance-matched.</strong> A pass is unlimited travel, so it is compared as an annual bill rather than per kilometre. Each city's single fare is in the sources below.</li>
+      <li><strong>One rate, two tiers.</strong> The CRA figure uses the first-5,000-km rate and the rate after it; a longer year averages lower, a shorter one higher.</li>
+    </ol>
+  </section>
+
+  <section id="sources">
+    <h2>Every figure and where it comes from</h2>
+    <p class="sub">Every number on this page traces to one of these, each read on the date shown. Where a figure does not exist, it is admitted above rather than filled in. Read 2026-10-09.</p>
+    <ul class="sources"><li><strong>CAA Driving Costs Calculator</strong> — carcosts.caa.ca, the per-province results for the 2025 Nissan Sentra (mainstream gas passenger car) at 12,500 km a year (55% city, 45% highway). Gives the fuel cost per year, the fuel price ($/L) and the electricity price ($/kWh) for each province. Read 2026-10-09. Source pages: <a href="https://carcosts.caa.ca/results/ontario/passenger_mainstream/ice" target="_blank" rel="noopener nofollow">Ontario</a> · <a href="https://carcosts.caa.ca/results/quebec/passenger_mainstream/ice" target="_blank" rel="noopener nofollow">Quebec</a> · <a href="https://carcosts.caa.ca/results/british-columbia/passenger_mainstream/ice" target="_blank" rel="noopener nofollow">British Columbia</a> · <a href="https://carcosts.caa.ca/results/alberta/passenger_mainstream/ice" target="_blank" rel="noopener nofollow">Alberta</a> · <a href="https://carcosts.caa.ca/results/manitoba/passenger_mainstream/ice" target="_blank" rel="noopener nofollow">Manitoba</a></li>
+        <li><strong>Canada Revenue Agency</strong>, “Motor vehicle provided by the employer” — the 2026 reasonable per-kilometre rate: $0.73 for the first 5,000 km and $0.67 after (provinces; the territories add four cents). Read 2026-10-09. <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/benefits-allowances/automobile/automobile-motor-vehicle-allowances/reasonable-kilometre-allowance.html" target="_blank" rel="noopener nofollow">canada.ca</a></li>
+        <li><strong>E-bike energy</strong> — this site's own <a href="../data/products.json">data/products.json</a>: each model's published battery capacity (Wh) and the maker's own claimed range, both read from the maker's product page (checked 2026-10-08). Wh/km and the yearly kWh are this page's arithmetic on those two figures.</li>
+        <li><strong>Toronto</strong> — TTC, Ontario. The TTC discontinued its adult monthly pass on 31 August 2026; pay-as-you-go fares are now capped after 47 paid trips in a calendar month, and the adult 12-month pass is CA$143.00 a month. Read 2026-10-09. <a href="https://www.ttc.ca/Fares-and-passes" target="_blank" rel="noopener nofollow">TTC fares</a></li>
+        <li><strong>Ottawa</strong> — OC Transpo, Ontario. OC Transpo caps a month of fares at the price of an adult monthly pass, CA$138.50. Read 2026-10-09. <a href="https://www.octranspo.com/en/fares/" target="_blank" rel="noopener nofollow">OC Transpo fares</a></li>
+        <li><strong>Montreal</strong> — STM, Quebec. The STM&#x27;s Monthly, All Modes A pass is CA$110.00; a single All modes A trip is CA$3.75. Read 2026-10-09. <a href="https://stm.info/en/info/fares/transit-fares/monthly-all-modes" target="_blank" rel="noopener nofollow">STM fares</a></li>
+        <li><strong>Calgary</strong> — Calgary Transit, Alberta. Calgary Transit&#x27;s 2026 adult fares: CA$4.00 single, CA$126.00 adult monthly pass. Read 2026-10-09. <a href="https://www.calgarytransit.com/fares---passes.html" target="_blank" rel="noopener nofollow">Calgary Transit fares</a></li>
+        <li><strong>Edmonton</strong> — ETS, Alberta. Edmonton&#x27;s ETS charges CA$3.00 for a 90-minute adult Arc trip and caps a month of adult Arc fares at CA$102. Read 2026-10-09. <a href="https://www.edmonton.ca/ets/fares-passes" target="_blank" rel="noopener nofollow">ETS fares</a></li>
+        <li><strong>Vancouver</strong> — TransLink, British Columbia. TransLink&#x27;s adult 1-zone monthly pass is CA$117.20; a 1-zone stored-value single fare is CA$2.85. Read 2026-10-09. <a href="https://www.translink.ca/transit-fares/pricing-and-fare-zones" target="_blank" rel="noopener nofollow">TransLink fares</a></li>
+        <li><strong>Winnipeg</strong> — Winnipeg Transit, Manitoba. Winnipeg Transit&#x27;s 2026 fares: CA$3.10 full fare on e-cash, CA$119.35 monthly e-pass. Read 2026-10-09. <a href="https://winnipegtransit.com/fares" target="_blank" rel="noopener nofollow">Winnipeg Transit fares</a></li></ul>
+    <p class="note mtb">Claimed range is the maker&#x27;s own estimate. Transit fares are set by each agency and change most years; the CRA rate is set annually and may differ after the year shown. Prices were read on the dates above and may since have moved. This page is general cost information, not financial or tax advice.</p>
+  </section>
+
+  <section id="next">
+    <h2>Read the rest</h2>
+    <ul class="otherbikes">
+      <li><a href="../">All seven commuter e-bikes, compared side by side</a></li>
+      <li><a href="../guide/">The free decision guide</a></li>
+      <li><a href="../how-far/">How far will it go? Range against your commute</a></li>
+      <li><a href="../stats/">Page views on this site &mdash; the counts, read live</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Disclosure:</strong> this page has no live affiliate links and nothing to buy. It carries no partner link and no commission, and every source is a public one, named in full below.</p>
+  <p>This is general cost information, not financial or tax advice, and not advice about your particular riding, health or local by-laws. Check your province's e-bike rules before buying.</p>
+  <p>Built 2026-10-08 by the GAMMA project. Sources: the CAA Driving Costs Calculator, the Canada Revenue Agency, and each city's own transit agency &mdash; all named above. Data: <a href="../data/products.json">products.json</a> &middot; <a href="../">the comparison</a>.</p>
+</div></footer>
+<script>
+/* Page-view count. One anonymous increment, read back on the stats page. */
+(function(){
+  try{
+    fetch("https://abacus.jasoncameron.dev/hit/maxhemmerich.github.io/canada-ebike-compare-commute-costs", {mode:"no-cors", cache:"no-store", credentials:"omit",
+      referrerPolicy:"no-referrer", keepalive:true});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
