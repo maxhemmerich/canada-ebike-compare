@@ -158,6 +158,12 @@ assert len(set(MODEL_SLUG.values())) == len(ORDER), \
 
 # Ordered: this order is the page order and the sitemap order.
 PAIRS = [
+    ("velotric-tempo", "velotric-discover-3"),    # "Tempo vs Discover 3" - the two Velotric city bikes, and the
+                                                  # ONLY pair here where both bikes sit behind one affiliate
+                                                  # constant (`AFFILIATE_VELOTRIC_TEMPO` and
+                                                  # `AFFILIATE_VELOTRIC_DISCOVER_3` are the same program), so it is
+                                                  # the page a Velotric approval pays on first. Ranked first for
+                                                  # that reason alone; the page itself claims nothing a reader sees.
     ("velotric-discover-3", "surface604-rook"),   # "Discover 3 vs Rook" - the two CA$2,699 commuters
     ("velotric-tempo", "radkick-7speed"),         # "Tempo vs RadKick 7-Speed" - the two lightest here
     ("aventon-soltera-2-5", "velotric-tempo"),    # "Soltera 2.5 vs Tempo" - the two light, cheap city bikes
@@ -1313,6 +1319,72 @@ def vs_page(a, b):
 
 for _pa, _pb in PAIRS:
     vs_page(_pa, _pb)
+
+# ---- the pair pages are read back and checked, before sitemap.xml is written
+# A vs page is the one page here that could quietly become a paid surface, because it names two products from
+# one maker. It must stay a reader's page: nothing on it may load config.js, carry an affiliate element, or
+# assert a tracking attribute with scripts stripped - and no figure may reach it that the catalogue does not
+# supply. All three are asserted below, per page, from the file on disk.
+_tmpl_probe = re.sub(r"(?s)<(style|script).*?</\1>", " ", VS_PAGE)
+_tmpl_probe = re.sub(r"(?s)<[^>]+>", " ", _tmpl_probe)
+_tmpl_probe = re.sub(r"__[A-Z_0-9]*__", "", _tmpl_probe)
+assert not re.search(r"\d", _tmpl_probe), \
+    "a figure is typed into the head-to-head template instead of being substituted"
+
+# The token rule for the figure gate below: a number with its thousands separators and decimals, and
+# without the sentence punctuation that would otherwise ride along on the end of it.
+_NUM_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+for _a, _b in PAIRS:
+    _pslug = pair_slug(_a, _b)
+    _file = os.path.join(ROOT, "vs", _pslug, "index.html")
+    _text = open(_file, encoding="utf-8").read()
+
+    # 1. nothing here can pay, and it says nothing about the status of any program. The Impact
+    #    `impact-site-verification` meta every page already carries is deliberately NOT in this list: it is a
+    #    static domain-ownership token the network reads once, not a per-visitor or per-click tracker, it is on
+    #    all 19 pages and is not this build's to move. What would actually turn this page into a paid surface -
+    #    a config.js load, an AFFILIATE_ constant, a data-aff hook, a buy button - is asserted absent.
+    for _bad in ("config.js", "AFFILIATE_", "data-aff", 'class="buyaff"', "affMap",
+                 "rel=\"sponsored\""):
+        assert _bad not in _text, "%s carries an affiliate element: %r" % (_file, _bad)
+
+    # 2. and with every <script> stripped, the markup asserts no tracking attribute at all.
+    _noscript = re.sub(r"(?s)<script.*?</script>", " ", _text)
+    assert not re.search(r'rel="[^"]*sponsored', _noscript), \
+        "%s: sponsored rel asserted on the markup with scripts stripped" % _file
+    assert not re.search(r'data-[a-z-]*(aff|track|affiliate)[a-z-]*\s*=', _noscript), \
+        "%s: a tracking attribute is asserted on the markup with scripts stripped" % _file
+
+    # 3. its own head.
+    assert '<link rel="canonical" href="%s/vs/%s/">' % (SITE, _pslug) in _text, \
+        "%s has no canonical of its own" % _file
+    for _head in ('<title>', 'name="description"'):
+        assert _head in _text, "%s is missing %s" % (_file, _head)
+
+    # 4. every figure on the page is one the catalogue supplies; nothing was typed for this pair. The
+    #    allowed set spans the whole catalogue, not just this pair: the page's own cross-links name the
+    #    other models ("RadKick 7-Speed", "Soltera 2.5", "Surface 604") and their figures are not on it.
+    _allowed = set()
+    for _q in PRODUCTS:
+        for _v in _q.values():
+            _allowed |= {t.rstrip(",.") for t in _NUM_RE.findall(str(_v))}
+    _allowed |= {t.rstrip(",.") for t in _NUM_RE.findall(CHECKED)}
+    _body = re.sub(r"(?s)<(style|script).*?</\1>", " ", _text.split("<body>", 1)[1])
+    _body = html.unescape(re.sub(r"(?s)<[^>]+>", " ", _body))
+    _nums = {t.rstrip(",.") for t in _NUM_RE.findall(_body)}
+    assert _nums <= _allowed, \
+        "%s: number with no published source in data/products.json: %r" % (_file, sorted(_nums - _allowed))
+
+    # 5. and it is reachable: the landing page and both models' own pages link it.
+    assert 'href="vs/%s/"' % _pslug in open(os.path.join(ROOT, "index.html"), encoding="utf-8").read(), \
+        "the landing page does not link vs/%s/" % _pslug
+    for _q in (_a, _b):
+        _bp = open(os.path.join(ROOT, "bikes", _q, "index.html"), encoding="utf-8").read()
+        assert 'href="../../vs/%s/"' % _pslug in _bp, \
+            "bikes/%s/ does not link vs/%s/" % (_q, _pslug)
+print("head-to-head pages: %d, every one read back - no affiliate element, no typed figure, "
+      "linked from the landing page and from both models' pages" % len(PAIRS))
 
 # ================================================================ "what a commute costs" (the linkable asset)
 # The one page on this site a third party would cite: what it actually costs, per year, to move a
@@ -3801,8 +3873,11 @@ for _path, _label in METRIC_PAGES:
     _title = _og_title_of(_text)
     _desc_m = re.search(r'<meta name="description" content="(.*?)">', _text, re.S)
     _canon_m = re.search(r'<link rel="canonical" href="(.*?)">', _text)
+    # The description is read out of an attribute, so it is already HTML-escaped; unescape it first, the
+    # same way _og_title_of does for the title, or esc() below escapes the escapes and a share card
+    # shows a reader "maker&#x27;s" instead of "maker's".
     assert _desc_m, "%s: no description to build a social card from" % _file
-    _desc = _desc_m.group(1)
+    _desc = html.unescape(_desc_m.group(1))
     _canon = _canon_m.group(1) if _canon_m else ("%s/%s" % (SITE, (_path + "/") if _path else ""))
     _add = []
     for _tag, _want in (('property="og:type"', '<meta property="og:type" content="article">'),
@@ -3844,6 +3919,10 @@ for _path, _label in METRIC_PAGES:
                   'name="twitter:card"', 'name="twitter:title"', 'name="twitter:description"',
                   'name="twitter:image"'):
         assert _need in _text, "%s is missing %s after the share-card pass" % (_file, _need)
+    # Reused markup must not be escaped twice: a share card that shows "&amp;#x27;" to a reader is the
+    # failure this guards, and it is invisible in a browser.
+    assert not re.search(r'content="[^"]*&amp;(amp|lt|gt|quot|#x?[0-9a-fA-F]+);', _text), \
+        "%s: a share-card attribute is double-escaped" % _file
     _png = OG_BY_PAGE[_path]
     _raw = open(_png, "rb").read()
     assert _raw[:8] == b"\x89PNG\r\n\x1a\n", "%s is not a PNG" % _png
