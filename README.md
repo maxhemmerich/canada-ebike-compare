@@ -140,8 +140,16 @@ and the PDF carry the same figures). The pages are plain HTML/CSS/JS.
   the counts, with its own title, description and canonical URL. Linked from the comparison page footer
 - `guide/index.html` — generated; the decision guide as an indexable page, from the same source as the
   PDF, with its own title, description, canonical URL and social card, and no affiliate element
-- `sitemap.xml` — generated; the fifteen indexable URLs (the comparison, the seven bikes, the range
-  picker, the decision guide, `stats/` and the four head-to-head pages)
+- `sitemap.xml` — generated; the twenty indexable URLs (the comparison, the seven bikes, the range
+  picker, the decision guide, `commute-costs/`, `gear/`, `rules/`, `trails/`, `stats/` and the five
+  head-to-head pages)
+- `commute-costs/index.html` — generated; what a commute costs per year by e-bike, car and transit, in
+  seven cities, every figure substituted from a named source
+- `gear/index.html`, `rules/index.html`, `trails/index.html` — generated; gear checklists and each
+  bike's load rating, the Canadian class and province rules, and the land managers' own trail rules.
+  Each quotes a named authority's own words and carries no affiliate element of any kind
+- `feed.xml` — generated; an RSS 2.0 status feed, one item per model with its price and availability
+- `og/*.png` — generated; one 1200×630 social card per page, drawn from that page's own title
 - `indexnow.py` + `indexnow.key` + `<key>.txt` — the sitemap-submission script, its key, and the
   hosted key file IndexNow verifies
 - `robots.txt` — generated; note it is ignored by crawlers here, because this site sits on a
@@ -149,6 +157,11 @@ and the PDF carry the same figures). The pages are plain HTML/CSS/JS.
 - `config.js` — affiliate placeholder constants + the on-page disclosure text
 - `data/products.json` — the sourced dataset (single source of truth)
 - `build.py` — generator
+- `linkgate.py` — the link gate `build.py` runs last. It reads every generated page back off disk and
+  resolves every reference the page carries against the tree — literal `href`/`src`, every `srcset`
+  candidate, the `og:image`/`twitter:image` share card, `<link rel="canonical">` (which must name the
+  page it sits on), and every `url`/`@id` inside a JSON data block — and stops the build on any that
+  does not land. Run it on its own against any tree: `py -3.10 linkgate.py <root> <site-url>`
 - `guide/canada-commuter-ebike-guide.pdf` — the decision guide (5 pages)
 
 The per-model pages offer a partner button **only** when that bike's constant in `config.js` holds a
